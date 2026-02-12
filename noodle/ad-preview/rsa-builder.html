@@ -6,170 +6,151 @@
 <title>Medley — RSA Builder</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; min-height: 100vh; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; color: #2c2c2c; min-height: 100vh; line-height: 1.5; }
 
-  .layout { display: grid; grid-template-columns: 1fr 380px; min-height: 100vh; }
+  /* Top bar */
+  .topbar { position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid #e8e8e8; padding: 12px 24px; display: flex; align-items: center; gap: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .topbar h1 { font-size: 16px; font-weight: 700; color: #333; white-space: nowrap; }
 
-  /* Left panel */
-  .builder { padding: 24px 28px 120px; overflow-y: auto; max-height: 100vh; }
-  h1 { font-size: 20px; margin-bottom: 2px; }
-  .intro { font-size: 13px; color: #666; margin-bottom: 16px; line-height: 1.5; }
+  .counter-group { display: flex; gap: 16px; flex: 1; }
+  .counter-pill { display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+  .counter-pill.good { background: #e8f5e9; color: #2e7d32; }
+  .counter-pill.warn { background: #fff8e1; color: #f57f17; }
+  .counter-pill.over { background: #fce4ec; color: #c62828; }
+  .counter-pill .num { font-size: 18px; font-weight: 800; }
 
-  /* Global counter */
-  .counter { display: flex; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e5e5e5; margin-bottom: 20px; }
-  .counter-item { display: flex; align-items: center; gap: 8px; }
-  .counter-num { font-size: 22px; font-weight: 700; }
-  .counter-num.good { color: #137333; }
-  .counter-num.over { color: #d93025; }
-  .counter-num.under { color: #f9ab00; }
-  .counter-label { font-size: 12px; color: #666; }
-  .counter-target { font-size: 11px; color: #999; }
-  .counter-bar { flex: 1; }
-  .counter-fill { height: 4px; background: #e5e5e5; border-radius: 2px; overflow: hidden; margin-top: 4px; }
-  .counter-fill-inner { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+  /* Sample preview - top right */
+  .sample-preview { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; max-width: 320px; min-width: 280px; cursor: pointer; transition: box-shadow 0.2s; flex-shrink: 0; }
+  .sample-preview:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .sample-preview .sp-label { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .sample-preview .sp-h { font-size: 14px; color: #1a0dab; line-height: 1.3; }
+  .sample-preview .sp-u { font-size: 11px; color: #006621; margin: 2px 0; }
+  .sample-preview .sp-u .badge { font-size: 9px; font-weight: bold; color: #006621; border: 1px solid #006621; border-radius: 2px; padding: 0 2px; margin-right: 2px; }
+  .sample-preview .sp-d { font-size: 11px; color: #4d5156; line-height: 1.4; }
 
-  /* Category */
-  .cat-header { display: flex; align-items: center; gap: 8px; margin: 20px 0 6px; }
-  .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; flex: 1; }
-  .cat-count { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
-  .cat-count.good { background: #e6f4ea; color: #137333; }
-  .cat-count.over { background: #fce8e6; color: #d93025; }
-  .cat-count.under { background: #fef7e0; color: #b06000; }
-  .cat-target { font-size: 11px; color: #bbb; }
-  .section-type { font-size: 14px; color: #1a73e8; font-weight: 600; margin: 24px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .section-note { font-size: 12px; color: #999; margin-bottom: 8px; }
+  /* Main content */
+  .main { max-width: 800px; margin: 0 auto; padding: 24px 24px 100px; }
 
-  /* Item rows */
-  .item { display: flex; align-items: center; gap: 5px; padding: 5px 4px; border-radius: 6px; transition: all 0.15s; cursor: default; }
-  .item:hover { background: #f8f9fa; }
-  .item.selected { background: #e6f4ea; }
-  .item.bench { opacity: 0.45; }
-  .item.dragging { opacity: 0.3; }
-  .item.drag-over { border-top: 2px solid #1a73e8; }
+  .section-head { font-size: 13px; font-weight: 700; color: #1a73e8; text-transform: uppercase; letter-spacing: 0.8px; margin: 32px 0 6px; display: flex; align-items: center; gap: 8px; }
+  .section-head:first-child { margin-top: 8px; }
+  .section-head .target { font-size: 11px; color: #999; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .section-note { font-size: 12px; color: #888; margin-bottom: 12px; padding: 8px 12px; background: #f5f7ff; border-radius: 6px; border-left: 3px solid #c5cae9; }
 
-  .drag-handle { cursor: grab; color: #ccc; font-size: 14px; padding: 0 2px; user-select: none; flex-shrink: 0; }
+  .cat-header { display: flex; align-items: center; gap: 8px; margin: 18px 0 4px; padding: 0 4px; }
+  .cat-header h3 { font-size: 11px; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; flex: 1; }
+  .cat-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .cat-badge.good { background: #e8f5e9; color: #2e7d32; }
+  .cat-badge.over { background: #fff8e1; color: #f57f17; }
+  .cat-badge.under { background: #f5f5f5; color: #999; }
+
+  /* Items */
+  .item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 8px; margin: 2px 0; transition: all 0.15s; background: #fff; border: 1px solid transparent; }
+  .item:hover { border-color: #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .item.kept { background: #f1f8f1; border-color: #c8e6c9; }
+  .item.kept.excess { background: #fffde7; border-color: #fff176; }
+  .item.cut { opacity: 0.4; background: #fafafa; }
+  .item.dragging { opacity: 0.2; }
+  .item.drag-over { box-shadow: 0 -2px 0 0 #1a73e8; }
+
+  .drag-handle { cursor: grab; color: #ddd; font-size: 11px; padding: 0 2px; user-select: none; flex-shrink: 0; letter-spacing: -1px; }
   .drag-handle:active { cursor: grabbing; }
-  .item:hover .drag-handle { color: #999; }
+  .item:hover .drag-handle { color: #aaa; }
 
-  .rank { width: 20px; font-size: 11px; font-weight: 700; color: #bbb; text-align: center; flex-shrink: 0; }
-  .item.selected .rank { color: #137333; }
+  .rank-num { width: 18px; font-size: 10px; font-weight: 700; color: #bbb; text-align: center; flex-shrink: 0; }
+  .item.kept .rank-num { color: #66bb6a; }
+  .item.kept.excess .rank-num { color: #f9a825; }
 
-  .sel-btn { width: 26px; height: 26px; border: 1px solid #dadce0; background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
-  .sel-btn:hover { background: #f0f0f0; }
-  .sel-btn.on { background: #e6f4ea; border-color: #34a853; color: #137333; }
+  .toggle-btn { width: 28px; height: 28px; border: 1.5px solid #e0e0e0; background: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+  .toggle-btn:hover { background: #f5f5f5; }
+  .toggle-btn.on { background: #e8f5e9; border-color: #66bb6a; color: #2e7d32; }
 
-  .item-text { flex: 1; font-size: 14px; padding: 2px 4px; border-radius: 3px; outline: none; }
-  .item-text:focus { background: #eef1ff; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
-  .item-meta { font-size: 10px; color: #bbb; flex-shrink: 0; }
-  .item-meta.over { color: #d93025; font-weight: bold; }
-  .item-meta.sweet { color: #137333; }
+  .item-text { flex: 1; font-size: 14px; padding: 2px 6px; border-radius: 4px; outline: none; }
+  .item-text:focus { background: #e8eaf6; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
+  .item.cut .item-text { text-decoration: line-through; color: #aaa; }
 
-  .cut-line { border-top: 2px dashed #d93025; margin: 4px 0; position: relative; }
-  .cut-line::after { content: "bench"; position: absolute; right: 0; top: -8px; font-size: 9px; color: #d93025; text-transform: uppercase; letter-spacing: 0.5px; background: #fff; padding: 0 4px; }
+  .item-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .char-count { font-size: 10px; color: #ccc; font-weight: 500; }
+  .char-count.over { color: #e53935; font-weight: 700; }
+  .char-count.sweet { color: #43a047; font-weight: 600; }
+  .rec-badge { font-size: 8px; font-weight: 800; color: #1a73e8; background: #e3f2fd; padding: 1px 5px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .cut-reason { font-size: 10px; color: #bbb; font-style: italic; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* Right panel */
-  .rsa-panel { background: #f8f9fa; border-left: 1px solid #e5e5e5; padding: 24px 20px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
-  .rsa-panel h3 { font-size: 14px; color: #1a73e8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .rsa-panel .sub { font-size: 12px; color: #999; margin-bottom: 16px; }
-
-  .rsa-section { margin-bottom: 20px; }
-  .rsa-section h4 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
-  .rsa-item { font-size: 13px; padding: 3px 0; color: #333; border-bottom: 1px solid #eee; }
-  .rsa-item .rn { color: #bbb; font-size: 11px; margin-right: 4px; }
-  .rsa-empty { font-size: 12px; color: #ccc; font-style: italic; }
-
-  .preview-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-  .pv-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
-  .pv-h { font-size: 15px; color: #1a0dab; line-height: 1.3; margin-bottom: 2px; }
-  .pv-u { font-size: 12px; color: #006621; margin-bottom: 3px; }
-  .pv-u .badge { font-size: 10px; font-weight: bold; color: #006621; border: 1px solid #006621; border-radius: 2px; padding: 0 3px; margin-right: 3px; }
-  .pv-d { font-size: 12px; color: #4d5156; line-height: 1.4; }
-
-  .ready-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
-  .ready-badge.yes { background: #e6f4ea; color: #137333; }
-  .ready-badge.no { background: #fef7e0; color: #b06000; }
-
-  .shuffle-btn { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
-  .shuffle-btn:hover { background: #1557b0; }
+  /* Cut line */
+  .cut-line { display: flex; align-items: center; gap: 8px; margin: 6px 8px; }
+  .cut-line-bar { flex: 1; height: 1px; border-top: 2px dashed #f9a825; }
+  .cut-line-label { font-size: 9px; color: #f9a825; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* Export bar */
-  .export-bar { position: fixed; bottom: 0; left: 0; right: 380px; background: #fff; border-top: 1px solid #e5e5e5; padding: 10px 28px; display: flex; gap: 12px; align-items: center; }
-  .export-bar button { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .export-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e8e8e8; padding: 10px 24px; display: flex; gap: 12px; align-items: center; justify-content: center; box-shadow: 0 -1px 4px rgba(0,0,0,0.04); }
+  .export-bar button { background: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
   .export-bar button:hover { background: #1557b0; }
   .export-bar button.sec { background: transparent; color: #1a73e8; border: 1px solid #dadce0; }
-  .export-bar .stat { font-size: 12px; color: #999; flex: 1; }
+  .export-bar .stat { font-size: 12px; color: #999; }
 
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; }
+  /* Overlay */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; align-items: center; justify-content: center; }
   .overlay.open { display: flex; }
-  .overlay-box { background: #fff; border-radius: 12px; max-width: 640px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; }
-  .overlay-header { position: sticky; top: 0; background: #fff; padding: 16px 24px 10px; border-bottom: 1px solid #e5e5e5; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 12px; }
-  .overlay-header h3 { font-size: 16px; flex: 1; }
-  .overlay-header button { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
-  .overlay-header button.close-btn { background: #666; }
+  .overlay-box { background: #fff; border-radius: 14px; max-width: 640px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .overlay-header { position: sticky; top: 0; background: #fff; padding: 16px 24px 12px; border-bottom: 1px solid #eee; border-radius: 14px 14px 0 0; display: flex; align-items: center; gap: 12px; }
+  .overlay-header h3 { font-size: 16px; font-weight: 700; flex: 1; }
+  .overlay-header button { background: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .overlay-header button.close-btn { background: #888; }
   .overlay-body { padding: 16px 24px 24px; overflow-y: auto; flex: 1; }
   .overlay-body pre { background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 13px; white-space: pre-wrap; line-height: 1.6; }
-
-  @media (max-width: 900px) {
-    .layout { grid-template-columns: 1fr; }
-    .rsa-panel { position: relative; max-height: none; border-left: none; border-top: 1px solid #e5e5e5; }
-    .export-bar { right: 0; }
-  }
 </style>
 </head>
 <body>
 
-<div class="layout">
-
-<div class="builder">
+<div class="topbar">
   <h1>Medley RSA Builder</h1>
-  <p class="intro">Build your Google Responsive Search Ad. Pick <b>15 headlines</b> and <b>4 descriptions</b>. Google will mix 3 headlines + 2 descriptions per impression. Drag to reorder priority. Click to select/deselect.</p>
+  <div class="counter-group">
+    <div class="counter-pill" id="hCounter"><span class="num" id="hNum">0</span>&nbsp;/ 15 headlines</div>
+    <div class="counter-pill" id="dCounter"><span class="num" id="dNum">0</span>&nbsp;/ 4 descriptions</div>
+  </div>
+  <div class="sample-preview" id="samplePreview" onclick="refreshSample()">
+    <div class="sp-label">Sample combo (click to shuffle)</div>
+    <div class="sp-h" id="spH">Select items to preview</div>
+    <div class="sp-u"><span class="badge">Ad</span> www.music-access.com</div>
+    <div class="sp-d" id="spD"></div>
+  </div>
+</div>
 
-  <div class="counter" id="counter"></div>
+<div class="main">
 
-  <div class="section-type">Headlines <span style="font-weight:400;color:#999;font-size:11px;">max 30 chars · pick 15</span></div>
+  <div class="section-head">Headlines <span class="target">pick 15 &middot; max 30 chars each</span></div>
+  <div class="section-note">Google picks 3 per impression. You want variety so any random 3 work together. <b>Keep = in your RSA. Cut = bench.</b></div>
 
-  <div class="cat-header"><h3>The Gap — hooks that stop the scroll</h3><span class="cat-target">pick 3</span><span class="cat-count" id="cc-gap"></span></div>
+  <div class="cat-header"><h3>The Gap &mdash; stops the scroll</h3><span class="cat-badge" id="cb-gap"></span></div>
   <div id="s-gap"></div>
 
-  <div class="cat-header"><h3>The Promise — what they get</h3><span class="cat-target">pick 3</span><span class="cat-count" id="cc-promise"></span></div>
+  <div class="cat-header"><h3>The Promise &mdash; what they get</h3><span class="cat-badge" id="cb-promise"></span></div>
   <div id="s-promise"></div>
 
-  <div class="cat-header"><h3>Credibility — why Medley</h3><span class="cat-target">pick 3</span><span class="cat-count" id="cc-cred"></span></div>
+  <div class="cat-header"><h3>Credibility &mdash; why Medley</h3><span class="cat-badge" id="cb-cred"></span></div>
   <div id="s-cred"></div>
 
-  <div class="cat-header"><h3>Audience — who it's for</h3><span class="cat-target">pick 3</span><span class="cat-count" id="cc-aud"></span></div>
+  <div class="cat-header"><h3>Audience &mdash; who it's for</h3><span class="cat-badge" id="cb-aud"></span></div>
   <div id="s-aud"></div>
 
-  <div class="cat-header"><h3>Format & Keywords</h3><span class="cat-target">pick 3</span><span class="cat-count" id="cc-cta"></span></div>
-  <div id="s-cta"></div>
+  <div class="cat-header"><h3>Keywords &mdash; helps Google match searches</h3><span class="cat-badge" id="cb-kw"></span></div>
+  <div id="s-kw"></div>
 
-  <div class="section-type" style="margin-top:32px;">Descriptions <span style="font-weight:400;color:#999;font-size:11px;">max 90 chars · pick 4 · shorter = better</span></div>
-  <div class="section-note">Two show together. Shorter catches eyes. Green = sweet spot (40-65 chars).</div>
+  <div class="section-head" style="margin-top:36px;">Descriptions <span class="target">pick 4 &middot; max 90 chars &middot; sweet spot 40&ndash;65</span></div>
+  <div class="section-note">Two show together per impression. Shorter catches eyes. <span style="color:#43a047;font-weight:600;">Green</span> char count = sweet spot.</div>
 
-  <div class="cat-header"><h3>For Teachers</h3><span class="cat-target">pick 2</span><span class="cat-count" id="cc-dt"></span></div>
+  <div class="cat-header"><h3>For Teachers</h3><span class="cat-badge" id="cb-dt"></span></div>
   <div id="s-dt"></div>
 
-  <div class="cat-header"><h3>For Admins</h3><span class="cat-target">pick 1</span><span class="cat-count" id="cc-da"></span></div>
+  <div class="cat-header"><h3>For Admins</h3><span class="cat-badge" id="cb-da"></span></div>
   <div id="s-da"></div>
 
-  <div class="cat-header"><h3>Universal</h3><span class="cat-target">pick 1</span><span class="cat-count" id="cc-du"></span></div>
+  <div class="cat-header"><h3>Universal</h3><span class="cat-badge" id="cb-du"></span></div>
   <div id="s-du"></div>
 </div>
 
-<!-- Right panel: Your RSA -->
-<div class="rsa-panel">
-  <h3>Your RSA</h3>
-  <p class="sub">What goes into Google Ads</p>
-  <div id="readyBadge"></div>
-  <div id="rsaSummary"></div>
-  <button class="shuffle-btn" onclick="renderPreviews()">Shuffle Preview</button>
-  <div id="previews"></div>
-</div>
-
-</div>
-
 <div class="export-bar">
-  <span class="stat" id="barStats"></span>
+  <span class="stat" id="barStat"></span>
+  <button class="sec" onclick="window.open('copy-worksheet.html','_blank')">Copy Workshop</button>
   <button class="sec" onclick="window.open('index.html','_blank')">Visual Preview</button>
   <button onclick="showExport()">Export Final RSA</button>
 </div>
@@ -177,411 +158,298 @@
 <div class="overlay" id="overlay">
   <div class="overlay-box">
     <div class="overlay-header">
-      <h3>Your RSA — Ready for Google Ads</h3>
+      <h3>Your RSA</h3>
       <button onclick="copyExport()" id="copyBtn">Copy to Clipboard</button>
       <button class="close-btn" onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
     </div>
-    <div class="overlay-body">
-      <pre id="exportPre"></pre>
-    </div>
+    <div class="overlay-body"><pre id="exportPre"></pre></div>
   </div>
 </div>
 
 <script>
-const STORAGE_KEY = "medley-rsa-builder-v1";
-const H_TARGET = 15;
-const D_TARGET = 4;
-const DESC_SWEET = [40, 65];
+const STORE = "medley-rsa-v2";
+const H_MAX = 15, D_MAX = 4;
+const SWEET = [40, 65];
 
-function loadStore() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
-function saveStore(store) { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
+function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } }
+function save(d) { localStorage.setItem(STORE, JSON.stringify(d)); }
 function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50); }
+function pick(a,n) { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b.slice(0,n); }
 
-// ================================================
-// DATA — Pre-ranked by recommendation (best first)
-// Selected = in your RSA. Not selected = bench.
-// ================================================
+// ============================================================
+// DATA — Panel-informed recommendations. keep=true means REC.
+// cutReason for items recommended to cut.
+// ============================================================
 const cats = [
-  // HEADLINES
-  { id: "gap", type: "h", target: 3, countEl: "cc-gap", containerEl: "s-gap", max: 30, items: [
-    { t: "Your Degree Didn't Cover This", sel: true, note: "#1 scroll-stopper" },
-    { t: "Not Trained for This?", sel: true, note: "empathetic question" },
-    { t: "Nobody Prepared You for This", sel: true, note: "direct, bold" },
-    { t: "What Your Degree Missed", sel: false },
-    { t: "When Inclusion Feels Hard", sel: false },
-    { t: "Not Another Lecture", sel: false },
-    { t: "The PD You Actually Need", sel: false },
-    { t: "Finally, PD That Fits", sel: false },
-    { t: "The PD You Were Missing", sel: false },
+  { id:"gap", type:"h", target:3, badge:"cb-gap", el:"s-gap", max:30, items:[
+    { t:"Your Degree Didn't Cover This", keep:true, rec:true },
+    { t:"Not Trained for This?", keep:true, rec:true },
+    { t:"When Inclusion Feels Hard", keep:true, rec:true },
+    { t:"Nobody Prepared You for This", keep:false, cut:"Redundant with 'Your Degree Didn't Cover This'" },
+    { t:"What Your Degree Missed", keep:false, cut:"Softer version of same idea" },
+    { t:"Not Another Lecture", keep:false, cut:"Negative framing, no inclusion signal" },
+    { t:"The PD You Actually Need", keep:false, cut:"Covered by 'Strategies That Actually Work'" },
+    { t:"The PD You Were Missing", keep:false, cut:"Weaker hook than other gap headlines" },
+    { t:"Finally, PD That Fits", keep:false, cut:"Vague \u2014 doesn't signal music or inclusion" },
   ]},
-  { id: "promise", type: "h", target: 3, countEl: "cc-promise", containerEl: "s-promise", max: 30, items: [
-    { t: "Tools for Monday Morning", sel: true, note: "concrete, practical" },
-    { t: "Strategies That Actually Work", sel: true, note: "addresses PD skepticism" },
-    { t: "Teach the Kids You Have", sel: true, note: "philosophy + practical" },
-    { t: "Feel Empowered to Teach", sel: false },
-    { t: "Every Kid, Every Ability", sel: false },
-    { t: "Hands-On Music PD", sel: false },
-    { t: "Make Monday Better", sel: false },
-    { t: "Reach Every Student", sel: false },
-    { t: "Music for ALL Learners", sel: false },
-    { t: "Monday Will Be Different", sel: false },
-    { t: "Ready for Next Monday", sel: false },
+  { id:"promise", type:"h", target:3, badge:"cb-promise", el:"s-promise", max:30, items:[
+    { t:"Tools for Monday Morning", keep:true, rec:true },
+    { t:"Strategies That Actually Work", keep:true, rec:true },
+    { t:"Teach the Kids You Have", keep:true, rec:true },
+    { t:"Feel Empowered to Teach", keep:false, cut:"Generic \u2014 could be any PD" },
+    { t:"Every Kid, Every Ability", keep:false, cut:"Overlaps with 'Teach the Kids You Have'" },
+    { t:"Hands-On Music PD", keep:false, cut:"Better as description language than headline" },
+    { t:"Make Monday Better", keep:false, cut:"Vague compared to 'Tools for Monday Morning'" },
+    { t:"Reach Every Student", keep:false, cut:"Generic education phrase" },
+    { t:"Music for ALL Learners", keep:false, cut:"Overlaps with other inclusive framing" },
+    { t:"Monday Will Be Different", keep:false, cut:"Weaker Monday variant" },
+    { t:"Ready for Next Monday", keep:false, cut:"Weakest Monday variant" },
   ]},
-  { id: "cred", type: "h", target: 3, countEl: "cc-cred", containerEl: "s-cred", max: 30, items: [
-    { t: "Real Teachers Not Consultants", sel: true, note: "strongest credibility" },
-    { t: "By Music Teachers", sel: true, note: "clean, simple" },
-    { t: "Humans, Not Curriculum", sel: true, note: "Jess's philosophy" },
-    { t: "Watch the Children", sel: false, note: "Jess's mantra" },
-    { t: "Teachers, Not Talking Heads", sel: false },
-    { t: "No Outsiders, Real Teachers", sel: false },
-    { t: "Kids First, Lessons Second", sel: false },
-    { t: "We See Kids, Not Labels", sel: false },
-    { t: "Made by Music Teachers", sel: false },
-    { t: "We're Music Teachers Too", sel: false },
+  { id:"cred", type:"h", target:3, badge:"cb-cred", el:"s-cred", max:30, items:[
+    { t:"Real Teachers Not Consultants", keep:true, rec:true },
+    { t:"By Music Teachers", keep:true, rec:true },
+    { t:"Humans, Not Curriculum", keep:true, rec:true, note:"Jess's philosophy" },
+    { t:"Watch the Children", keep:false, cut:"Too insider for cold search ads" },
+    { t:"Teachers, Not Talking Heads", keep:false, cut:"Same idea as 'Real Teachers Not Consultants'" },
+    { t:"No Outsiders, Real Teachers", keep:false, cut:"Same idea, less elegant" },
+    { t:"Kids First, Lessons Second", keep:false, cut:"Philosophical, not clearly about PD" },
+    { t:"We See Kids, Not Labels", keep:false, cut:"Great but insider \u2014 save for retargeting" },
+    { t:"Made by Music Teachers", keep:false, cut:"Redundant with 'By Music Teachers'" },
+    { t:"We're Music Teachers Too", keep:false, cut:"Redundant with 'By Music Teachers'" },
   ]},
-  { id: "aud", type: "h", target: 3, countEl: "cc-aud", containerEl: "s-aud", max: 30, items: [
-    { t: "For Music Teachers", sel: true, note: "clear teacher signal" },
-    { t: "Equip Your Music Teachers", sel: true, note: "admin action verb" },
-    { t: "Schools & Districts", sel: true, note: "admin signal" },
-    { t: "PD Teachers Actually Request", sel: false },
-    { t: "Train Your Music Dept", sel: false },
+  { id:"aud", type:"h", target:3, badge:"cb-aud", el:"s-aud", max:30, items:[
+    { t:"For Music Teachers", keep:true, rec:true },
+    { t:"Equip Your Music Teachers", keep:true, rec:true },
+    { t:"Schools & Districts", keep:true, rec:true },
+    { t:"PD Teachers Actually Request", keep:false, cut:"Long \u2014 works better as description" },
+    { t:"Train Your Music Dept", keep:false, cut:"Covered by 'Equip Your Music Teachers'" },
   ]},
-  { id: "cta", type: "h", target: 3, countEl: "cc-cta", containerEl: "s-cta", max: 30, items: [
-    { t: "Inclusive Music PD", sel: true, note: "keyword match" },
-    { t: "Adaptive Music Ed", sel: true, note: "keyword variation" },
-    { t: "Virtual & In-Person", sel: true, note: "format flexibility" },
-    { t: "See What We Offer", sel: false },
+  { id:"kw", type:"h", target:3, badge:"cb-kw", el:"s-kw", max:30, items:[
+    { t:"Inclusive Music PD", keep:true, rec:true },
+    { t:"Adaptive Music Ed", keep:true, rec:true },
+    { t:"Virtual & In-Person", keep:true, rec:true },
+    { t:"See What We Offer", keep:false, cut:"Generic \u2014 no keyword value" },
   ]},
 
-  // DESCRIPTIONS
-  { id: "dt", type: "d", target: 2, countEl: "cc-dt", containerEl: "s-dt", max: 90, items: [
-    { t: "We teach what your degree didn't. By music teachers.", sel: true, note: "52 — punchiest" },
-    { t: "You were trained for music, not disability. We bridge that gap.", sel: true, note: "62 — Jess's voice" },
-    { t: "Not theory. Hands-on skills your program skipped. Use them Monday.", sel: false },
-    { t: "The skills your program skipped. We'll get you there.", sel: false },
-    { t: "Stop feeling lost. Fellow music teachers show you what works.", sel: false },
-    { t: "Your degree covered the curriculum, not every learner. We cover the rest.", sel: false },
-    { t: "Weren't trained for this? We'll get you there. Practical inclusion PD.", sel: false },
-    { t: "Fill the gap your degree left. Real strategies for inclusive classrooms.", sel: false },
-    { t: "Bridge what your degree missed. Hands-on strategies that work.", sel: false },
-    { t: "Feel empowered to include every student. Monday will look different.", sel: false },
-    { t: "Your program left gaps. We fill them with practical strategies.", sel: false },
+  { id:"dt", type:"d", target:2, badge:"cb-dt", el:"s-dt", max:90, items:[
+    { t:"We teach what your degree didn't. By music teachers.", keep:true, rec:true, note:"52 chars" },
+    { t:"Not theory. Hands-on skills your program skipped. Use them Monday.", keep:true, rec:true, note:"66 chars" },
+    { t:"You were trained for music, not disability. We bridge that gap.", keep:false, cut:"Strong but redundant with #1" },
+    { t:"The skills your program skipped. We'll get you there.", keep:false, cut:"Less concrete than 'Use them Monday'" },
+    { t:"Stop feeling lost. Fellow music teachers show you what works.", keep:false, cut:"Emotional but lower keyword density" },
+    { t:"Your degree covered the curriculum, not every learner. We cover the rest.", keep:false, cut:"73 chars \u2014 too long for scanning" },
+    { t:"Weren't trained for this? We'll get you there. Practical inclusion PD.", keep:false, cut:"70 chars \u2014 echoes headlines" },
+    { t:"Fill the gap your degree left. Real strategies for inclusive classrooms.", keep:false, cut:"72 chars \u2014 running long" },
+    { t:"Bridge what your degree missed. Hands-on strategies that work.", keep:false, cut:"Redundant with keeps" },
+    { t:"Feel empowered to include every student. Monday will look different.", keep:false, cut:"Abstract empowerment language" },
+    { t:"Your program left gaps. We fill them with practical strategies.", keep:false, cut:"Generic \u2014 no unique angle" },
   ]},
-  { id: "da", type: "d", target: 1, countEl: "cc-da", containerEl: "s-da", max: 90, items: [
-    { t: "Your music teachers weren't trained for inclusion. We can help.", sel: true, note: "63 — direct" },
-    { t: "Your team needs this. PD by music teachers who get it.", sel: false },
-    { t: "PD teachers actually request. By music teachers, not outsiders.", sel: false },
-    { t: "Every child in your district deserves music. Equip your team.", sel: false },
-    { t: "Inclusion PD that fills the gap their programs left. We come to you.", sel: false },
+  { id:"da", type:"d", target:1, badge:"cb-da", el:"s-da", max:90, items:[
+    { t:"Your music teachers weren't trained for inclusion. We can help.", keep:true, rec:true, note:"63 chars" },
+    { t:"PD teachers actually request. By music teachers, not outsiders.", keep:false, cut:"Interesting but less direct for admin" },
+    { t:"Your team needs this. PD by music teachers who get it.", keep:false, cut:"Pushy tone \u2014 'needs this'" },
+    { t:"Every child in your district deserves music. Equip your team.", keep:false, cut:"Preachy \u2014 moralizing tone" },
+    { t:"Inclusion PD that fills the gap their programs left. We come to you.", keep:false, cut:"69 chars \u2014 feature-heavy" },
   ]},
-  { id: "du", type: "d", target: 1, countEl: "cc-du", containerEl: "s-du", max: 90, items: [
-    { t: "Inclusion PD by music teachers. Practical. Hands-on.", sel: true, note: "52 — staccato" },
-    { t: "Strategies you didn't learn in school. Virtual & in-person.", sel: false },
-    { t: "The training music teachers actually need. Inclusive, adaptive, hands-on.", sel: false },
-    { t: "Inclusion PD that fills the gap. By music teachers, for music teachers.", sel: false },
+  { id:"du", type:"d", target:1, badge:"cb-du", el:"s-du", max:90, items:[
+    { t:"Inclusion PD by music teachers. Practical. Hands-on.", keep:true, rec:true, note:"52 chars" },
+    { t:"Strategies you didn't learn in school. Virtual & in-person.", keep:false, cut:"Format-focused, less emotional" },
+    { t:"The training music teachers actually need. Inclusive, adaptive, hands-on.", keep:false, cut:"73 chars \u2014 keyword-stuffed" },
+    { t:"Inclusion PD that fills the gap. By music teachers, for music teachers.", keep:false, cut:"71 chars \u2014 redundant with keeps" },
   ]},
 ];
 
-// Generate IDs
-cats.forEach(cat => cat.items.forEach(item => { item.id = slug(item.t); }));
+// Init IDs
+cats.forEach(c => c.items.forEach(item => { item.id = slug(item.t); }));
 
-// Load persisted state
+// Persistence
 function applyStore() {
-  const store = loadStore();
-  // Restore selection and order
-  cats.forEach(cat => {
-    const saved = store[cat.id];
-    if (!saved) return;
-    // Restore selections
-    if (saved.sels) {
-      cat.items.forEach(item => {
-        if (saved.sels[item.id] !== undefined) item.sel = saved.sels[item.id];
-      });
+  const s = load();
+  cats.forEach(c => {
+    const d = s[c.id];
+    if (!d) return;
+    if (d.keeps) c.items.forEach(i => { if (d.keeps[i.id] !== undefined) i.keep = d.keeps[i.id]; });
+    if (d.order) {
+      const m = {}; d.order.forEach((id,idx) => m[id] = idx);
+      c.items.sort((a,b) => ((m[a.id] ?? 999) - (m[b.id] ?? 999)));
     }
-    // Restore order
-    if (saved.order) {
-      const orderMap = {};
-      saved.order.forEach((id, i) => orderMap[id] = i);
-      cat.items.sort((a, b) => {
-        const oa = orderMap[a.id] !== undefined ? orderMap[a.id] : 999;
-        const ob = orderMap[b.id] !== undefined ? orderMap[b.id] : 999;
-        return oa - ob;
-      });
-    }
-    // Restore edited text
-    if (saved.texts) {
-      cat.items.forEach(item => {
-        if (saved.texts[item.id]) item.t = saved.texts[item.id];
-      });
-    }
+    if (d.texts) c.items.forEach(i => { if (d.texts[i.id]) i.t = d.texts[i.id]; });
   });
 }
-
-function persistAll() {
-  const store = {};
-  cats.forEach(cat => {
-    store[cat.id] = {
-      sels: {},
-      order: cat.items.map(i => i.id),
-      texts: {},
-    };
-    cat.items.forEach(item => {
-      store[cat.id].sels[item.id] = item.sel;
-      store[cat.id].texts[item.id] = item.t;
-    });
+function persist() {
+  const s = {};
+  cats.forEach(c => {
+    s[c.id] = { keeps:{}, order:c.items.map(i=>i.id), texts:{} };
+    c.items.forEach(i => { s[c.id].keeps[i.id] = i.keep; s[c.id].texts[i.id] = i.t; });
   });
-  saveStore(store);
+  save(s);
 }
-
 applyStore();
 
-// ================================================
-// DRAG STATE
-// ================================================
-let dragCat = null;
-let dragIdx = null;
+// Drag state
+let dragCat=null, dragIdx=null;
 
-// ================================================
+// ============================================================
 // RENDER
-// ================================================
+// ============================================================
 function render() {
-  cats.forEach(cat => {
-    const container = document.getElementById(cat.containerEl);
-    container.innerHTML = "";
+  cats.forEach(c => {
+    const el = document.getElementById(c.el);
+    el.innerHTML = "";
+    const kept = c.items.filter(i => i.keep);
+    const cut = c.items.filter(i => !i.keep);
 
-    // Sort: selected first, then bench
-    const selected = cat.items.filter(i => i.sel);
-    const bench = cat.items.filter(i => !i.sel);
+    kept.forEach((item, i) => renderRow(el, item, i+1, c, true, i >= c.target));
 
-    // Render selected items
-    selected.forEach((item, i) => renderRow(container, item, i + 1, cat, true));
-
-    // Cut line if there are bench items
-    if (bench.length > 0 && selected.length > 0) {
+    if (cut.length && kept.length) {
       const line = document.createElement("div");
       line.className = "cut-line";
-      container.appendChild(line);
+      line.innerHTML = '<span class="cut-line-label">cut</span><div class="cut-line-bar"></div>';
+      el.appendChild(line);
     }
 
-    // Render bench
-    bench.forEach((item, i) => renderRow(container, item, selected.length + i + 1, cat, false));
+    cut.forEach((item, i) => renderRow(el, item, kept.length+i+1, c, false, false));
 
-    // Category count
-    const countEl = document.getElementById(cat.countEl);
-    const count = selected.length;
-    countEl.textContent = `${count}/${cat.target}`;
-    countEl.className = "cat-count " + (count === cat.target ? "good" : count > cat.target ? "over" : "under");
+    // Badge
+    const badge = document.getElementById(c.badge);
+    const n = kept.length;
+    badge.textContent = `${n}/${c.target}`;
+    badge.className = "cat-badge " + (n === c.target ? "good" : n > c.target ? "over" : "under");
   });
 
-  renderCounter();
-  renderRSA();
-  persistAll();
+  updateCounters();
+  refreshSample();
+  persist();
 }
 
-function renderRow(container, item, rank, cat, isSelected) {
+function renderRow(container, item, rank, cat, isKept, isExcess) {
   const row = document.createElement("div");
-  row.className = "item" + (isSelected ? " selected" : " bench");
+  row.className = "item" + (isKept ? " kept" : " cut") + (isExcess ? " excess" : "");
   row.draggable = true;
 
-  row.addEventListener("dragstart", e => {
-    dragCat = cat;
-    dragIdx = cat.items.indexOf(item);
-    row.classList.add("dragging");
-    e.dataTransfer.effectAllowed = "move";
-  });
-  row.addEventListener("dragend", () => { row.classList.remove("dragging"); });
-  row.addEventListener("dragover", e => {
-    e.preventDefault();
-    if (dragCat !== cat) return;
-    row.classList.add("drag-over");
-  });
-  row.addEventListener("dragleave", () => { row.classList.remove("drag-over"); });
+  row.addEventListener("dragstart", e => { dragCat=cat; dragIdx=cat.items.indexOf(item); row.classList.add("dragging"); e.dataTransfer.effectAllowed="move"; });
+  row.addEventListener("dragend", () => row.classList.remove("dragging"));
+  row.addEventListener("dragover", e => { e.preventDefault(); if(dragCat===cat) row.classList.add("drag-over"); });
+  row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
   row.addEventListener("drop", e => {
-    e.preventDefault();
-    row.classList.remove("drag-over");
-    if (dragCat !== cat) return;
-    const targetIdx = cat.items.indexOf(item);
-    if (dragIdx === targetIdx) return;
-    const [moved] = cat.items.splice(dragIdx, 1);
-    cat.items.splice(targetIdx, 0, moved);
+    e.preventDefault(); row.classList.remove("drag-over");
+    if(dragCat!==cat) return;
+    const ti = cat.items.indexOf(item);
+    if(dragIdx===ti) return;
+    const [moved] = cat.items.splice(dragIdx,1);
+    cat.items.splice(ti,0,moved);
     render();
   });
 
-  // Drag handle
   const handle = document.createElement("span");
   handle.className = "drag-handle";
   handle.textContent = "\u2630";
 
-  // Rank
-  const rankEl = document.createElement("span");
-  rankEl.className = "rank";
-  rankEl.textContent = rank;
+  const rk = document.createElement("span");
+  rk.className = "rank-num";
+  rk.textContent = isKept ? rank : "";
 
-  // Select button
   const btn = document.createElement("button");
-  btn.className = "sel-btn" + (isSelected ? " on" : "");
-  btn.textContent = isSelected ? "\u2713" : "";
-  btn.onclick = (e) => {
-    e.stopPropagation();
-    item.sel = !item.sel;
-    render();
-  };
+  btn.className = "toggle-btn" + (isKept ? " on" : "");
+  btn.textContent = isKept ? "\u2713" : "";
+  btn.onclick = e => { e.stopPropagation(); item.keep = !item.keep; render(); };
 
-  // Text
   const text = document.createElement("span");
   text.className = "item-text";
   text.contentEditable = true;
   text.textContent = item.t;
   text.addEventListener("input", () => {
-    item.t = text.textContent;
-    item.id = slug(item.t);
-    updateMeta(meta, item.t.length, cat);
-    persistAll();
+    item.t = text.textContent; item.id = slug(item.t);
+    charEl.textContent = `${text.textContent.length}/${cat.max}`;
+    charEl.className = charClass(text.textContent.length, cat);
+    persist(); refreshSample();
   });
-  text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
+  text.addEventListener("keydown", e => { if(e.key==="Enter"){e.preventDefault();text.blur();} });
 
-  // Meta (char count)
   const meta = document.createElement("span");
-  updateMeta(meta, item.t.length, cat);
+  meta.className = "item-meta";
 
-  // Note
-  if (item.note) {
-    const note = document.createElement("span");
-    note.style.cssText = "font-size:10px;color:#bbb;font-style:italic;margin-right:4px;flex-shrink:0;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
-    note.textContent = item.note;
-    note.title = item.note;
-    row.append(handle, rankEl, btn, text, note, meta);
-  } else {
-    row.append(handle, rankEl, btn, text, meta);
+  if (item.rec) {
+    const rec = document.createElement("span");
+    rec.className = "rec-badge";
+    rec.textContent = "REC";
+    rec.title = "Recommended by panel consensus";
+    meta.appendChild(rec);
   }
 
+  if (!isKept && item.cut) {
+    const reason = document.createElement("span");
+    reason.className = "cut-reason";
+    reason.textContent = item.cut;
+    reason.title = item.cut;
+    meta.appendChild(reason);
+  }
+
+  if (item.note && isKept) {
+    const note = document.createElement("span");
+    note.style.cssText = "font-size:10px;color:#aaa;font-style:italic;";
+    note.textContent = item.note;
+    meta.appendChild(note);
+  }
+
+  const charEl = document.createElement("span");
+  charEl.textContent = `${item.t.length}/${cat.max}`;
+  charEl.className = charClass(item.t.length, cat);
+  meta.appendChild(charEl);
+
+  row.append(handle, rk, btn, text, meta);
   container.appendChild(row);
 }
 
-function updateMeta(el, len, cat) {
-  el.textContent = `${len}/${cat.max}`;
-  el.className = "item-meta";
-  if (len > cat.max) el.classList.add("over");
-  else if (cat.type === "d" && len >= DESC_SWEET[0] && len <= DESC_SWEET[1]) el.classList.add("sweet");
+function charClass(len, cat) {
+  if (len > cat.max) return "char-count over";
+  if (cat.type === "d" && len >= SWEET[0] && len <= SWEET[1]) return "char-count sweet";
+  return "char-count";
 }
 
-function renderCounter() {
-  const hCount = cats.filter(c => c.type === "h").reduce((n, c) => n + c.items.filter(i => i.sel).length, 0);
-  const dCount = cats.filter(c => c.type === "d").reduce((n, c) => n + c.items.filter(i => i.sel).length, 0);
+function updateCounters() {
+  const hk = cats.filter(c=>c.type==="h").reduce((n,c)=>n+c.items.filter(i=>i.keep).length,0);
+  const dk = cats.filter(c=>c.type==="d").reduce((n,c)=>n+c.items.filter(i=>i.keep).length,0);
 
-  const hClass = hCount === H_TARGET ? "good" : hCount > H_TARGET ? "over" : "under";
-  const dClass = dCount === D_TARGET ? "good" : dCount > D_TARGET ? "over" : "under";
+  const hEl = document.getElementById("hCounter");
+  const dEl = document.getElementById("dCounter");
+  document.getElementById("hNum").textContent = hk;
+  document.getElementById("dNum").textContent = dk;
+  hEl.className = "counter-pill " + (hk===H_MAX?"good":hk>H_MAX?"over":"warn");
+  dEl.className = "counter-pill " + (dk===D_MAX?"good":dk>D_MAX?"over":"warn");
 
-  document.getElementById("counter").innerHTML = `
-    <div class="counter-item">
-      <div><div class="counter-num ${hClass}">${hCount}</div><div class="counter-target">/ ${H_TARGET} headlines</div></div>
-      <div class="counter-bar"><div class="counter-fill"><div class="counter-fill-inner" style="width:${Math.min(100, hCount/H_TARGET*100)}%;background:${hClass==='good'?'#34a853':hClass==='over'?'#d93025':'#f9ab00'}"></div></div></div>
-    </div>
-    <div class="counter-item">
-      <div><div class="counter-num ${dClass}">${dCount}</div><div class="counter-target">/ ${D_TARGET} descriptions</div></div>
-      <div class="counter-bar"><div class="counter-fill"><div class="counter-fill-inner" style="width:${Math.min(100, dCount/D_TARGET*100)}%;background:${dClass==='good'?'#34a853':dClass==='over'?'#d93025':'#f9ab00'}"></div></div></div>
-    </div>
-  `;
-
-  document.getElementById("barStats").textContent = `${hCount}/${H_TARGET} headlines \u00b7 ${dCount}/${D_TARGET} descriptions`;
+  document.getElementById("barStat").textContent = `${hk}/${H_MAX} headlines \u00b7 ${dk}/${D_MAX} descriptions` + (hk===H_MAX&&dk===D_MAX ? " \u2014 Ready!" : "");
 }
 
-function renderRSA() {
-  const hSel = [];
-  const dSel = [];
-  cats.forEach(c => {
-    c.items.forEach(item => {
-      if (!item.sel) return;
-      if (c.type === "h") hSel.push(item.t);
-      else dSel.push(item.t);
-    });
-  });
-
-  const ready = hSel.length === H_TARGET && dSel.length === D_TARGET;
-  document.getElementById("readyBadge").innerHTML = ready
-    ? '<span class="ready-badge yes">Ready to submit</span>'
-    : `<span class="ready-badge no">${H_TARGET - hSel.length > 0 ? (H_TARGET - hSel.length) + ' more headlines' : ''}${H_TARGET - hSel.length > 0 && D_TARGET - dSel.length > 0 ? ' + ' : ''}${D_TARGET - dSel.length > 0 ? (D_TARGET - dSel.length) + ' more descriptions' : ''}${hSel.length > H_TARGET ? (hSel.length - H_TARGET) + ' too many headlines' : ''}${dSel.length > D_TARGET ? ' ' + (dSel.length - D_TARGET) + ' too many descriptions' : ''}</span>`;
-
-  let html = '<div class="rsa-section"><h4>Headlines (' + hSel.length + '/' + H_TARGET + ')</h4>';
-  if (hSel.length) {
-    hSel.forEach((t, i) => html += `<div class="rsa-item"><span class="rn">${i+1}.</span>${t}</div>`);
-  } else {
-    html += '<div class="rsa-empty">Select headlines on the left</div>';
-  }
-  html += '</div><div class="rsa-section"><h4>Descriptions (' + dSel.length + '/' + D_TARGET + ')</h4>';
-  if (dSel.length) {
-    dSel.forEach((t, i) => html += `<div class="rsa-item"><span class="rn">${i+1}.</span>${t}</div>`);
-  } else {
-    html += '<div class="rsa-empty">Select descriptions on the left</div>';
-  }
-  html += '</div>';
-
-  document.getElementById("rsaSummary").innerHTML = html;
+function refreshSample() {
+  const hk=[], dk=[];
+  cats.forEach(c=>c.items.forEach(i=>{if(!i.keep)return;(c.type==="h"?hk:dk).push(i.t);}));
+  if(hk.length<3||dk.length<2){document.getElementById("spH").textContent="Need more selections";document.getElementById("spD").textContent="";return;}
+  document.getElementById("spH").textContent = pick(hk,3).join(" | ");
+  document.getElementById("spD").textContent = pick(dk,2).join(" ");
 }
 
-function renderPreviews() {
-  const container = document.getElementById("previews");
-  container.innerHTML = "";
-  const hSel = [], dSel = [];
-  cats.forEach(c => c.items.forEach(item => { if (!item.sel) return; (c.type === "h" ? hSel : dSel).push(item.t); }));
-  if (hSel.length < 3 || dSel.length < 2) return;
-
-  for (let i = 0; i < 3; i++) {
-    const h = pick(hSel, 3);
-    const d = pick(dSel, 2);
-    const card = document.createElement("div");
-    card.className = "preview-card";
-    card.innerHTML = `
-      <div class="pv-label">Sample combo ${i+1}</div>
-      <div class="pv-h">${h.join(" | ")}</div>
-      <div class="pv-u"><span class="badge">Ad</span> www.music-access.com</div>
-      <div class="pv-d">${d.join(" ")}</div>
-    `;
-    container.appendChild(card);
-  }
-}
-
-function pick(arr, n) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-  return a.slice(0, n);
-}
-
-// ================================================
+// ============================================================
 // EXPORT
-// ================================================
+// ============================================================
 function showExport() {
-  const hSel = [], dSel = [];
-  cats.forEach(c => c.items.forEach(item => { if (!item.sel) return; (c.type === "h" ? hSel : dSel).push(item.t); }));
-
-  let t = `MEDLEY RSA — FINAL\n${"=".repeat(40)}\n\n`;
-  t += `HEADLINES (${hSel.length}/${H_TARGET}):\n`;
-  hSel.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
-  t += `\nDESCRIPTIONS (${dSel.length}/${D_TARGET}):\n`;
-  dSel.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
-
-  if (hSel.length >= 3 && dSel.length >= 2) {
-    t += "\nSAMPLE COMBOS:\n";
-    for (let i = 0; i < 5; i++) {
-      t += `\n  ${pick(hSel, 3).join(" | ")}\n  ${pick(dSel, 2).join(" ")}\n`;
-    }
-  }
-
-  document.getElementById("exportPre").textContent = t;
+  const hk=[], dk=[];
+  cats.forEach(c=>c.items.forEach(i=>{if(!i.keep)return;(c.type==="h"?hk:dk).push(i.t);}));
+  let t = `MEDLEY RSA \u2014 FINAL\n${"=".repeat(40)}\n\nHEADLINES (${hk.length}/${H_MAX}):\n`;
+  hk.forEach((x,i)=>t+=`  ${i+1}. ${x} (${x.length}/30)\n`);
+  t += `\nDESCRIPTIONS (${dk.length}/${D_MAX}):\n`;
+  dk.forEach((x,i)=>t+=`  ${i+1}. ${x} (${x.length}/90)\n`);
+  if(hk.length>=3&&dk.length>=2){t+="\nSAMPLE COMBOS:\n";for(let i=0;i<5;i++)t+=`\n  ${pick(hk,3).join(" | ")}\n  ${pick(dk,2).join(" ")}\n`;}
+  document.getElementById("exportPre").textContent=t;
   document.getElementById("overlay").classList.add("open");
 }
-
-function copyExport() {
-  navigator.clipboard.writeText(document.getElementById("exportPre").textContent).then(() => {
-    const btn = document.getElementById("copyBtn");
-    btn.textContent = "Copied!";
-    setTimeout(() => btn.textContent = "Copy to Clipboard", 1500);
+function copyExport(){
+  navigator.clipboard.writeText(document.getElementById("exportPre").textContent).then(()=>{
+    const b=document.getElementById("copyBtn");b.textContent="Copied!";setTimeout(()=>b.textContent="Copy to Clipboard",1500);
   });
 }
 
-// Init
 render();
-renderPreviews();
 </script>
 </body>
 </html>
