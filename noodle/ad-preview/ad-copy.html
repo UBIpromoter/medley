@@ -30,8 +30,16 @@
   .page-intro { padding: 8px 0 12px; font-size: 13px; color: #666; line-height: 1.6; }
   .page-intro strong { color: #333; }
 
+  /* Campaign tabs */
+  .camp-tabs { display: flex; gap: 4px; margin: 4px 0 12px; }
+  .camp-tab { background: transparent; border: 1px solid #dadce0; border-radius: 8px; padding: 7px 18px; font-size: 13px; font-weight: 500; color: #666; cursor: pointer; transition: all 0.15s; }
+  .camp-tab:hover { background: #f5f5f5; color: #333; }
+  .camp-tab.active { background: #1a73e8; color: #fff; border-color: #1a73e8; font-weight: 600; cursor: default; }
+  .camp-tab.active:hover { background: #1a73e8; }
+
   /* Section headers */
   .section-type { font-size: 14px; color: #1a73e8; font-weight: 600; margin: 24px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .section-type:first-child { margin-top: 0; }
   .section-type .limit { font-size: 11px; color: #999; font-weight: 400; text-transform: none; letter-spacing: 0; }
 
   .cat-header { display: flex; align-items: center; gap: 8px; margin: 16px 0 2px; padding: 0 4px; }
@@ -72,6 +80,12 @@
   .item-text:focus { background: #eef1ff; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
   .item.remix .item-text { background: #f3eefa; }
 
+  .shared-badge { font-size: 9px; color: #1a73e8; background: #e8f0fe; padding: 1px 6px; border-radius: 8px; flex-shrink: 0; white-space: nowrap; }
+  .share-toggle { font-size: 9px; padding: 2px 8px; border-radius: 8px; cursor: pointer; flex-shrink: 0; white-space: nowrap; transition: all 0.12s; font-family: inherit; }
+  .share-toggle.off { border: 1px dashed #ccc; background: transparent; color: #ccc; }
+  .share-toggle.off:hover { border-color: #1a73e8; color: #1a73e8; }
+  .share-toggle.on { border: 1px solid #1a73e8; background: #e8f0fe; color: #1a73e8; }
+  .share-toggle.on:hover { background: #d2e3fc; }
   .item-note { font-size: 10px; color: #bbb; font-style: italic; flex-shrink: 0; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .item-meta { font-size: 10px; color: #bbb; flex-shrink: 0; white-space: nowrap; min-width: 36px; text-align: right; }
   .item-meta.over { color: #d93025; font-weight: bold; }
@@ -115,7 +129,6 @@
   .summary-section h4 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
   .summary-item { font-size: 12px; padding: 2px 0; color: #333; border-bottom: 1px solid #eee; }
   .summary-item .rn { color: #bbb; font-size: 10px; margin-right: 4px; }
-  .summary-empty { font-size: 12px; color: #ccc; font-style: italic; }
 
   /* Bottom bar */
   .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: #fff; border-top: 1px solid #e8e8e8; padding: 10px 24px; display: flex; gap: 8px; align-items: center; justify-content: center; box-shadow: 0 -1px 4px rgba(0,0,0,0.04); }
@@ -130,7 +143,7 @@
   /* Export overlay */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: center; justify-content: center; }
   .overlay.open { display: flex; }
-  .overlay-box { background: #fff; border-radius: 12px; max-width: 640px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; }
+  .overlay-box { background: #fff; border-radius: 12px; max-width: 700px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; }
   .overlay-header { padding: 16px 24px 10px; border-bottom: 1px solid #e5e5e5; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 12px; }
   .overlay-header h3 { font-size: 16px; flex: 1; }
   .overlay-header button { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
@@ -160,46 +173,25 @@
 <div class="worksheet">
 
   <div class="page-intro">
-    <strong>Your ad copy.</strong> Items above the line are in the ad. Drag to reorder, <strong>&#10007;</strong> to remove, <strong>&#128260;</strong> to flag for a rewrite. You can edit any text directly or add your own.
+    <strong>Two campaigns — Teachers and Admins.</strong> Items with a <span class="shared-badge" style="display:inline">Shared</span> badge live in both. Drag above the line to include, edit any text directly, or add your own.
   </div>
 
-  <div class="section-type">Headlines <span class="limit">Google picks 3 of your 15 per impression</span></div>
+  <div class="camp-tabs">
+    <button class="camp-tab active" data-camp="t" onclick="switchCamp('t')">Teachers Campaign</button>
+    <button class="camp-tab" data-camp="a" onclick="switchCamp('a')">Admins Campaign</button>
+  </div>
 
-  <div class="cat-header"><h3>The Gap</h3><span class="cat-badge" id="cb-gap"></span></div>
-  <div id="s-gap"></div>
-
-  <div class="cat-header"><h3>The Promise</h3><span class="cat-badge" id="cb-promise"></span></div>
-  <div id="s-promise"></div>
-
-  <div class="cat-header"><h3>Credibility</h3><span class="cat-badge" id="cb-cred"></span></div>
-  <div id="s-cred"></div>
-
-  <div class="cat-header"><h3>Audience</h3><span class="cat-badge" id="cb-aud"></span></div>
-  <div id="s-aud"></div>
-
-  <div class="cat-header"><h3>Format</h3><span class="cat-badge" id="cb-cta"></span></div>
-  <div id="s-cta"></div>
-
-  <div class="section-type" style="margin-top:32px;">Descriptions <span class="limit">Google picks 2 of your 4 per impression</span></div>
-
-  <div class="cat-header"><h3>For Teachers</h3><span class="cat-badge" id="cb-dt"></span></div>
-  <div id="s-dt"></div>
-
-  <div class="cat-header"><h3>For Admins</h3><span class="cat-badge" id="cb-da"></span></div>
-  <div id="s-da"></div>
-
-  <div class="cat-header"><h3>Universal</h3><span class="cat-badge" id="cb-du"></span></div>
-  <div id="s-du"></div>
+  <div id="catContent"></div>
 </div>
 
 <!-- Right panel -->
 <div class="preview-panel">
-  <h3>Live Preview</h3>
+  <h3>Live Preview — <span id="campLabel">Teachers</span></h3>
   <p class="sub">Google will mix your headlines and descriptions — here's what that might look like</p>
   <button class="shuffle-btn" onclick="renderPreviews()">Shuffle</button>
   <div id="previews"></div>
   <div class="summary-section" id="summary"></div>
-  <button class="export-btn" onclick="showExport()">Export Copy</button>
+  <button class="export-btn" onclick="showExport()">Export Both Campaigns</button>
 </div>
 </div>
 
@@ -214,7 +206,7 @@
 <div class="overlay" id="overlay">
   <div class="overlay-box">
     <div class="overlay-header">
-      <h3>Your Ad Copy</h3>
+      <h3>Your Ad Copy — Both Campaigns</h3>
       <button onclick="copyExport()" id="copyBtn">Copy to Clipboard</button>
       <button class="close-btn" onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
     </div>
@@ -223,7 +215,7 @@
 </div>
 
 <script>
-const STORAGE_KEY = "medley-ad-v1";
+const STORAGE_KEY = "medley-ad-v2";
 const H_MAX = 15, D_MAX = 4;
 const DESC_SWEET = [40, 65];
 
@@ -234,71 +226,95 @@ function pick(a, n) { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math
 function esc(s) { const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
 
 // =============================================
-// DATA — curated starting set
-// keep: true = above cut line (in the ad)
-// keep: false = below cut line (available)
-// killed: true = removed (can restore)
+// CAMPAIGN STATE
+// =============================================
+let activeCamp = "t"; // "t" = teachers, "a" = admins
+
+function getKeep(item) { return activeCamp === "t" ? item.keepT : item.keepA; }
+function setKeep(item, val) {
+  if (activeCamp === "t") item.keepT = val;
+  else item.keepA = val;
+}
+function getKilled(item) { return activeCamp === "t" ? item.killedT : item.killedA; }
+function setKilled(item, val) {
+  if (activeCamp === "t") item.killedT = val;
+  else item.killedA = val;
+}
+function getTarget(cat) { return activeCamp === "t" ? cat.targetT : cat.targetA; }
+
+// =============================================
+// DATA — two campaigns with shared items
+// camp: "t" = teachers only, "a" = admins only, "b" = both
+// keepT/keepA: above cut line per campaign
 // =============================================
 const cats = [
-  { id:"gap", type:"h", label:"The Gap", target:3, containerEl:"s-gap", badgeEl:"cb-gap", max:30, items:[
-    { t:"Your Degree Didn't Cover This", keep:true },
-    { t:"Not Trained for This?", keep:true },
-    { t:"When Inclusion Feels Hard", keep:true },
-    { t:"What Your Degree Missed", keep:false },
-    { t:"The PD You Actually Need", keep:false },
+  // --- HEADLINES ---
+  { id:"gap", type:"h", label:"The Gap", camps:"ta", targetT:3, targetA:3, max:30, items:[
+    { t:"Your Degree Didn't Cover This", camp:"t", keepT:true, keepA:false },
+    { t:"Not Trained for This?", camp:"b", keepT:true, keepA:true },
+    { t:"When Inclusion Feels Hard", camp:"b", keepT:true, keepA:false },
+    { t:"Bridge the Training Gap", camp:"a", keepT:false, keepA:true },
+    { t:"What Your Degree Missed", camp:"t", keepT:false, keepA:false },
+    { t:"The PD You Actually Need", camp:"b", keepT:false, keepA:true },
   ]},
-  { id:"promise", type:"h", label:"The Promise", target:4, containerEl:"s-promise", badgeEl:"cb-promise", max:30, items:[
-    { t:"Tools for Monday Morning", keep:true },
-    { t:"Strategies That Actually Work", keep:true },
-    { t:"Teach the Kids You Have", keep:true },
-    { t:"Feel Empowered to Teach", keep:true },
-    { t:"Hands-On Music PD", keep:false },
-    { t:"Music for ALL Learners", keep:false },
-    { t:"Ready for Next Monday", keep:false },
+  { id:"promise", type:"h", label:"The Promise", camps:"ta", targetT:5, targetA:3, max:30, items:[
+    { t:"Tools for Monday Morning", camp:"t", keepT:true, keepA:false },
+    { t:"Strategies That Actually Work", camp:"b", keepT:true, keepA:true },
+    { t:"Teach the Kids You Have", camp:"t", keepT:true, keepA:false },
+    { t:"Feel Empowered to Teach", camp:"t", keepT:true, keepA:false },
+    { t:"Hands-On Music PD", camp:"b", keepT:true, keepA:true },
+    { t:"Music for ALL Learners", camp:"b", keepT:false, keepA:true },
+    { t:"Ready for Next Monday", camp:"t", keepT:false, keepA:false },
+    { t:"Build an Inclusive Program", camp:"a", keepT:false, keepA:false },
   ]},
-  { id:"cred", type:"h", label:"Credibility", target:3, containerEl:"s-cred", badgeEl:"cb-cred", max:30, items:[
-    { t:"By Music Teachers", keep:true },
-    { t:"Real Teachers Not Consultants", keep:true },
-    { t:"Humans, Not Curriculum", keep:true, note:"Jess's philosophy" },
-    { t:"Watch the Children", keep:false, note:"Jess's mantra" },
-    { t:"We See Kids, Not Labels", keep:false },
-    { t:"Made by Music Teachers", keep:false },
+  { id:"cred", type:"h", label:"Credibility", camps:"ta", targetT:3, targetA:3, max:30, items:[
+    { t:"By Music Teachers", camp:"b", keepT:true, keepA:true },
+    { t:"Real Teachers Not Consultants", camp:"b", keepT:true, keepA:true },
+    { t:"Humans, Not Curriculum", camp:"b", keepT:true, keepA:true, note:"Jess's philosophy" },
+    { t:"Watch the Children", camp:"b", keepT:false, keepA:false, note:"Jess's mantra" },
+    { t:"We See Kids, Not Labels", camp:"b", keepT:false, keepA:false },
+    { t:"Made by Music Teachers", camp:"b", keepT:false, keepA:false },
   ]},
-  { id:"aud", type:"h", label:"Audience", target:2, containerEl:"s-aud", badgeEl:"cb-aud", max:30, items:[
-    { t:"For Music Teachers", keep:true },
-    { t:"Equip Your Music Teachers", keep:true },
-    { t:"Schools & Districts", keep:false },
+  { id:"aud", type:"h", label:"Audience", camps:"ta", targetT:1, targetA:3, max:30, items:[
+    { t:"For Music Teachers", camp:"t", keepT:true, keepA:false },
+    { t:"Equip Your Music Teachers", camp:"a", keepT:false, keepA:true },
+    { t:"Schools & Districts", camp:"a", keepT:false, keepA:true },
+    { t:"Train Your Music Department", camp:"a", keepT:false, keepA:true },
   ]},
-  { id:"cta", type:"h", label:"Format", target:3, containerEl:"s-cta", badgeEl:"cb-cta", max:30, items:[
-    { t:"Inclusive Music PD", keep:true },
-    { t:"Adaptive Music Ed", keep:true },
-    { t:"Virtual & In-Person", keep:true },
+  { id:"cta", type:"h", label:"Format", camps:"ta", targetT:3, targetA:3, max:30, items:[
+    { t:"Inclusive Music PD", camp:"b", keepT:true, keepA:true },
+    { t:"Adaptive Music Ed", camp:"b", keepT:true, keepA:true },
+    { t:"Virtual & In-Person", camp:"b", keepT:true, keepA:true },
   ]},
 
-  { id:"dt", type:"d", label:"For Teachers", target:2, containerEl:"s-dt", badgeEl:"cb-dt", max:90, items:[
-    { t:"We teach what your degree didn't. By music teachers.", keep:true },
-    { t:"You were trained for music, not disability. We bridge that gap.", keep:true },
-    { t:"Not theory. Hands-on skills your program skipped. Use them Monday.", keep:false },
-    { t:"Weren't trained for this? We'll get you there. Practical inclusion PD.", keep:false },
-    { t:"Fill the gap your degree left. Real strategies for inclusive classrooms.", keep:false },
-    { t:"Feel empowered to include every student. Monday will look different.", keep:false },
+  // --- DESCRIPTIONS ---
+  { id:"dt", type:"d", label:"For Teachers", camps:"t", targetT:2, targetA:0, max:90, items:[
+    { t:"We teach what your degree didn't. By music teachers.", camp:"t", keepT:true, keepA:false },
+    { t:"You were trained for music, not disability. We bridge that gap.", camp:"t", keepT:true, keepA:false },
+    { t:"Not theory. Hands-on skills your program skipped. Use them Monday.", camp:"t", keepT:false, keepA:false },
+    { t:"Weren't trained for this? We'll get you there. Practical inclusion PD.", camp:"t", keepT:false, keepA:false },
+    { t:"Fill the gap your degree left. Real strategies for inclusive classrooms.", camp:"t", keepT:false, keepA:false },
+    { t:"Feel empowered to include every student. Monday will look different.", camp:"t", keepT:false, keepA:false },
   ]},
-  { id:"da", type:"d", label:"For Admins", target:1, containerEl:"s-da", badgeEl:"cb-da", max:90, items:[
-    { t:"Your music teachers weren't trained for inclusion. We can help.", keep:true },
-    { t:"Every child in your district deserves music. Equip your team.", keep:false },
-    { t:"PD teachers actually request. By music teachers, not outsiders.", keep:false },
+  { id:"da", type:"d", label:"For Admins", camps:"a", targetT:0, targetA:2, max:90, items:[
+    { t:"Your music teachers weren't trained for inclusion. We can help.", camp:"a", keepT:false, keepA:true },
+    { t:"Every child in your district deserves music. Equip your team.", camp:"a", keepT:false, keepA:true },
+    { t:"PD teachers actually request. By music teachers, not outsiders.", camp:"a", keepT:false, keepA:false },
   ]},
-  { id:"du", type:"d", label:"Universal", target:1, containerEl:"s-du", badgeEl:"cb-du", max:90, items:[
-    { t:"Inclusion PD by music teachers. Practical. Hands-on.", keep:true },
-    { t:"Strategies you didn't learn in school. Virtual & in-person.", keep:false },
-    { t:"The training music teachers actually need. Inclusive, adaptive, hands-on.", keep:false },
+  { id:"du", type:"d", label:"Universal", camps:"ta", targetT:2, targetA:2, max:90, items:[
+    { t:"Inclusion PD by music teachers. Practical. Hands-on.", camp:"b", keepT:true, keepA:true },
+    { t:"Strategies you didn't learn in school. Virtual & in-person.", camp:"b", keepT:true, keepA:true },
+    { t:"The training music teachers actually need. Inclusive, adaptive, hands-on.", camp:"b", keepT:false, keepA:false },
   ]},
 ];
 
-// Generate stable IDs
+// Generate stable IDs and defaults
 cats.forEach(cat => cat.items.forEach(item => {
   if (!item.id) item.id = slug(item.t);
-  if (item.killed === undefined) item.killed = false;
+  if (item.keepT === undefined) item.keepT = false;
+  if (item.keepA === undefined) item.keepA = false;
+  if (item.killedT === undefined) item.killedT = false;
+  if (item.killedA === undefined) item.killedA = false;
   if (item.remix === undefined) item.remix = false;
 }));
 
@@ -308,6 +324,7 @@ cats.forEach(cat => cat.items.forEach(item => {
 function applyStore() {
   const store = loadStore();
   if (!store) return;
+  if (store._activeCamp) activeCamp = store._activeCamp;
   cats.forEach(cat => {
     const saved = store[cat.id];
     if (!saved) return;
@@ -315,16 +332,19 @@ function applyStore() {
       cat.items.forEach(item => {
         const s = saved.items[item.id];
         if (!s) return;
-        if (s.keep !== undefined) item.keep = s.keep;
-        if (s.killed !== undefined) item.killed = s.killed;
+        if (s.keepT !== undefined) item.keepT = s.keepT;
+        if (s.keepA !== undefined) item.keepA = s.keepA;
+        if (s.killedT !== undefined) item.killedT = s.killedT;
+        if (s.killedA !== undefined) item.killedA = s.killedA;
         if (s.remix !== undefined) item.remix = s.remix;
+        if (s.camp) item.camp = s.camp;
         if (s.t) item.t = s.t;
       });
       // Restore user-added items
       Object.keys(saved.items).forEach(id => {
         if (!cat.items.find(i => i.id === id)) {
           const s = saved.items[id];
-          cat.items.push({ t:s.t, keep:s.keep, killed:s.killed||false, remix:s.remix||false, id });
+          cat.items.push({ t:s.t, keepT:s.keepT||false, keepA:s.keepA||false, camp:s.camp||activeCamp, killedT:s.killedT||false, killedA:s.killedA||false, remix:s.remix||false, id });
         }
       });
     }
@@ -336,14 +356,14 @@ function applyStore() {
 }
 
 function persistAll() {
-  const store = {};
+  const store = { _activeCamp: activeCamp };
   cats.forEach(cat => {
     store[cat.id] = {
       order: cat.items.map(i => i.id),
       items: {}
     };
     cat.items.forEach(item => {
-      store[cat.id].items[item.id] = { keep:item.keep, killed:item.killed, remix:item.remix, t:item.t };
+      store[cat.id].items[item.id] = { keepT:item.keepT, keepA:item.keepA, camp:item.camp, killedT:item.killedT, killedA:item.killedA, remix:item.remix, t:item.t };
     });
   });
   saveStore(store);
@@ -373,6 +393,25 @@ function downloadBackup() {
 applyStore();
 
 // =============================================
+// CAMPAIGN SWITCHING
+// =============================================
+function switchCamp(camp) {
+  if (camp === activeCamp) return;
+  activeCamp = camp;
+  document.querySelectorAll(".camp-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.camp === camp);
+  });
+  document.getElementById("campLabel").textContent = camp === "t" ? "Teachers" : "Admins";
+  render();
+}
+
+// Set initial tab state
+document.querySelectorAll(".camp-tab").forEach(btn => {
+  btn.classList.toggle("active", btn.dataset.camp === activeCamp);
+});
+document.getElementById("campLabel").textContent = activeCamp === "t" ? "Teachers" : "Admins";
+
+// =============================================
 // DRAG STATE
 // =============================================
 let dragCat = null, dragItem = null;
@@ -381,61 +420,94 @@ let dragCat = null, dragItem = null;
 // RENDER
 // =============================================
 function render() {
+  const content = document.getElementById("catContent");
+  content.innerHTML = "";
+
+  let lastType = "";
   cats.forEach(cat => {
-    const container = document.getElementById(cat.containerEl);
-    container.innerHTML = "";
+    if (!cat.camps.includes(activeCamp)) return;
 
-    const kept = cat.items.filter(i => i.keep && !i.killed);
-    const available = cat.items.filter(i => !i.keep && !i.killed);
-    const killed = cat.items.filter(i => i.killed);
-
-    // Kept items (above the line)
-    kept.forEach((item, i) => {
-      const isExcess = i >= cat.target;
-      renderRow(container, item, i + 1, cat, "kept", isExcess);
-    });
-
-    // Drop zone + cut line
-    if (available.length > 0 || killed.length > 0) {
-      const zone = document.createElement("div");
-      zone.className = "drop-zone";
-      zone.textContent = "Drop here to include in ad";
-      zone.addEventListener("dragover", e => { e.preventDefault(); if (dragCat === cat) zone.classList.add("drag-hover"); });
-      zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover"));
-      zone.addEventListener("drop", e => {
-        e.preventDefault(); zone.classList.remove("drag-hover");
-        if (dragCat !== cat || !dragItem) return;
-        dragItem.keep = true;
-        if (dragItem.killed) dragItem.killed = false;
-        render();
-      });
-      container.appendChild(zone);
-
-      const line = document.createElement("div");
-      line.className = "cut-line";
-      line.innerHTML = `<span class="cut-line-label">${kept.length}/${cat.target} in ad</span><div class="cut-line-bar"></div>`;
-      container.appendChild(line);
+    // Section header on type change
+    if (cat.type !== lastType) {
+      lastType = cat.type;
+      const section = document.createElement("div");
+      section.className = "section-type";
+      if (cat.type === "d") section.style.marginTop = "32px";
+      section.innerHTML = cat.type === "h"
+        ? 'Headlines <span class="limit">Google picks 3 of your 15 per impression</span>'
+        : 'Descriptions <span class="limit">Google picks 2 of your 4 per impression</span>';
+      content.appendChild(section);
     }
 
-    // Available items (below the line)
-    available.forEach(item => renderRow(container, item, null, cat, "available", false));
-
-    // Killed items
-    killed.forEach(item => renderKilledRow(container, item, cat));
-
-    // Add your own row
-    renderAddRow(container, cat);
-
-    // Category badge
-    const badge = document.getElementById(cat.badgeEl);
-    badge.textContent = `${kept.length}/${cat.target}`;
-    badge.className = "cat-badge " + (kept.length === cat.target ? "good" : kept.length > cat.target ? "over" : "under");
+    renderCategory(content, cat);
   });
 
   updateCounters();
   renderPreviews();
   renderSummary();
   persistAll();
+}
+
+function renderCategory(parent, cat) {
+  const target = getTarget(cat);
+
+  // Filter items visible in this campaign
+  const visible = cat.items.filter(i => i.camp === activeCamp || i.camp === "b");
+  const kept = visible.filter(i => getKeep(i) && !getKilled(i));
+  const available = visible.filter(i => !getKeep(i) && !getKilled(i));
+  const killed = visible.filter(i => getKilled(i));
+
+  // Category header
+  const header = document.createElement("div");
+  header.className = "cat-header";
+  const h3 = document.createElement("h3");
+  h3.textContent = cat.label;
+  const badge = document.createElement("span");
+  badge.className = "cat-badge " + (kept.length === target ? "good" : kept.length > target ? "over" : "under");
+  badge.textContent = `${kept.length}/${target}`;
+  header.append(h3, badge);
+  parent.appendChild(header);
+
+  // Container for items
+  const container = document.createElement("div");
+
+  // Kept items (above the line)
+  kept.forEach((item, i) => {
+    renderRow(container, item, i + 1, cat, "kept", i >= target);
+  });
+
+  // Drop zone + cut line
+  if (available.length > 0 || killed.length > 0) {
+    const zone = document.createElement("div");
+    zone.className = "drop-zone";
+    zone.textContent = "Drop here to include in ad";
+    zone.addEventListener("dragover", e => { e.preventDefault(); if (dragCat === cat) zone.classList.add("drag-hover"); });
+    zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover"));
+    zone.addEventListener("drop", e => {
+      e.preventDefault(); zone.classList.remove("drag-hover");
+      if (dragCat !== cat || !dragItem) return;
+      setKeep(dragItem, true);
+      if (getKilled(dragItem)) setKilled(dragItem, false);
+      render();
+    });
+    container.appendChild(zone);
+
+    const line = document.createElement("div");
+    line.className = "cut-line";
+    line.innerHTML = `<span class="cut-line-label">${kept.length}/${target} in ad</span><div class="cut-line-bar"></div>`;
+    container.appendChild(line);
+  }
+
+  // Available items (below the line)
+  available.forEach(item => renderRow(container, item, null, cat, "available", false));
+
+  // Killed items
+  killed.forEach(item => renderKilledRow(container, item, cat));
+
+  // Add your own row
+  renderAddRow(container, cat);
+
+  parent.appendChild(container);
 }
 
 function renderRow(container, item, rank, cat, state, isExcess) {
@@ -476,9 +548,9 @@ function renderRow(container, item, rank, cat, state, isExcess) {
     const insertAfter = e.clientY >= row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
     cat.items.splice(insertAfter ? toIdx + 1 : toIdx, 0, dragItem);
 
-    // Match the keep state of where it was dropped
-    dragItem.keep = item.keep;
-    if (dragItem.killed) dragItem.killed = false;
+    // Match the keep state of where it was dropped (for active campaign)
+    setKeep(dragItem, getKeep(item));
+    if (getKilled(dragItem)) setKilled(dragItem, false);
 
     render();
   });
@@ -501,7 +573,7 @@ function renderRow(container, item, rank, cat, state, isExcess) {
   killBtn.className = "vote-btn kill";
   killBtn.textContent = "\u2717";
   killBtn.title = "Remove";
-  killBtn.onclick = e => { e.stopPropagation(); item.killed = true; item.keep = false; item.remix = false; render(); };
+  killBtn.onclick = e => { e.stopPropagation(); setKilled(item, true); setKeep(item, false); item.remix = false; render(); };
 
   const remixBtn = document.createElement("button");
   remixBtn.className = "vote-btn" + (item.remix ? " remix-on" : "");
@@ -524,6 +596,23 @@ function renderRow(container, item, rank, cat, state, isExcess) {
   });
   text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
 
+  // Share toggle
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle " + (item.camp === "b" ? "on" : "off");
+  shareBtn.textContent = item.camp === "b" ? "Shared" : "Share";
+  shareBtn.title = item.camp === "b" ? "Remove from other campaign" : "Add to both campaigns";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    if (item.camp === "b") {
+      item.camp = activeCamp;
+      if (activeCamp === "t") { item.keepA = false; item.killedA = false; }
+      else { item.keepT = false; item.killedT = false; }
+    } else {
+      item.camp = "b";
+    }
+    render();
+  };
+
   // Note
   const noteEl = document.createElement("span");
   if (item.note) {
@@ -536,7 +625,7 @@ function renderRow(container, item, rank, cat, state, isExcess) {
   const meta = document.createElement("span");
   updateMeta(meta, item.t.length, cat);
 
-  row.append(handle, rk, btns, text);
+  row.append(handle, rk, btns, text, shareBtn);
   if (item.note) row.append(noteEl);
   row.append(meta);
   container.appendChild(row);
@@ -559,56 +648,63 @@ function renderKilledRow(container, item, cat) {
   restoreBtn.className = "vote-btn restore";
   restoreBtn.textContent = "\u2713";
   restoreBtn.title = "Bring back";
-  restoreBtn.onclick = () => { item.killed = false; render(); };
+  restoreBtn.onclick = () => { setKilled(item, false); render(); };
   btns.append(restoreBtn);
 
   const text = document.createElement("span");
   text.className = "item-text";
   text.textContent = item.t;
 
+  const shareLabel = document.createElement("span");
+  if (item.camp === "b") {
+    shareLabel.className = "shared-badge";
+    shareLabel.textContent = "Shared";
+  }
+
   const meta = document.createElement("span");
   updateMeta(meta, item.t.length, cat);
 
-  row.append(spacer, rk, btns, text, meta);
+  row.append(spacer, rk, btns, text);
+  if (item.camp === "b") row.append(shareLabel);
+  row.append(meta);
   container.appendChild(row);
 }
 
-function updateMeta(el, len, cat) {
-  el.textContent = `${len}/${cat.max}`;
-  el.className = "item-meta";
-  if (len > cat.max) el.classList.add("over");
-  else if (cat.type === "d" && len >= DESC_SWEET[0] && len <= DESC_SWEET[1]) el.classList.add("sweet");
-}
-
-// =============================================
-// ADD YOUR OWN — rendered as a matching item row
-// =============================================
 function renderAddRow(container, cat) {
   const row = document.createElement("div");
   row.className = "item add-item";
 
-  // + icon where drag handle would be
   const icon = document.createElement("span");
   icon.className = "add-icon";
   icon.textContent = "+";
 
-  // Empty rank spacer
   const rk = document.createElement("span");
   rk.className = "rank-num";
 
-  // Invisible button spacers for alignment
   const btns = document.createElement("div");
   btns.className = "add-spacer";
   btns.innerHTML = '<span class="add-spacer-btn"></span><span class="add-spacer-btn"></span>';
 
-  // Input field where item-text would be
   const input = document.createElement("input");
   input.className = "add-field";
   input.type = "text";
-  input.placeholder = "Add your own — press Enter";
+  input.placeholder = "Add your own \u2014 press Enter";
   input.maxLength = cat.max;
 
-  // Char counter where item-meta would be
+  // Share toggle for new items
+  let addShared = false;
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle off";
+  shareBtn.textContent = "Share";
+  shareBtn.title = "Add to both campaigns";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    addShared = !addShared;
+    shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
+    shareBtn.textContent = addShared ? "Shared" : "Share";
+    shareBtn.title = addShared ? "Will add to both campaigns" : "Add to both campaigns";
+  };
+
   const meta = document.createElement("span");
   meta.className = "item-meta";
   meta.textContent = `0/${cat.max}`;
@@ -623,20 +719,36 @@ function renderAddRow(container, cat) {
     if (e.key !== "Enter") return;
     const text = input.value.trim();
     if (!text) return;
-    cat.items.push({ t: text, keep: false, killed: false, remix: false, id: slug(text) });
+    const camp = addShared ? "b" : activeCamp;
+    const newItem = { t: text, camp, keepT: false, keepA: false, killedT: false, killedA: false, remix: false, id: slug(text) };
+    cat.items.push(newItem);
     render();
   });
 
-  row.append(icon, rk, btns, input, meta);
+  row.append(icon, rk, btns, input, shareBtn, meta);
   container.appendChild(row);
 }
 
+function updateMeta(el, len, cat) {
+  el.textContent = `${len}/${cat.max}`;
+  el.className = "item-meta";
+  if (len > cat.max) el.classList.add("over");
+  else if (cat.type === "d" && len >= DESC_SWEET[0] && len <= DESC_SWEET[1]) el.classList.add("sweet");
+}
+
 // =============================================
-// COUNTERS
+// COUNTERS — per active campaign
 // =============================================
 function updateCounters() {
-  const hKept = cats.filter(c => c.type === "h").reduce((n, c) => n + c.items.filter(i => i.keep && !i.killed).length, 0);
-  const dKept = cats.filter(c => c.type === "d").reduce((n, c) => n + c.items.filter(i => i.keep && !i.killed).length, 0);
+  let hKept = 0, dKept = 0;
+  cats.forEach(c => {
+    if (!c.camps.includes(activeCamp)) return;
+    c.items.forEach(item => {
+      if ((item.camp !== activeCamp && item.camp !== "b") || getKilled(item) || !getKeep(item)) return;
+      if (c.type === "h") hKept++;
+      else dKept++;
+    });
+  });
 
   document.getElementById("hNum").textContent = hKept;
   document.getElementById("dNum").textContent = dKept;
@@ -648,16 +760,27 @@ function updateCounters() {
 }
 
 // =============================================
-// PREVIEWS
+// PREVIEWS — per active campaign
 // =============================================
+function getKeptForCamp(camp) {
+  const hKept = [], dKept = [];
+  cats.forEach(c => {
+    if (!c.camps.includes(camp)) return;
+    c.items.forEach(item => {
+      const killed = camp === "t" ? item.killedT : item.killedA;
+      if ((item.camp !== camp && item.camp !== "b") || killed) return;
+      const keep = camp === "t" ? item.keepT : item.keepA;
+      if (!keep) return;
+      (c.type === "h" ? hKept : dKept).push(item.t);
+    });
+  });
+  return { hKept, dKept };
+}
+
 function renderPreviews() {
   const container = document.getElementById("previews");
   container.innerHTML = "";
-  const hKept = [], dKept = [];
-  cats.forEach(c => c.items.forEach(item => {
-    if (!item.keep || item.killed) return;
-    (c.type === "h" ? hKept : dKept).push(item.t);
-  }));
+  const { hKept, dKept } = getKeptForCamp(activeCamp);
 
   if (hKept.length < 3 || dKept.length < 2) {
     container.innerHTML = '<div style="font-size:12px;color:#999;font-style:italic;padding:8px 0;">Need at least 3 headlines and 2 descriptions above the line for previews.</div>';
@@ -675,13 +798,10 @@ function renderPreviews() {
 
 function renderSummary() {
   const container = document.getElementById("summary");
-  const hKept = [], dKept = [];
-  cats.forEach(c => c.items.forEach(item => {
-    if (!item.keep || item.killed) return;
-    (c.type === "h" ? hKept : dKept).push(item.t);
-  }));
+  const { hKept, dKept } = getKeptForCamp(activeCamp);
+  const campName = activeCamp === "t" ? "Teachers" : "Admins";
 
-  let html = `<h4>In the ad: ${hKept.length} headlines, ${dKept.length} descriptions</h4>`;
+  let html = `<h4>${campName}: ${hKept.length} headlines, ${dKept.length} descriptions</h4>`;
   hKept.forEach((t, i) => html += `<div class="summary-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
   if (dKept.length) {
     html += '<div style="margin-top:8px;"></div>';
@@ -691,29 +811,60 @@ function renderSummary() {
 }
 
 // =============================================
-// EXPORT
+// EXPORT — both campaigns
 // =============================================
 function showExport() {
-  const hKept = [], dKept = [], remixItems = [];
+  const tData = getKeptForCamp("t");
+  const aData = getKeptForCamp("a");
+  const remixItems = [];
   cats.forEach(c => c.items.forEach(item => {
-    if (item.keep && !item.killed) (c.type === "h" ? hKept : dKept).push(item.t);
-    if (item.remix && !item.killed) remixItems.push({ t: item.t, cat: c.label, type: c.type === "h" ? "headline" : "description" });
+    if (item.remix && (!item.killedT || !item.killedA)) remixItems.push({ t: item.t, cat: c.label, type: c.type === "h" ? "headline" : "description" });
   }));
 
-  let t = `MEDLEY AD COPY\n${"=".repeat(40)}\n\n`;
-  t += `HEADLINES (${hKept.length}/${H_MAX}):\n`;
-  hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
-  t += `\nDESCRIPTIONS (${dKept.length}/${D_MAX}):\n`;
-  dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+  let t = `MEDLEY AD COPY \u2014 TWO CAMPAIGNS\n${"=".repeat(44)}\n`;
+
+  // Teachers
+  t += `\n\nTEACHERS CAMPAIGN\n${"-".repeat(30)}\n`;
+  t += `\nHeadlines (${tData.hKept.length}/${H_MAX}):\n`;
+  tData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
+  t += `\nDescriptions (${tData.dKept.length}/${D_MAX}):\n`;
+  tData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+
+  // Admins
+  t += `\n\nADMINS CAMPAIGN\n${"-".repeat(30)}\n`;
+  t += `\nHeadlines (${aData.hKept.length}/${H_MAX}):\n`;
+  aData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
+  t += `\nDescriptions (${aData.dKept.length}/${D_MAX}):\n`;
+  aData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+
+  // Shared items
+  const sharedH = tData.hKept.filter(h => aData.hKept.includes(h));
+  const sharedD = tData.dKept.filter(d => aData.dKept.includes(d));
+  if (sharedH.length || sharedD.length) {
+    t += `\n\nSHARED ACROSS BOTH\n${"-".repeat(30)}\n`;
+    if (sharedH.length) {
+      t += `\nHeadlines (${sharedH.length}):\n`;
+      sharedH.forEach((text, i) => t += `  ${i+1}. ${text}\n`);
+    }
+    if (sharedD.length) {
+      t += `\nDescriptions (${sharedD.length}):\n`;
+      sharedD.forEach((text, i) => t += `  ${i+1}. ${text}\n`);
+    }
+  }
 
   if (remixItems.length) {
-    t += `\nFLAGGED FOR REWRITE (${remixItems.length}):\n`;
+    t += `\n\nFLAGGED FOR REWRITE (${remixItems.length}):\n`;
     remixItems.forEach((r, i) => t += `  ${i+1}. [${r.cat}] ${r.t}\n`);
   }
 
-  if (hKept.length >= 3 && dKept.length >= 2) {
-    t += "\nSAMPLE COMBOS:\n";
-    for (let i = 0; i < 5; i++) t += `\n  ${pick(hKept, 3).join(" | ")}\n  ${pick(dKept, 2).join(" ")}\n`;
+  // Sample combos per campaign
+  if (tData.hKept.length >= 3 && tData.dKept.length >= 2) {
+    t += "\n\nSAMPLE COMBOS \u2014 TEACHERS:\n";
+    for (let i = 0; i < 3; i++) t += `\n  ${pick(tData.hKept, 3).join(" | ")}\n  ${pick(tData.dKept, 2).join(" ")}\n`;
+  }
+  if (aData.hKept.length >= 3 && aData.dKept.length >= 2) {
+    t += "\n\nSAMPLE COMBOS \u2014 ADMINS:\n";
+    for (let i = 0; i < 3; i++) t += `\n  ${pick(aData.hKept, 3).join(" | ")}\n  ${pick(aData.dKept, 2).join(" ")}\n`;
   }
 
   document.getElementById("exportPre").textContent = t;

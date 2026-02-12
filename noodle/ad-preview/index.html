@@ -236,7 +236,7 @@ function renderAll() {
 }
 
 function downloadBackup() {
-  const keys = ['medley-ad-v1', 'medley-ad-workshop-v7', 'medley-rsa-v2'];
+  const keys = ['medley-ad-v2', 'medley-ad-v1', 'medley-ad-workshop-v7', 'medley-rsa-v2'];
   const data = {};
   keys.forEach(k => { try { data[k] = JSON.parse(localStorage.getItem(k)); } catch {} });
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
