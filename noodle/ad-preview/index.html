@@ -59,7 +59,7 @@
 
 <div class="topbar">
   <h1>Medley Ad Preview</h1>
-  <span class="step-badge">Step 3 of 3</span>
+  <span class="step-badge">Step 2 of 2</span>
   <span class="subtitle">What your ads could look like in Google</span>
   <button class="refresh-btn" onclick="location.reload()">Refresh</button>
 </div>
@@ -76,7 +76,6 @@
 
 <div class="bottom-bar">
   <button class="nav-btn" onclick="location.href='ad-copy.html'">Ad Copy</button>
-  <button class="nav-btn" onclick="location.href='ad-builder.html'">Ad Builder</button>
   <button class="nav-btn active">Visual Preview</button>
   <span class="bar-sep"></span>
   <button class="util-btn" onclick="downloadBackup()">Download Backup</button>
@@ -237,7 +236,7 @@ function renderAll() {
 }
 
 function downloadBackup() {
-  const keys = ['medley-ad-workshop-v7', 'medley-rsa-v2'];
+  const keys = ['medley-ad-v1', 'medley-ad-workshop-v7', 'medley-rsa-v2'];
   const data = {};
   keys.forEach(k => { try { data[k] = JSON.parse(localStorage.getItem(k)); } catch {} });
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
