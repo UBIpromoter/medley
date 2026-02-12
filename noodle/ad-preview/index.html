@@ -6,7 +6,16 @@
 <title>Medley — Ad Review Board</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: Arial, sans-serif; background: #fff; color: #202124; min-height: 100vh; padding: 24px; padding-bottom: 80px; }
+  body { font-family: Arial, sans-serif; background: #fff; color: #202124; min-height: 100vh; padding-bottom: 80px; }
+
+  /* Bottom bar */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: #fff; border-top: 1px solid #e8e8e8; padding: 10px 24px; display: flex; gap: 12px; align-items: center; justify-content: center; box-shadow: 0 -1px 4px rgba(0,0,0,0.04); }
+  .bottom-bar button { background: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .bottom-bar button:hover { background: #1557b0; }
+  .bottom-bar button.sec { background: transparent; color: #1a73e8; border: 1px solid #dadce0; }
+  .bottom-bar button.sec:hover { background: #f0f6ff; }
+  .bottom-bar button.sec.current { color: #333; border-color: #333; font-weight: 700; cursor: default; }
+  .bottom-bar button.sec.current:hover { background: transparent; }
 
   h1 { font-size: 20px; color: #202124; margin-bottom: 4px; }
   .subtitle { font-size: 14px; color: #70757a; margin-bottom: 24px; }
@@ -69,9 +78,11 @@
 </head>
 <body>
 
-<div style="max-width:1200px;margin:0 auto;">
-  <h1>Medley Ad Review Board</h1>
-  <p class="subtitle">12 combos — filling the gap, empowerment, Monday-ready. Rate each: Keep, Cut, or Remix.</p>
+
+<button onclick="location.reload()" style="position:fixed;top:8px;right:12px;z-index:999;background:#fff;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;color:#888;cursor:pointer;">Refresh</button>
+<div style="max-width:1200px;margin:0 auto;padding:24px;">
+  <h1>Medley Ad Preview</h1>
+  <p class="subtitle">Sample ad combos. Rate each: Keep, Cut, or Remix.</p>
 </div>
 
 <div class="top-controls">
@@ -95,6 +106,12 @@
     <pre id="exportPre"></pre>
     <button onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
   </div>
+</div>
+
+<div class="bottom-bar">
+  <button class="sec" onclick="location.href='copy-worksheet.html'">Ad Copy</button>
+  <button class="sec" onclick="location.href='rsa-builder.html'">Ad Builder</button>
+  <button class="sec current">Visual Preview</button>
 </div>
 
 <script>

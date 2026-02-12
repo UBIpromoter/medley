@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medley — RSA Builder</title>
+<title>Medley — Ad Builder</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; color: #2c2c2c; min-height: 100vh; line-height: 1.5; }
+
 
   /* Top bar */
   .topbar { position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid #e8e8e8; padding: 12px 24px; display: flex; align-items: center; gap: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
@@ -80,12 +81,19 @@
   .cut-line-bar { flex: 1; height: 1px; border-top: 2px dashed #f9a825; }
   .cut-line-label { font-size: 9px; color: #f9a825; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
+  .drop-zone { padding: 10px 8px; margin: 2px 0; border: 2px dashed transparent; border-radius: 8px; transition: all 0.15s; text-align: center; font-size: 11px; color: transparent; }
+  .drop-zone.drag-hover { border-color: #1a73e8; background: #e8f0fe; color: #1a73e8; font-weight: 600; }
+
   /* Export bar */
   .export-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e8e8e8; padding: 10px 24px; display: flex; gap: 12px; align-items: center; justify-content: center; box-shadow: 0 -1px 4px rgba(0,0,0,0.04); }
   .export-bar button { background: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
   .export-bar button:hover { background: #1557b0; }
   .export-bar button.sec { background: transparent; color: #1a73e8; border: 1px solid #dadce0; }
+  .export-bar button.sec:hover { background: #f0f6ff; }
+  .export-bar button.sec.current { color: #333; border-color: #333; font-weight: 700; cursor: default; }
+  .export-bar button.sec.current:hover { background: transparent; }
   .export-bar .stat { font-size: 12px; color: #999; }
+  .bar-sep { width: 1px; height: 20px; background: #e0e0e0; }
 
   /* Overlay */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; align-items: center; justify-content: center; }
@@ -101,8 +109,9 @@
 </head>
 <body>
 
+<button onclick="location.reload()" style="position:fixed;top:8px;right:12px;z-index:999;background:#fff;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;color:#888;cursor:pointer;">Refresh</button>
 <div class="topbar">
-  <h1>Medley RSA Builder</h1>
+  <h1>Medley Ad Builder</h1>
   <div class="counter-group">
     <div class="counter-pill" id="hCounter"><span class="num" id="hNum">0</span>&nbsp;/ 15 headlines</div>
     <div class="counter-pill" id="dCounter"><span class="num" id="dNum">0</span>&nbsp;/ 4 descriptions</div>
@@ -115,28 +124,27 @@
   </div>
 </div>
 
+
 <div class="main">
 
-  <div class="section-head">Headlines <span class="target">pick 15 &middot; max 30 chars each</span></div>
-  <div class="section-note">Google picks 3 per impression. You want variety so any random 3 work together. <b>Keep = in your RSA. Cut = bench.</b></div>
+  <div class="section-head">Headlines <span class="target">pick 15 &middot; max 30 characters</span></div>
 
-  <div class="cat-header"><h3>The Gap &mdash; stops the scroll</h3><span class="cat-badge" id="cb-gap"></span></div>
+  <div class="cat-header"><h3>The Gap</h3><span class="cat-badge" id="cb-gap"></span></div>
   <div id="s-gap"></div>
 
-  <div class="cat-header"><h3>The Promise &mdash; what they get</h3><span class="cat-badge" id="cb-promise"></span></div>
+  <div class="cat-header"><h3>The Promise</h3><span class="cat-badge" id="cb-promise"></span></div>
   <div id="s-promise"></div>
 
-  <div class="cat-header"><h3>Credibility &mdash; why Medley</h3><span class="cat-badge" id="cb-cred"></span></div>
+  <div class="cat-header"><h3>Credibility</h3><span class="cat-badge" id="cb-cred"></span></div>
   <div id="s-cred"></div>
 
-  <div class="cat-header"><h3>Audience &mdash; who it's for</h3><span class="cat-badge" id="cb-aud"></span></div>
+  <div class="cat-header"><h3>Audience</h3><span class="cat-badge" id="cb-aud"></span></div>
   <div id="s-aud"></div>
 
-  <div class="cat-header"><h3>Keywords &mdash; helps Google match searches</h3><span class="cat-badge" id="cb-kw"></span></div>
+  <div class="cat-header"><h3>Keywords</h3><span class="cat-badge" id="cb-kw"></span></div>
   <div id="s-kw"></div>
 
-  <div class="section-head" style="margin-top:36px;">Descriptions <span class="target">pick 4 &middot; max 90 chars &middot; sweet spot 40&ndash;65</span></div>
-  <div class="section-note">Two show together per impression. Shorter catches eyes. <span style="color:#43a047;font-weight:600;">Green</span> char count = sweet spot.</div>
+  <div class="section-head" style="margin-top:36px;">Descriptions <span class="target">pick 4 &middot; max 90 characters</span></div>
 
   <div class="cat-header"><h3>For Teachers</h3><span class="cat-badge" id="cb-dt"></span></div>
   <div id="s-dt"></div>
@@ -150,9 +158,11 @@
 
 <div class="export-bar">
   <span class="stat" id="barStat"></span>
-  <button class="sec" onclick="window.open('copy-worksheet.html','_blank')">Copy Workshop</button>
-  <button class="sec" onclick="window.open('index.html','_blank')">Visual Preview</button>
-  <button onclick="showExport()">Export Final RSA</button>
+  <button class="sec" onclick="location.href='copy-worksheet.html'">Ad Copy</button>
+  <button class="sec current">Ad Builder</button>
+  <button class="sec" onclick="location.href='index.html'">Visual Preview</button>
+  <span class="bar-sep"></span>
+  <button onclick="showExport()">Export Final Ad</button>
 </div>
 
 <div class="overlay" id="overlay">
@@ -301,7 +311,26 @@ function render() {
 
     kept.forEach((item, i) => renderRow(el, item, i+1, c, true, i >= c.target));
 
-    if (cut.length && kept.length) {
+    if (cut.length) {
+      // Drop zone: drop here to add to kept section
+      const zone = document.createElement("div");
+      zone.className = "drop-zone";
+      zone.textContent = "Drop here to keep";
+      zone.addEventListener("dragover", e => { e.preventDefault(); if(dragCat===c) zone.classList.add("drag-hover"); });
+      zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover"));
+      zone.addEventListener("drop", e => {
+        e.preventDefault(); zone.classList.remove("drag-hover");
+        if(dragCat!==c) return;
+        const moved = c.items[dragIdx];
+        c.items.splice(dragIdx, 1);
+        // Insert at end of kept items
+        const lastKeptIdx = c.items.reduce((last, it, i) => it.keep ? i : last, -1);
+        c.items.splice(lastKeptIdx + 1, 0, moved);
+        moved.keep = true;
+        render();
+      });
+      el.appendChild(zone);
+
       const line = document.createElement("div");
       line.className = "cut-line";
       line.innerHTML = '<span class="cut-line-label">cut</span><div class="cut-line-bar"></div>';

@@ -8,42 +8,69 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; min-height: 100vh; }
 
+  /* Page nav */
+  /* Bottom bar */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: #fff; border-top: 1px solid #e8e8e8; padding: 10px 24px; display: flex; gap: 12px; align-items: center; justify-content: center; box-shadow: 0 -1px 4px rgba(0,0,0,0.04); }
+  .bottom-bar button { background: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .bottom-bar button:hover { background: #1557b0; }
+  .bottom-bar button.sec { background: transparent; color: #1a73e8; border: 1px solid #dadce0; }
+  .bottom-bar button.sec:hover { background: #f0f6ff; }
+  .bottom-bar button.sec.current { color: #333; border-color: #333; font-weight: 700; cursor: default; }
+  .bottom-bar button.sec.current:hover { background: transparent; }
+  .bottom-bar button.sec.quiet { color: #999; border-color: #e0e0e0; font-weight: 400; }
+  .bottom-bar button.sec.quiet:hover { color: #666; background: #f8f8f8; }
+  .bottom-bar .stat { font-size: 12px; color: #999; }
+  .bar-sep { width: 1px; height: 20px; background: #e0e0e0; }
+  .save-status { font-size: 11px; color: #8da4be; transition: opacity 0.3s; }
+  .save-status.flash { color: #2e7d32; }
+
   .layout { display: grid; grid-template-columns: 1fr 380px; min-height: 100vh; }
 
+  /* Topbar */
+  .topbar { position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid #e8e8e8; padding: 10px 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .topbar h1 { font-size: 15px; font-weight: 700; color: #333; white-space: nowrap; }
+  .counter-group { display: flex; gap: 12px; flex: 1; }
+  .counter-pill { display: flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 16px; font-size: 12px; font-weight: 600; }
+  .counter-pill.good { background: #e8f5e9; color: #2e7d32; }
+  .counter-pill.warn { background: #fff8e1; color: #f57f17; }
+  .counter-pill .num { font-size: 16px; font-weight: 800; }
+
   /* Left panel */
-  .worksheet { padding: 24px 28px 40px; overflow-y: auto; max-height: 100vh; }
-  h1 { font-size: 20px; margin-bottom: 2px; }
-  .intro { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.5; }
-
-  /* Voice check banner */
-  .voice-check { background: #fffbea; border: 1px solid #f0d060; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; line-height: 1.5; color: #6b5900; }
-  .voice-check strong { color: #4a3d00; }
-
-  /* Stats bar */
-  .stats-bar { display: flex; gap: 16px; padding: 10px 16px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e5e5e5; margin-bottom: 20px; font-size: 13px; color: #555; align-items: center; flex-wrap: wrap; }
-  .stat-num { font-weight: 700; }
-  .stat-num.green { color: #137333; }
-  .stat-num.amber { color: #b06000; }
-  .stat-num.red { color: #d93025; }
-  .stat-sep { color: #ddd; }
+  .worksheet { padding: 16px 28px 40px; overflow-y: auto; max-height: 100vh; }
 
   /* Section headers */
   .section-type { font-size: 14px; color: #1a73e8; font-weight: 600; margin: 24px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
   .section-note { font-size: 12px; color: #999; margin-bottom: 8px; }
 
-  .cat-header { display: flex; align-items: center; gap: 8px; margin: 18px 0 6px; }
-  .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; flex: 1; }
-  .cat-count { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #e6f4ea; color: #137333; }
+  .cat-header { margin: 18px 0 2px; }
+  .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; display: inline; }
+  .cat-count { font-size: 10px; font-weight: 600; color: #137333; margin-left: 2px; }
+
+  /* Add-your-own row — mirrors .item layout exactly */
+  .add-row { display: flex; align-items: center; gap: 6px; padding: 6px 6px; border-radius: 6px; }
+  .add-placeholder { width: 55px; flex-shrink: 0; } /* matches vote-btns width: 26+3+26 */
+  .add-input { border: 1px solid #e0e0e0; border-radius: 4px; padding: 2px 6px; font-size: 14px; color: #333; outline: none; background: #fafafa; transition: border-color 0.15s; font-family: inherit; }
+  .add-input[data-max="30"] { width: 30ch; }
+  .add-input[data-max="90"] { width: 60ch; }
+  .add-input:focus { border-color: #1a73e8; background: #fff; }
+  .add-input::placeholder { color: #c0c0c0; }
+  .add-counter { font-size: 10px; color: #bbb; white-space: nowrap; flex-shrink: 0; min-width: 36px; text-align: right; }
+  .add-counter.warn { color: #e67700; }
+  .add-counter.over { color: #d93025; font-weight: 600; }
 
   /* Item rows */
   .item { display: flex; align-items: center; gap: 6px; padding: 6px 6px; border-radius: 6px; transition: all 0.15s; }
   .item:hover { background: #f8f9fa; }
-  .item.approved { background: #f0faf2; }
   .item.remix { background: #f3eefa; border-left: 3px solid #9334e6; }
-  .item.killed { display: none; }
+  .item.killed { opacity: 0.4; }
+  .item.killed .item-text { text-decoration: line-through; }
+  .item.killed .vote-btn.kill { display: none; }
+  .item.killed .vote-btn.remix-on, .item.killed .vote-btn:not(.restore) { }
+  .vote-btn.restore { color: #999; }
+  .vote-btn.restore:hover { background: #e6f4ea; border-color: #34a853; color: #137333; }
 
   .vote-btns { display: flex; gap: 3px; flex-shrink: 0; }
-  .vote-btn { width: 26px; height: 26px; border: 1px solid #dadce0; background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+  .vote-btn { width: 26px; height: 26px; border: 1px solid #dadce0; background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; color: #bbb; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
   .vote-btn:hover { background: #f0f0f0; }
   .vote-btn.approve-on { background: #e6f4ea; border-color: #34a853; color: #137333; }
   .vote-btn.remix-on { background: #f3eefa; border-color: #9334e6; color: #9334e6; }
@@ -55,7 +82,7 @@
   .item-text { flex: 1; font-size: 14px; padding: 2px 6px; border-radius: 3px; outline: none; min-width: 0; }
   .item-text:focus { background: #eef1ff; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
 
-  .item-meta { font-size: 10px; color: #bbb; flex-shrink: 0; white-space: nowrap; }
+  .item-meta { font-size: 10px; color: #bbb; flex-shrink: 0; white-space: nowrap; min-width: 36px; text-align: right; }
   .item-meta.over { color: #d93025; font-weight: bold; }
   .item-meta.sweet { color: #137333; }
 
@@ -104,52 +131,60 @@
 </head>
 <body>
 
+<button onclick="location.reload()" style="position:fixed;top:8px;right:12px;z-index:999;background:#fff;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;color:#888;cursor:pointer;">Refresh</button>
+<div class="topbar">
+  <h1>Medley Ad Copy</h1>
+  <div class="counter-group">
+    <div class="counter-pill" id="hPill"><span class="num" id="hNum">0</span>&nbsp;headlines</div>
+    <div class="counter-pill" id="dPill"><span class="num" id="dNum">0</span>&nbsp;descriptions</div>
+  </div>
+</div>
+
 <div class="layout">
 
 <div class="worksheet">
-  <h1>Medley Copy Worksheet</h1>
-  <p class="intro">Vote on every piece of copy. <b>Approve</b> what works, <b>kill</b> what doesn't, <b>remix</b> what needs another pass. Edit text inline. Right panel shows live Google Ad combos from your approved pieces.</p>
 
-  <div class="voice-check">
-    <strong>Voice check:</strong> Jess says <em>disability</em>, not "special needs." Language should be <em>inclusive, adaptive, all learners.</em> Watch for anything that sounds clinical or deficit-framed. If it doesn't sound like Jess would say it on a call, flag it for remix.
-  </div>
+  <div class="section-type">Headlines <span style="font-weight:400;color:#999;font-size:11px;">max 30 characters</span></div>
 
-  <div class="stats-bar" id="statsBar"></div>
-
-  <div class="section-type">Headlines <span style="font-weight:400;color:#999;font-size:11px;">max 30 chars</span></div>
-
-  <div class="cat-header"><h3>The Gap &mdash; hooks that stop the scroll</h3><span class="cat-count" id="cc-gap"></span></div>
+  <div class="cat-header"><h3>The Gap</h3> <span class="cat-count" id="cc-gap"></span></div>
   <div id="s-gap"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="gap" data-max="30" placeholder="Add your own — press Enter" maxlength="30"><span class="add-counter">0/30</span></div>
 
-  <div class="cat-header"><h3>The Promise &mdash; what they get</h3><span class="cat-count" id="cc-promise"></span></div>
+  <div class="cat-header"><h3>The Promise</h3> <span class="cat-count" id="cc-promise"></span></div>
   <div id="s-promise"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="promise" data-max="30" placeholder="Add your own — press Enter" maxlength="30"><span class="add-counter">0/30</span></div>
 
-  <div class="cat-header"><h3>Credibility &mdash; why Medley</h3><span class="cat-count" id="cc-cred"></span></div>
+  <div class="cat-header"><h3>Credibility</h3> <span class="cat-count" id="cc-cred"></span></div>
   <div id="s-cred"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="cred" data-max="30" placeholder="Add your own — press Enter" maxlength="30"><span class="add-counter">0/30</span></div>
 
-  <div class="cat-header"><h3>Audience &mdash; who it's for</h3><span class="cat-count" id="cc-aud"></span></div>
+  <div class="cat-header"><h3>Audience</h3> <span class="cat-count" id="cc-aud"></span></div>
   <div id="s-aud"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="aud" data-max="30" placeholder="Add your own — press Enter" maxlength="30"><span class="add-counter">0/30</span></div>
 
-  <div class="cat-header"><h3>Format &amp; CTA</h3><span class="cat-count" id="cc-cta"></span></div>
+  <div class="cat-header"><h3>Format</h3> <span class="cat-count" id="cc-cta"></span></div>
   <div id="s-cta"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="cta" data-max="30" placeholder="Add your own — press Enter" maxlength="30"><span class="add-counter">0/30</span></div>
 
-  <div class="section-type" style="margin-top:32px;">Descriptions <span style="font-weight:400;color:#999;font-size:11px;">max 90 chars</span></div>
-  <div class="section-note">Shorter catches eyes. People scan, not read. <span style="color:#137333;font-weight:600;">Green = sweet spot (40&ndash;65 chars).</span></div>
+  <div class="section-type" style="margin-top:32px;">Descriptions <span style="font-weight:400;color:#999;font-size:11px;">max 90 characters</span></div>
 
-  <div class="cat-header"><h3>For Teachers</h3><span class="cat-count" id="cc-dt"></span></div>
+  <div class="cat-header"><h3>For Teachers</h3> <span class="cat-count" id="cc-dt"></span></div>
   <div id="s-dt"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="dt" data-max="90" placeholder="Add your own — press Enter" maxlength="90"><span class="add-counter">0/90</span></div>
 
-  <div class="cat-header"><h3>For Admins</h3><span class="cat-count" id="cc-da"></span></div>
+  <div class="cat-header"><h3>For Admins</h3> <span class="cat-count" id="cc-da"></span></div>
   <div id="s-da"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="da" data-max="90" placeholder="Add your own — press Enter" maxlength="90"><span class="add-counter">0/90</span></div>
 
-  <div class="cat-header"><h3>Universal</h3><span class="cat-count" id="cc-du"></span></div>
+  <div class="cat-header"><h3>Universal</h3> <span class="cat-count" id="cc-du"></span></div>
   <div id="s-du"></div>
+  <div class="add-row"><div class="add-placeholder"></div><input class="add-input" data-cat="du" data-max="90" placeholder="Add your own — press Enter" maxlength="90"><span class="add-counter">0/90</span></div>
 </div>
 
 <!-- Right panel: Live Preview -->
 <div class="preview-panel">
   <h3>Live Preview</h3>
-  <p class="sub">4 random combos from approved copy</p>
+  <p class="sub">Random combos from your picks</p>
   <button class="shuffle-btn" onclick="renderPreviews()">Shuffle Combos</button>
   <div id="previews"></div>
 
@@ -158,6 +193,16 @@
   <button class="export-btn" onclick="showExport()">Export Approved Copy</button>
 </div>
 
+</div>
+
+<div class="bottom-bar">
+  <span class="stat" id="barStat"></span>
+  <button class="sec current">Ad Copy</button>
+  <button class="sec" onclick="location.href='rsa-builder.html'">Ad Builder</button>
+  <button class="sec" onclick="location.href='index.html'">Visual Preview</button>
+  <span class="bar-sep"></span>
+  <button class="sec quiet" onclick="downloadBackup()">Download Backup</button>
+  <span class="save-status" id="saveStatus">Auto-saved</span>
 </div>
 
 <!-- Export overlay -->
@@ -175,7 +220,7 @@
 </div>
 
 <script>
-const STORAGE_KEY = "medley-ad-workshop-v5";
+const STORAGE_KEY = "medley-ad-workshop-v7";
 const DESC_SWEET = [40, 65];
 
 function loadStore() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; } }
@@ -190,81 +235,81 @@ function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
 const cats = [
   // HEADLINES
   { id: "gap", type: "h", label: "The Gap", countEl: "cc-gap", containerEl: "s-gap", max: 30, items: [
-    { t: "Your Degree Didn't Cover This", vote: true, remix: false, note: "#1 scroll-stopper" },
-    { t: "Not Trained for This?", vote: true, remix: false, note: "empathetic question" },
-    { t: "Nobody Prepared You for This", vote: true, remix: false, note: "direct, bold" },
-    { t: "What Your Degree Missed", vote: true, remix: false },
-    { t: "When Inclusion Feels Hard", vote: true, remix: false },
-    { t: "Not Another Lecture", vote: true, remix: false },
-    { t: "The PD You Actually Need", vote: true, remix: false },
-    { t: "Finally, PD That Fits", vote: true, remix: false },
-    { t: "The PD You Were Missing", vote: true, remix: false },
+    { t: "Your Degree Didn't Cover This", vote: null, remix: false, note: "#1 scroll-stopper" },
+    { t: "Not Trained for This?", vote: null, remix: false, note: "empathetic question" },
+    { t: "Nobody Prepared You for This", vote: null, remix: false, note: "direct, bold" },
+    { t: "What Your Degree Missed", vote: null, remix: false },
+    { t: "When Inclusion Feels Hard", vote: null, remix: false },
+    { t: "Not Another Lecture", vote: null, remix: false },
+    { t: "The PD You Actually Need", vote: null, remix: false },
+    { t: "Finally, PD That Fits", vote: null, remix: false },
+    { t: "The PD You Were Missing", vote: null, remix: false },
   ]},
   { id: "promise", type: "h", label: "The Promise", countEl: "cc-promise", containerEl: "s-promise", max: 30, items: [
-    { t: "Tools for Monday Morning", vote: true, remix: false, note: "concrete, practical" },
-    { t: "Strategies That Actually Work", vote: true, remix: false, note: "addresses PD skepticism" },
-    { t: "Teach the Kids You Have", vote: true, remix: false, note: "philosophy + practical" },
-    { t: "Feel Empowered to Teach", vote: true, remix: false },
-    { t: "Every Kid, Every Ability", vote: true, remix: false },
-    { t: "Hands-On Music PD", vote: true, remix: false },
-    { t: "Make Monday Better", vote: true, remix: false },
-    { t: "Reach Every Student", vote: true, remix: false },
-    { t: "Music for ALL Learners", vote: true, remix: false },
-    { t: "Monday Will Be Different", vote: true, remix: false },
-    { t: "Ready for Next Monday", vote: true, remix: false },
+    { t: "Tools for Monday Morning", vote: null, remix: false, note: "concrete, practical" },
+    { t: "Strategies That Actually Work", vote: null, remix: false, note: "addresses PD skepticism" },
+    { t: "Teach the Kids You Have", vote: null, remix: false, note: "philosophy + practical" },
+    { t: "Feel Empowered to Teach", vote: null, remix: false },
+    { t: "Every Kid, Every Ability", vote: null, remix: false },
+    { t: "Hands-On Music PD", vote: null, remix: false },
+    { t: "Make Monday Better", vote: null, remix: false },
+    { t: "Reach Every Student", vote: null, remix: false },
+    { t: "Music for ALL Learners", vote: null, remix: false },
+    { t: "Monday Will Be Different", vote: null, remix: false },
+    { t: "Ready for Next Monday", vote: null, remix: false },
   ]},
   { id: "cred", type: "h", label: "Credibility", countEl: "cc-cred", containerEl: "s-cred", max: 30, items: [
-    { t: "Real Teachers Not Consultants", vote: true, remix: false, note: "strongest credibility" },
-    { t: "By Music Teachers", vote: true, remix: false, note: "clean, simple" },
-    { t: "Humans, Not Curriculum", vote: true, remix: false, note: "Jess's philosophy" },
-    { t: "Watch the Children", vote: true, remix: false, note: "Jess's mantra" },
-    { t: "Teachers, Not Talking Heads", vote: true, remix: false },
-    { t: "No Outsiders, Real Teachers", vote: true, remix: false },
-    { t: "Kids First, Lessons Second", vote: true, remix: false },
-    { t: "We See Kids, Not Labels", vote: true, remix: false },
-    { t: "Made by Music Teachers", vote: true, remix: false },
-    { t: "We're Music Teachers Too", vote: true, remix: false },
+    { t: "Real Teachers Not Consultants", vote: null, remix: false, note: "strongest credibility" },
+    { t: "By Music Teachers", vote: null, remix: false, note: "clean, simple" },
+    { t: "Humans, Not Curriculum", vote: null, remix: false, note: "Jess's philosophy" },
+    { t: "Watch the Children", vote: null, remix: false, note: "Jess's mantra" },
+    { t: "Teachers, Not Talking Heads", vote: null, remix: false },
+    { t: "No Outsiders, Real Teachers", vote: null, remix: false },
+    { t: "Kids First, Lessons Second", vote: null, remix: false },
+    { t: "We See Kids, Not Labels", vote: null, remix: false },
+    { t: "Made by Music Teachers", vote: null, remix: false },
+    { t: "We're Music Teachers Too", vote: null, remix: false },
   ]},
   { id: "aud", type: "h", label: "Audience", countEl: "cc-aud", containerEl: "s-aud", max: 30, items: [
-    { t: "For Music Teachers", vote: true, remix: false, note: "clear teacher signal" },
-    { t: "Equip Your Music Teachers", vote: true, remix: false, note: "admin action verb" },
-    { t: "Schools & Districts", vote: true, remix: false, note: "admin signal" },
-    { t: "PD Teachers Actually Request", vote: true, remix: false },
-    { t: "Train Your Music Dept", vote: true, remix: false },
+    { t: "For Music Teachers", vote: null, remix: false, note: "clear teacher signal" },
+    { t: "Equip Your Music Teachers", vote: null, remix: false, note: "admin action verb" },
+    { t: "Schools & Districts", vote: null, remix: false, note: "admin signal" },
+    { t: "PD Teachers Actually Request", vote: null, remix: false },
+    { t: "Train Your Music Dept", vote: null, remix: false },
   ]},
   { id: "cta", type: "h", label: "Format & CTA", countEl: "cc-cta", containerEl: "s-cta", max: 30, items: [
-    { t: "Inclusive Music PD", vote: true, remix: false, note: "keyword match" },
-    { t: "Adaptive Music Ed", vote: true, remix: false, note: "keyword variation" },
-    { t: "Virtual & In-Person", vote: true, remix: false, note: "format flexibility" },
-    { t: "See What We Offer", vote: true, remix: false },
+    { t: "Inclusive Music PD", vote: null, remix: false, note: "keyword match" },
+    { t: "Adaptive Music Ed", vote: null, remix: false, note: "keyword variation" },
+    { t: "Virtual & In-Person", vote: null, remix: false, note: "format flexibility" },
+    { t: "See What We Offer", vote: null, remix: false },
   ]},
 
   // DESCRIPTIONS
   { id: "dt", type: "d", label: "For Teachers", countEl: "cc-dt", containerEl: "s-dt", max: 90, items: [
-    { t: "We teach what your degree didn't. By music teachers.", vote: true, remix: false, note: "52 \u2014 punchiest" },
-    { t: "You were trained for music, not disability. We bridge that gap.", vote: true, remix: false, note: "62 \u2014 Jess's voice" },
-    { t: "Not theory. Hands-on skills your program skipped. Use them Monday.", vote: true, remix: false },
-    { t: "The skills your program skipped. We'll get you there.", vote: true, remix: false },
-    { t: "Stop feeling lost. Fellow music teachers show you what works.", vote: true, remix: false },
-    { t: "Your degree covered the curriculum, not every learner. We cover the rest.", vote: true, remix: false },
-    { t: "Weren't trained for this? We'll get you there. Practical inclusion PD.", vote: true, remix: false },
-    { t: "Fill the gap your degree left. Real strategies for inclusive classrooms.", vote: true, remix: false },
-    { t: "Bridge what your degree missed. Hands-on strategies that work.", vote: true, remix: false },
-    { t: "Feel empowered to include every student. Monday will look different.", vote: true, remix: false },
-    { t: "Your program left gaps. We fill them with practical strategies.", vote: true, remix: false },
+    { t: "We teach what your degree didn't. By music teachers.", vote: null, remix: false, note: "52 \u2014 punchiest" },
+    { t: "You were trained for music, not disability. We bridge that gap.", vote: null, remix: false, note: "62 \u2014 Jess's voice" },
+    { t: "Not theory. Hands-on skills your program skipped. Use them Monday.", vote: null, remix: false },
+    { t: "The skills your program skipped. We'll get you there.", vote: null, remix: false },
+    { t: "Stop feeling lost. Fellow music teachers show you what works.", vote: null, remix: false },
+    { t: "Your degree covered the curriculum, not every learner. We cover the rest.", vote: null, remix: false },
+    { t: "Weren't trained for this? We'll get you there. Practical inclusion PD.", vote: null, remix: false },
+    { t: "Fill the gap your degree left. Real strategies for inclusive classrooms.", vote: null, remix: false },
+    { t: "Bridge what your degree missed. Hands-on strategies that work.", vote: null, remix: false },
+    { t: "Feel empowered to include every student. Monday will look different.", vote: null, remix: false },
+    { t: "Your program left gaps. We fill them with practical strategies.", vote: null, remix: false },
   ]},
   { id: "da", type: "d", label: "For Admins", countEl: "cc-da", containerEl: "s-da", max: 90, items: [
-    { t: "Your music teachers weren't trained for inclusion. We can help.", vote: true, remix: false, note: "63 \u2014 direct" },
-    { t: "Your team needs this. PD by music teachers who get it.", vote: true, remix: false },
-    { t: "PD teachers actually request. By music teachers, not outsiders.", vote: true, remix: false },
-    { t: "Every child in your district deserves music. Equip your team.", vote: true, remix: false },
-    { t: "Inclusion PD that fills the gap their programs left. We come to you.", vote: true, remix: false },
+    { t: "Your music teachers weren't trained for inclusion. We can help.", vote: null, remix: false, note: "63 \u2014 direct" },
+    { t: "Your team needs this. PD by music teachers who get it.", vote: null, remix: false },
+    { t: "PD teachers actually request. By music teachers, not outsiders.", vote: null, remix: false },
+    { t: "Every child in your district deserves music. Equip your team.", vote: null, remix: false },
+    { t: "Inclusion PD that fills the gap their programs left. We come to you.", vote: null, remix: false },
   ]},
   { id: "du", type: "d", label: "Universal", countEl: "cc-du", containerEl: "s-du", max: 90, items: [
-    { t: "Inclusion PD by music teachers. Practical. Hands-on.", vote: true, remix: false, note: "52 \u2014 staccato" },
-    { t: "Strategies you didn't learn in school. Virtual & in-person.", vote: true, remix: false },
-    { t: "The training music teachers actually need. Inclusive, adaptive, hands-on.", vote: true, remix: false },
-    { t: "Inclusion PD that fills the gap. By music teachers, for music teachers.", vote: true, remix: false },
+    { t: "Inclusion PD by music teachers. Practical. Hands-on.", vote: null, remix: false, note: "52 \u2014 staccato" },
+    { t: "Strategies you didn't learn in school. Virtual & in-person.", vote: null, remix: false },
+    { t: "The training music teachers actually need. Inclusive, adaptive, hands-on.", vote: null, remix: false },
+    { t: "Inclusion PD that fills the gap. By music teachers, for music teachers.", vote: null, remix: false },
   ]},
 ];
 
@@ -299,9 +344,32 @@ function persistAll() {
     });
   });
   saveStore(store);
+  flashSaved();
 }
 
+let saveTimer;
+function flashSaved() {
+  const el = document.getElementById("saveStatus");
+  if (!el) return;
+  el.textContent = "Saved";
+  el.classList.add("flash");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { el.textContent = "Auto-saved"; el.classList.remove("flash"); }, 1500);
+}
+
+function downloadBackup() {
+  const store = loadStore();
+  const blob = new Blob([JSON.stringify(store, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `medley-copy-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+const hadStore = !!loadStore();
 applyStore();
+if (!hadStore) persistAll();  // first visit: mark all current items as known (no NEW badge)
 
 // ================================================
 // RENDER
@@ -311,15 +379,16 @@ function render() {
     const container = document.getElementById(cat.containerEl);
     container.innerHTML = "";
 
-    cat.items.forEach(item => {
-      if (item.vote === false) return; // killed = hidden
-      renderRow(container, item, cat);
-    });
+    // Active items first, then killed items at the bottom
+    const active = cat.items.filter(i => i.vote !== false);
+    const killed = cat.items.filter(i => i.vote === false);
+    active.forEach(item => renderRow(container, item, cat));
+    killed.forEach(item => renderRow(container, item, cat));
 
     // Category count
-    const approved = cat.items.filter(i => i.vote === true).length;
+    const approved = cat.items.filter(i => i.vote !== false).length;
     const countEl = document.getElementById(cat.countEl);
-    countEl.textContent = `${approved} approved`;
+    countEl.textContent = `${approved} active`;
   });
 
   renderStats();
@@ -328,55 +397,83 @@ function render() {
   persistAll();
 }
 
+// Add-your-own: char counter + Enter to add
+document.querySelectorAll(".add-input").forEach(input => {
+  const counter = input.parentElement.querySelector(".add-counter");
+  const max = parseInt(input.dataset.max);
+
+  input.addEventListener("input", () => {
+    const len = input.value.length;
+    counter.textContent = `${len}/${max}`;
+    counter.className = "add-counter" + (len > max ? " over" : len > max * 0.85 ? " warn" : "");
+  });
+
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const text = input.value.trim();
+    if (!text) return;
+    const catId = input.dataset.cat;
+    const cat = cats.find(c => c.id === catId);
+    if (!cat) return;
+    const newItem = { t: text, vote: null, remix: false, id: slug(text) };
+    cat.items.push(newItem);
+    input.value = "";
+    counter.textContent = `0/${max}`;
+    counter.className = "add-counter";
+    render();
+  });
+});
+
 function renderRow(container, item, cat) {
   const row = document.createElement("div");
   let cls = "item";
-  if (item.vote === true && !item.remix) cls += " approved";
-  if (item.remix) cls += " remix";
+  if (item.vote === false) cls += " killed";
+  else if (item.remix) cls += " remix";
   row.className = cls;
 
-  // Vote buttons
   const btns = document.createElement("div");
   btns.className = "vote-btns";
 
-  // Approve
-  const approveBtn = document.createElement("button");
-  approveBtn.className = "vote-btn" + (item.vote === true ? " approve-on" : "");
-  approveBtn.textContent = "\u2713";
-  approveBtn.title = "Approve";
-  approveBtn.onclick = () => {
-    item.vote = item.vote === true ? null : true;
-    render();
-  };
-
-  // Kill
-  const killBtn = document.createElement("button");
-  killBtn.className = "vote-btn kill";
-  killBtn.textContent = "\u2717";
-  killBtn.title = "Kill \u2014 gone forever";
-  killBtn.onclick = () => {
-    if (confirm("Kill this copy? It will be hidden permanently.")) {
+  if (item.vote === false) {
+    // Killed: show restore checkmark
+    const restoreBtn = document.createElement("button");
+    restoreBtn.className = "vote-btn restore";
+    restoreBtn.textContent = "\u2713";
+    restoreBtn.title = "Bring back";
+    restoreBtn.onclick = () => {
+      item.vote = null;
+      render();
+    };
+    btns.append(restoreBtn);
+  } else {
+    // Active: show kill and remix
+    const killBtn = document.createElement("button");
+    killBtn.className = "vote-btn kill";
+    killBtn.textContent = "\u2717";
+    killBtn.title = "Remove";
+    killBtn.onclick = () => {
       item.vote = false;
       item.remix = false;
       render();
-    }
-  };
+    };
 
-  // Remix
-  const remixBtn = document.createElement("button");
-  remixBtn.className = "vote-btn" + (item.remix ? " remix-on" : "");
-  remixBtn.textContent = "\uD83D\uDD04";
-  remixBtn.title = "Request remix";
-  remixBtn.onclick = () => {
-    item.remix = !item.remix;
-    render();
-  };
+    const remixBtn = document.createElement("button");
+    remixBtn.className = "vote-btn" + (item.remix ? " remix-on" : "");
+    remixBtn.textContent = "\uD83D\uDD04";
+    remixBtn.title = "Request remix";
+    remixBtn.onclick = () => {
+      item.remix = !item.remix;
+      render();
+    };
 
-  btns.append(approveBtn, killBtn, remixBtn);
+    btns.append(killBtn, remixBtn);
+  }
 
-  // NEW badge
+  // NEW badge — only for items not in saved store (truly new additions)
   const newBadge = document.createElement("span");
-  if (item.vote === null) {
+  const savedStore = loadStore();
+  const isKnown = savedStore && savedStore[cat.id] && savedStore[cat.id][item.id];
+  if (item.vote === null && !isKnown) {
     newBadge.className = "new-badge";
     newBadge.textContent = "NEW";
   }
@@ -425,30 +522,17 @@ function renderStats() {
   const hCats = cats.filter(c => c.type === "h");
   const dCats = cats.filter(c => c.type === "d");
 
-  const hApproved = hCats.reduce((n, c) => n + c.items.filter(i => i.vote === true).length, 0);
-  const hUnvoted = hCats.reduce((n, c) => n + c.items.filter(i => i.vote === null).length, 0);
-  const hKilled = hCats.reduce((n, c) => n + c.items.filter(i => i.vote === false).length, 0);
-  const hRemix = hCats.reduce((n, c) => n + c.items.filter(i => i.remix).length, 0);
+  const hActive = hCats.reduce((n, c) => n + c.items.filter(i => i.vote !== false).length, 0);
+  const dActive = dCats.reduce((n, c) => n + c.items.filter(i => i.vote !== false).length, 0);
+  const remix = cats.reduce((n, c) => n + c.items.filter(i => i.remix).length, 0);
 
-  const dApproved = dCats.reduce((n, c) => n + c.items.filter(i => i.vote === true).length, 0);
-  const dUnvoted = dCats.reduce((n, c) => n + c.items.filter(i => i.vote === null).length, 0);
-  const dKilled = dCats.reduce((n, c) => n + c.items.filter(i => i.vote === false).length, 0);
-  const dRemix = dCats.reduce((n, c) => n + c.items.filter(i => i.remix).length, 0);
+  document.getElementById("hNum").textContent = hActive;
+  document.getElementById("dNum").textContent = dActive;
 
-  const bar = document.getElementById("statsBar");
-  let html = "";
-  html += `<span><strong>Headlines:</strong> <span class="stat-num green">${hApproved}</span> approved`;
-  if (hUnvoted > 0) html += ` \u00b7 <span class="stat-num amber">${hUnvoted}</span> unvoted`;
-  if (hRemix > 0) html += ` \u00b7 <span class="stat-num" style="color:#9334e6">${hRemix}</span> remix`;
-  if (hKilled > 0) html += ` \u00b7 <span class="stat-num red">${hKilled}</span> killed`;
-  html += `</span>`;
-  html += `<span class="stat-sep">|</span>`;
-  html += `<span><strong>Descriptions:</strong> <span class="stat-num green">${dApproved}</span> approved`;
-  if (dUnvoted > 0) html += ` \u00b7 <span class="stat-num amber">${dUnvoted}</span> unvoted`;
-  if (dRemix > 0) html += ` \u00b7 <span class="stat-num" style="color:#9334e6">${dRemix}</span> remix`;
-  if (dKilled > 0) html += ` \u00b7 <span class="stat-num red">${dKilled}</span> killed`;
-  html += `</span>`;
-  bar.innerHTML = html;
+  let stat = `${hActive} headlines \u00b7 ${dActive} descriptions`;
+  if (remix > 0) stat += ` \u00b7 ${remix} remix`;
+  const barStat = document.getElementById("barStat");
+  if (barStat) barStat.textContent = stat;
 }
 
 function renderApprovedSummary() {
@@ -456,22 +540,22 @@ function renderApprovedSummary() {
   const hApproved = [];
   const dApproved = [];
   cats.forEach(c => c.items.forEach(item => {
-    if (item.vote !== true) return;
+    if (item.vote === false) return;
     (c.type === "h" ? hApproved : dApproved).push(item.t);
   }));
 
-  let html = '<h4>Approved Headlines (' + hApproved.length + ')</h4>';
+  let html = '<h4>Headlines (' + hApproved.length + ')</h4>';
   if (hApproved.length) {
     hApproved.forEach((t, i) => html += `<div class="approved-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
   } else {
-    html += '<div class="approved-empty">No headlines approved yet</div>';
+    html += '<div class="approved-empty">No headlines yet</div>';
   }
 
-  html += '<h4 style="margin-top:14px;">Approved Descriptions (' + dApproved.length + ')</h4>';
+  html += '<h4 style="margin-top:14px;">Descriptions (' + dApproved.length + ')</h4>';
   if (dApproved.length) {
     dApproved.forEach((t, i) => html += `<div class="approved-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
   } else {
-    html += '<div class="approved-empty">No descriptions approved yet</div>';
+    html += '<div class="approved-empty">No descriptions yet</div>';
   }
 
   container.innerHTML = html;
@@ -490,10 +574,10 @@ function renderPreviews() {
   const container = document.getElementById("previews");
   container.innerHTML = "";
   const hApproved = [], dApproved = [];
-  cats.forEach(c => c.items.forEach(item => { if (item.vote !== true) return; (c.type === "h" ? hApproved : dApproved).push(item.t); }));
+  cats.forEach(c => c.items.forEach(item => { if (item.vote === false) return; (c.type === "h" ? hApproved : dApproved).push(item.t); }));
 
   if (hApproved.length < 3 || dApproved.length < 2) {
-    container.innerHTML = '<div style="font-size:12px;color:#999;font-style:italic;padding:8px 0;">Need at least 3 approved headlines and 2 approved descriptions for previews.</div>';
+    container.innerHTML = '<div style="font-size:12px;color:#999;font-style:italic;padding:8px 0;">Need at least 3 headlines and 2 descriptions for previews.</div>';
     return;
   }
 
@@ -524,7 +608,7 @@ function pick(arr, n) {
 function showExport() {
   const hApproved = [], dApproved = [], remixItems = [];
   cats.forEach(c => c.items.forEach(item => {
-    if (item.vote === true) (c.type === "h" ? hApproved : dApproved).push(item.t);
+    if (item.vote !== false) (c.type === "h" ? hApproved : dApproved).push(item.t);
     if (item.remix) remixItems.push({ t: item.t, cat: c.label, type: c.type === "h" ? "headline" : "description" });
   }));
 
