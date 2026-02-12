@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medley — Ad Review Board</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #fff; color: #202124; min-height: 100vh; padding: 24px; padding-bottom: 80px; }
+
+  h1 { font-size: 20px; color: #202124; margin-bottom: 4px; }
+  .subtitle { font-size: 14px; color: #70757a; margin-bottom: 24px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+
+  .review-card { border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s; }
+  .review-card.good { border-color: #34a853; box-shadow: 0 0 0 1px #34a853; }
+  .review-card.bad { border-color: #ea4335; box-shadow: 0 0 0 1px #ea4335; opacity: 0.4; }
+  .review-card.remix { border-color: #fbbc04; box-shadow: 0 0 0 1px #fbbc04; }
+
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: #f8f9fa; border-bottom: 1px solid #ebebeb; }
+  .card-num { font-size: 13px; font-weight: 600; color: #70757a; }
+  .card-audience { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .card-audience.teacher { background: #e8f0fe; color: #1a73e8; }
+  .card-audience.admin { background: #fce8e6; color: #d93025; }
+  .card-audience.both { background: #e6f4ea; color: #137333; }
+
+  .ad-preview { padding: 16px; }
+  .ad-h { font-size: 18px; color: #1a0dab; line-height: 1.3; margin-bottom: 2px; text-decoration: none; display: block; }
+  .ad-h:hover { text-decoration: underline; }
+  .ad-u { font-size: 13px; color: #006621; margin-bottom: 3px; }
+  .ad-u .badge { font-size: 11px; font-weight: bold; color: #006621; border: 1px solid #006621; border-radius: 3px; padding: 0 3px; margin-right: 4px; }
+  .ad-d { font-size: 13px; color: #4d5156; line-height: 1.5; }
+  .ad-sl { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 40px; margin-top: 8px; padding-left: 12px; }
+  .ad-sl a { font-size: 13px; color: #1a0dab; text-decoration: none; line-height: 1.5; }
+  .ad-sl a:hover { text-decoration: underline; }
+
+  .feedback { display: flex; align-items: center; gap: 4px; padding: 8px 16px; border-top: 1px solid #ebebeb; background: #fafafa; }
+  .fb-btn { border: 1px solid #dadce0; background: #fff; border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
+  .fb-btn:hover { background: #f1f3f4; }
+  .fb-btn.active-good { background: #e6f4ea; border-color: #34a853; color: #137333; }
+  .fb-btn.active-bad { background: #fce8e6; border-color: #ea4335; color: #d93025; }
+  .fb-btn.active-remix { background: #fef7e0; border-color: #fbbc04; color: #e37400; }
+  .fb-note { flex: 1; border: none; background: none; font-size: 12px; color: #70757a; outline: none; padding: 4px; }
+  .fb-note::placeholder { color: #bdc1c6; }
+
+  .summary { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #dadce0; padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 24px; z-index: 100; box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
+  .summary .stat { font-size: 13px; color: #70757a; }
+  .summary .stat b { color: #202124; }
+  .summary .count-good { color: #137333; }
+  .summary .count-bad { color: #d93025; }
+  .summary .count-remix { color: #e37400; }
+  .summary button { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .summary button:hover { background: #1557b0; }
+  .summary button.secondary { background: transparent; color: #1a73e8; border: 1px solid #dadce0; }
+
+  .top-controls { display: flex; align-items: center; gap: 16px; max-width: 1200px; margin: 0 auto 20px; }
+  .top-controls label { font-size: 13px; color: #70757a; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+  .overlay-box { background: #fff; border-radius: 12px; padding: 24px; max-width: 640px; width: 90%; max-height: 80vh; overflow-y: auto; }
+  .overlay-box h3 { color: #202124; margin-bottom: 16px; }
+  .overlay-box pre { background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 13px; color: #202124; white-space: pre-wrap; line-height: 1.6; }
+  .overlay-box button { margin-top: 16px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 14px; cursor: pointer; }
+
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div style="max-width:1200px;margin:0 auto;">
+  <h1>Medley Ad Review Board</h1>
+  <p class="subtitle">12 combos — filling the gap, empowerment, Monday-ready. Rate each: Keep, Cut, or Remix.</p>
+</div>
+
+<div class="top-controls">
+  <label><input type="checkbox" id="slToggle" checked onchange="renderAll()"> Show sitelinks</label>
+  <label><input type="checkbox" id="showBadToggle" checked onchange="toggleBadVisibility()"> Show rejected</label>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="summary">
+  <span class="stat">Keep: <b class="count-good" id="cGood">0</b></span>
+  <span class="stat">Cut: <b class="count-bad" id="cBad">0</b></span>
+  <span class="stat">Remix: <b class="count-remix" id="cRemix">0</b></span>
+  <span class="stat">Unrated: <b id="cNone">12</b></span>
+  <button class="secondary" onclick="showExport()">Export Winners</button>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <h3>Winning Ad Copy</h3>
+    <pre id="exportPre"></pre>
+    <button onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<script>
+const sitelinks = [
+  { text: "Professional Development", url: "https://www.music-access.com/professional-development" },
+  { text: "Teacher Resources",       url: "https://www.music-access.com/teacher-resources" },
+  { text: "Our Team",                url: "https://www.music-access.com/about" },
+  { text: "Online PD Courses",       url: "https://www.music-access.com/store/online-pd" },
+  { text: "Read the Blog",           url: "https://www.music-access.com/blog" },
+];
+
+// =============================================
+// 12 CURATED COMBOS — "you weren't trained for
+// this, and we'll get you there by Monday"
+// =============================================
+const combos = [
+  // --- TEACHER-FOCUSED (1-4) ---
+  {
+    audience: "teacher",
+    h: ["Inclusive Music PD", "Do Better by Monday", "By Music Teachers"],
+    d: [
+      "Weren't trained for this? We'll get you there. Practical inclusion PD for music teachers.",
+      "Not theory \u2014 the hands-on skills your program didn't cover. Walk out ready for Monday.",
+    ],
+  },
+  {
+    audience: "teacher",
+    h: ["Not Another Lecture", "Hands-On Music PD", "For Music Teachers"],
+    d: [
+      "Fill the gap your degree left. Real strategies for inclusive music classrooms. Enroll now.",
+      "Feel empowered to include every student. Practical PD that changes what Monday looks like.",
+    ],
+  },
+  {
+    audience: "teacher",
+    h: ["Inclusive Music PD", "Feel Empowered to Teach", "By Music Teachers"],
+    d: [
+      "Weren't trained for this? We'll get you there. Practical inclusion PD for music teachers.",
+      "Practical strategies you didn't learn in school. Virtual & in-person. Enroll today.",
+    ],
+  },
+  {
+    audience: "teacher",
+    h: ["What School Didn't Teach", "Adaptive Music Ed", "By Music Teachers"],
+    d: [
+      "Fill the gap your degree left. Real strategies for inclusive music classrooms. Enroll now.",
+      "Not theory \u2014 the hands-on skills your program didn't cover. Walk out ready for Monday.",
+    ],
+  },
+
+  // --- ADMIN-FOCUSED (5-8) ---
+  {
+    audience: "admin",
+    h: ["Inclusive Music PD", "Schools & Districts", "Virtual & In-Person"],
+    d: [
+      "Your music teachers weren't trained for inclusion. Give them the tools. Book PD today.",
+      "Every child in your district deserves music. Equip your team to make it happen.",
+    ],
+  },
+  {
+    audience: "admin",
+    h: ["Train Your Music Dept", "Inclusive Music PD", "Virtual & In-Person"],
+    d: [
+      "Every child in your district deserves music. Equip your team to make it happen.",
+      "Music-specific inclusion PD that fills the gap. By music teachers, for music teachers.",
+    ],
+  },
+  {
+    audience: "admin",
+    h: ["Schools & Districts", "Adaptive Music Ed", "Enroll Online Today"],
+    d: [
+      "Your music teachers weren't trained for inclusion. Give them the tools. Book PD today.",
+      "Music-specific inclusion PD that fills the gap. By music teachers, for music teachers.",
+    ],
+  },
+  {
+    audience: "admin",
+    h: ["Humans, Not Curriculum", "Adaptive Music Ed", "Schools & Districts"],
+    d: [
+      "Every child in your district deserves music. Equip your team to make it happen.",
+      "Your music teachers weren't trained for inclusion. Give them the tools. Book PD today.",
+    ],
+  },
+
+  // --- BOTH AUDIENCES (9-12) ---
+  {
+    audience: "both",
+    h: ["Inclusive Music PD", "Virtual & In-Person", "Enroll Online Today"],
+    d: [
+      "Music-specific inclusion PD that fills the gap. By music teachers, for music teachers.",
+      "Practical strategies you didn't learn in school. Virtual & in-person. Enroll today.",
+    ],
+  },
+  {
+    audience: "both",
+    h: ["Music for ALL Learners", "By Music Teachers", "Schools & Districts"],
+    d: [
+      "Weren't trained for this? We'll get you there. Practical inclusion PD for music teachers.",
+      "Your music teachers weren't trained for inclusion. Give them the tools. Book PD today.",
+    ],
+  },
+  {
+    audience: "both",
+    h: ["By Music Teachers", "Inclusive Music PD", "Not Another Lecture"],
+    d: [
+      "Not theory \u2014 the hands-on skills your program didn't cover. Walk out ready for Monday.",
+      "Feel empowered to include every student. Practical PD that changes what Monday looks like.",
+    ],
+  },
+  {
+    audience: "both",
+    h: ["Adaptive Music Ed", "For Music Teachers", "Schools & Districts"],
+    d: [
+      "Fill the gap your degree left. Real strategies for inclusive music classrooms. Enroll now.",
+      "Music-specific inclusion PD that fills the gap. By music teachers, for music teachers.",
+    ],
+  },
+];
+
+// State
+const ratings = new Array(12).fill(null);
+const notes = new Array(12).fill("");
+
+function renderAll() {
+  const grid = document.getElementById("grid");
+  const showSL = document.getElementById("slToggle").checked;
+  grid.innerHTML = "";
+
+  combos.forEach((combo, i) => {
+    const card = document.createElement("div");
+    card.className = "review-card" + (ratings[i] ? ` ${ratings[i]}` : "");
+    card.id = `card-${i}`;
+
+    const headlineStr = combo.h.join(" | ");
+    const descStr = combo.d.join(" ");
+    const audienceLabel = combo.audience === "teacher" ? "Teachers" : combo.audience === "admin" ? "Admins" : "Both";
+
+    let slHTML = "";
+    if (showSL) {
+      slHTML = `<div class="ad-sl">${sitelinks.slice(0,4).map(s =>
+        `<a href="${s.url}" target="_blank">${s.text}</a>`
+      ).join("")}</div>`;
+    }
+
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="card-num">#${i+1}</span>
+        <span class="card-audience ${combo.audience}">${audienceLabel}</span>
+      </div>
+      <div class="ad-preview">
+        <a class="ad-h" href="https://www.music-access.com/professional-development" target="_blank">${headlineStr}</a>
+        <div class="ad-u"><span class="badge">Ad</span> www.music-access.com</div>
+        <div class="ad-d">${descStr}</div>
+        ${slHTML}
+      </div>
+      <div class="feedback">
+        <button class="fb-btn ${ratings[i]==='good'?'active-good':''}" onclick="rate(${i},'good')">Keep</button>
+        <button class="fb-btn ${ratings[i]==='bad'?'active-bad':''}" onclick="rate(${i},'bad')">Cut</button>
+        <button class="fb-btn ${ratings[i]==='remix'?'active-remix':''}" onclick="rate(${i},'remix')">Remix</button>
+        <input class="fb-note" placeholder="Notes..." value="${notes[i].replace(/"/g,'&quot;')}" oninput="notes[${i}]=this.value" />
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  toggleBadVisibility();
+  updateCounts();
+}
+
+function rate(i, rating) {
+  ratings[i] = ratings[i] === rating ? null : rating;
+  renderAll();
+}
+
+function toggleBadVisibility() {
+  const hide = !document.getElementById("showBadToggle").checked;
+  document.querySelectorAll(".review-card.bad").forEach(c => {
+    c.style.display = hide ? "none" : "";
+  });
+}
+
+function updateCounts() {
+  document.getElementById("cGood").textContent = ratings.filter(r => r === "good").length;
+  document.getElementById("cBad").textContent = ratings.filter(r => r === "bad").length;
+  document.getElementById("cRemix").textContent = ratings.filter(r => r === "remix").length;
+  document.getElementById("cNone").textContent = ratings.filter(r => r === null).length;
+}
+
+function showExport() {
+  let t = "";
+  const good = [], remix = [];
+  combos.forEach((c, i) => {
+    if (ratings[i] === "good") good.push({ ...c, i });
+    if (ratings[i] === "remix") remix.push({ ...c, i });
+  });
+
+  if (good.length) {
+    t += "=== WINNERS ===\n\n";
+    good.forEach(c => {
+      t += `#${c.i+1} [${c.audience}]\n`;
+      t += `  ${c.h.join(" | ")}\n`;
+      t += `  ${c.d[0]}\n`;
+      t += `  ${c.d[1]}\n`;
+      if (notes[c.i]) t += `  Note: ${notes[c.i]}\n`;
+      t += "\n";
+    });
+  }
+
+  if (remix.length) {
+    t += "=== REMIX ===\n\n";
+    remix.forEach(c => {
+      t += `#${c.i+1} [${c.audience}]\n`;
+      t += `  ${c.h.join(" | ")}\n`;
+      t += `  ${c.d[0]}\n`;
+      t += `  ${c.d[1]}\n`;
+      if (notes[c.i]) t += `  Note: ${notes[c.i]}\n`;
+      t += "\n";
+    });
+  }
+
+  // Deduplicate winning copy
+  const winH = new Set(), winD = new Set();
+  good.forEach(c => { c.h.forEach(h => winH.add(h)); c.d.forEach(d => winD.add(d)); });
+
+  if (winH.size) {
+    t += "\n=== PASTE INTO GOOGLE ADS ===\n\nHeadlines:\n";
+    [...winH].forEach((h, i) => t += `  ${i+1}. ${h}\n`);
+    t += "\nDescriptions:\n";
+    [...winD].forEach((d, i) => t += `  ${i+1}. ${d}\n`);
+  }
+
+  if (!t) t = "No combos rated yet. Mark some as Keep or Remix first.";
+  document.getElementById("exportPre").textContent = t;
+  document.getElementById("overlay").classList.add("open");
+}
+
+renderAll();
+</script>
+</body>
+</html>

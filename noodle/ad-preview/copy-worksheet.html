@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medley — Copy Worksheet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; min-height: 100vh; }
+
+  .layout { display: grid; grid-template-columns: 1fr 380px; min-height: 100vh; }
+
+  /* Left panel */
+  .worksheet { padding: 24px 28px 40px; overflow-y: auto; max-height: 100vh; }
+  h1 { font-size: 20px; margin-bottom: 2px; }
+  .intro { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.5; }
+
+  /* Voice check banner */
+  .voice-check { background: #fffbea; border: 1px solid #f0d060; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; line-height: 1.5; color: #6b5900; }
+  .voice-check strong { color: #4a3d00; }
+
+  /* Stats bar */
+  .stats-bar { display: flex; gap: 16px; padding: 10px 16px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e5e5e5; margin-bottom: 20px; font-size: 13px; color: #555; align-items: center; flex-wrap: wrap; }
+  .stat-num { font-weight: 700; }
+  .stat-num.green { color: #137333; }
+  .stat-num.amber { color: #b06000; }
+  .stat-num.red { color: #d93025; }
+  .stat-sep { color: #ddd; }
+
+  /* Section headers */
+  .section-type { font-size: 14px; color: #1a73e8; font-weight: 600; margin: 24px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .section-note { font-size: 12px; color: #999; margin-bottom: 8px; }
+
+  .cat-header { display: flex; align-items: center; gap: 8px; margin: 18px 0 6px; }
+  .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; flex: 1; }
+  .cat-count { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #e6f4ea; color: #137333; }
+
+  /* Item rows */
+  .item { display: flex; align-items: center; gap: 6px; padding: 6px 6px; border-radius: 6px; transition: all 0.15s; }
+  .item:hover { background: #f8f9fa; }
+  .item.approved { background: #f0faf2; }
+  .item.remix { background: #f3eefa; border-left: 3px solid #9334e6; }
+  .item.killed { display: none; }
+
+  .vote-btns { display: flex; gap: 3px; flex-shrink: 0; }
+  .vote-btn { width: 26px; height: 26px; border: 1px solid #dadce0; background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+  .vote-btn:hover { background: #f0f0f0; }
+  .vote-btn.approve-on { background: #e6f4ea; border-color: #34a853; color: #137333; }
+  .vote-btn.remix-on { background: #f3eefa; border-color: #9334e6; color: #9334e6; }
+  .vote-btn.kill { color: #999; }
+  .vote-btn.kill:hover { background: #fce8e6; border-color: #d93025; color: #d93025; }
+
+  .new-badge { font-size: 9px; font-weight: 700; color: #b06000; background: #fef7e0; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; letter-spacing: 0.3px; text-transform: uppercase; }
+
+  .item-text { flex: 1; font-size: 14px; padding: 2px 6px; border-radius: 3px; outline: none; min-width: 0; }
+  .item-text:focus { background: #eef1ff; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
+
+  .item-meta { font-size: 10px; color: #bbb; flex-shrink: 0; white-space: nowrap; }
+  .item-meta.over { color: #d93025; font-weight: bold; }
+  .item-meta.sweet { color: #137333; }
+
+  .item-note { font-size: 10px; color: #bbb; font-style: italic; flex-shrink: 0; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Right panel */
+  .preview-panel { background: #f8f9fa; border-left: 1px solid #e5e5e5; padding: 24px 20px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+  .preview-panel h3 { font-size: 14px; color: #1a73e8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .preview-panel .sub { font-size: 12px; color: #999; margin-bottom: 16px; }
+
+  .approved-summary { margin-bottom: 20px; }
+  .approved-summary h4 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
+  .approved-item { font-size: 12px; padding: 2px 0; color: #333; border-bottom: 1px solid #eee; }
+  .approved-item .rn { color: #bbb; font-size: 10px; margin-right: 4px; }
+  .approved-empty { font-size: 12px; color: #ccc; font-style: italic; }
+
+  .shuffle-btn { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+  .shuffle-btn:hover { background: #1557b0; }
+
+  .preview-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+  .pv-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+  .pv-h { font-size: 15px; color: #1a0dab; line-height: 1.3; margin-bottom: 2px; }
+  .pv-u { font-size: 12px; color: #006621; margin-bottom: 3px; }
+  .pv-u .badge { font-size: 10px; font-weight: bold; color: #006621; border: 1px solid #006621; border-radius: 2px; padding: 0 3px; margin-right: 3px; }
+  .pv-d { font-size: 12px; color: #4d5156; line-height: 1.4; }
+
+  .export-btn { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 16px; width: 100%; }
+  .export-btn:hover { background: #1557b0; }
+
+  /* Export overlay */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+  .overlay-box { background: #fff; border-radius: 12px; max-width: 640px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; }
+  .overlay-header { position: sticky; top: 0; background: #fff; padding: 16px 24px 10px; border-bottom: 1px solid #e5e5e5; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 12px; z-index: 1; }
+  .overlay-header h3 { font-size: 16px; flex: 1; }
+  .overlay-header button { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .overlay-header button.close-btn { background: #666; }
+  .overlay-body { padding: 16px 24px 24px; overflow-y: auto; flex: 1; }
+  .overlay-body pre { background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 13px; white-space: pre-wrap; line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .preview-panel { position: relative; max-height: none; border-left: none; border-top: 1px solid #e5e5e5; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<div class="worksheet">
+  <h1>Medley Copy Worksheet</h1>
+  <p class="intro">Vote on every piece of copy. <b>Approve</b> what works, <b>kill</b> what doesn't, <b>remix</b> what needs another pass. Edit text inline. Right panel shows live Google Ad combos from your approved pieces.</p>
+
+  <div class="voice-check">
+    <strong>Voice check:</strong> Jess says <em>disability</em>, not "special needs." Language should be <em>inclusive, adaptive, all learners.</em> Watch for anything that sounds clinical or deficit-framed. If it doesn't sound like Jess would say it on a call, flag it for remix.
+  </div>
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="section-type">Headlines <span style="font-weight:400;color:#999;font-size:11px;">max 30 chars</span></div>
+
+  <div class="cat-header"><h3>The Gap &mdash; hooks that stop the scroll</h3><span class="cat-count" id="cc-gap"></span></div>
+  <div id="s-gap"></div>
+
+  <div class="cat-header"><h3>The Promise &mdash; what they get</h3><span class="cat-count" id="cc-promise"></span></div>
+  <div id="s-promise"></div>
+
+  <div class="cat-header"><h3>Credibility &mdash; why Medley</h3><span class="cat-count" id="cc-cred"></span></div>
+  <div id="s-cred"></div>
+
+  <div class="cat-header"><h3>Audience &mdash; who it's for</h3><span class="cat-count" id="cc-aud"></span></div>
+  <div id="s-aud"></div>
+
+  <div class="cat-header"><h3>Format &amp; CTA</h3><span class="cat-count" id="cc-cta"></span></div>
+  <div id="s-cta"></div>
+
+  <div class="section-type" style="margin-top:32px;">Descriptions <span style="font-weight:400;color:#999;font-size:11px;">max 90 chars</span></div>
+  <div class="section-note">Shorter catches eyes. People scan, not read. <span style="color:#137333;font-weight:600;">Green = sweet spot (40&ndash;65 chars).</span></div>
+
+  <div class="cat-header"><h3>For Teachers</h3><span class="cat-count" id="cc-dt"></span></div>
+  <div id="s-dt"></div>
+
+  <div class="cat-header"><h3>For Admins</h3><span class="cat-count" id="cc-da"></span></div>
+  <div id="s-da"></div>
+
+  <div class="cat-header"><h3>Universal</h3><span class="cat-count" id="cc-du"></span></div>
+  <div id="s-du"></div>
+</div>
+
+<!-- Right panel: Live Preview -->
+<div class="preview-panel">
+  <h3>Live Preview</h3>
+  <p class="sub">4 random combos from approved copy</p>
+  <button class="shuffle-btn" onclick="renderPreviews()">Shuffle Combos</button>
+  <div id="previews"></div>
+
+  <div class="approved-summary" id="approvedSummary"></div>
+
+  <button class="export-btn" onclick="showExport()">Export Approved Copy</button>
+</div>
+
+</div>
+
+<!-- Export overlay -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="overlay-header">
+      <h3>Approved Copy &mdash; Export</h3>
+      <button onclick="copyExport()" id="copyBtn">Copy to Clipboard</button>
+      <button class="close-btn" onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
+    </div>
+    <div class="overlay-body">
+      <pre id="exportPre"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "medley-ad-workshop-v5";
+const DESC_SWEET = [40, 65];
+
+function loadStore() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; } }
+function saveStore(store) { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
+function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50); }
+
+// ================================================
+// DATA — All copy pieces, flat within categories.
+// vote: true = approved, false = killed, null = new/unvoted
+// remix: true = flagged for remix pass
+// ================================================
+const cats = [
+  // HEADLINES
+  { id: "gap", type: "h", label: "The Gap", countEl: "cc-gap", containerEl: "s-gap", max: 30, items: [
+    { t: "Your Degree Didn't Cover This", vote: true, remix: false, note: "#1 scroll-stopper" },
+    { t: "Not Trained for This?", vote: true, remix: false, note: "empathetic question" },
+    { t: "Nobody Prepared You for This", vote: true, remix: false, note: "direct, bold" },
+    { t: "What Your Degree Missed", vote: true, remix: false },
+    { t: "When Inclusion Feels Hard", vote: true, remix: false },
+    { t: "Not Another Lecture", vote: true, remix: false },
+    { t: "The PD You Actually Need", vote: true, remix: false },
+    { t: "Finally, PD That Fits", vote: true, remix: false },
+    { t: "The PD You Were Missing", vote: true, remix: false },
+  ]},
+  { id: "promise", type: "h", label: "The Promise", countEl: "cc-promise", containerEl: "s-promise", max: 30, items: [
+    { t: "Tools for Monday Morning", vote: true, remix: false, note: "concrete, practical" },
+    { t: "Strategies That Actually Work", vote: true, remix: false, note: "addresses PD skepticism" },
+    { t: "Teach the Kids You Have", vote: true, remix: false, note: "philosophy + practical" },
+    { t: "Feel Empowered to Teach", vote: true, remix: false },
+    { t: "Every Kid, Every Ability", vote: true, remix: false },
+    { t: "Hands-On Music PD", vote: true, remix: false },
+    { t: "Make Monday Better", vote: true, remix: false },
+    { t: "Reach Every Student", vote: true, remix: false },
+    { t: "Music for ALL Learners", vote: true, remix: false },
+    { t: "Monday Will Be Different", vote: true, remix: false },
+    { t: "Ready for Next Monday", vote: true, remix: false },
+  ]},
+  { id: "cred", type: "h", label: "Credibility", countEl: "cc-cred", containerEl: "s-cred", max: 30, items: [
+    { t: "Real Teachers Not Consultants", vote: true, remix: false, note: "strongest credibility" },
+    { t: "By Music Teachers", vote: true, remix: false, note: "clean, simple" },
+    { t: "Humans, Not Curriculum", vote: true, remix: false, note: "Jess's philosophy" },
+    { t: "Watch the Children", vote: true, remix: false, note: "Jess's mantra" },
+    { t: "Teachers, Not Talking Heads", vote: true, remix: false },
+    { t: "No Outsiders, Real Teachers", vote: true, remix: false },
+    { t: "Kids First, Lessons Second", vote: true, remix: false },
+    { t: "We See Kids, Not Labels", vote: true, remix: false },
+    { t: "Made by Music Teachers", vote: true, remix: false },
+    { t: "We're Music Teachers Too", vote: true, remix: false },
+  ]},
+  { id: "aud", type: "h", label: "Audience", countEl: "cc-aud", containerEl: "s-aud", max: 30, items: [
+    { t: "For Music Teachers", vote: true, remix: false, note: "clear teacher signal" },
+    { t: "Equip Your Music Teachers", vote: true, remix: false, note: "admin action verb" },
+    { t: "Schools & Districts", vote: true, remix: false, note: "admin signal" },
+    { t: "PD Teachers Actually Request", vote: true, remix: false },
+    { t: "Train Your Music Dept", vote: true, remix: false },
+  ]},
+  { id: "cta", type: "h", label: "Format & CTA", countEl: "cc-cta", containerEl: "s-cta", max: 30, items: [
+    { t: "Inclusive Music PD", vote: true, remix: false, note: "keyword match" },
+    { t: "Adaptive Music Ed", vote: true, remix: false, note: "keyword variation" },
+    { t: "Virtual & In-Person", vote: true, remix: false, note: "format flexibility" },
+    { t: "See What We Offer", vote: true, remix: false },
+  ]},
+
+  // DESCRIPTIONS
+  { id: "dt", type: "d", label: "For Teachers", countEl: "cc-dt", containerEl: "s-dt", max: 90, items: [
+    { t: "We teach what your degree didn't. By music teachers.", vote: true, remix: false, note: "52 \u2014 punchiest" },
+    { t: "You were trained for music, not disability. We bridge that gap.", vote: true, remix: false, note: "62 \u2014 Jess's voice" },
+    { t: "Not theory. Hands-on skills your program skipped. Use them Monday.", vote: true, remix: false },
+    { t: "The skills your program skipped. We'll get you there.", vote: true, remix: false },
+    { t: "Stop feeling lost. Fellow music teachers show you what works.", vote: true, remix: false },
+    { t: "Your degree covered the curriculum, not every learner. We cover the rest.", vote: true, remix: false },
+    { t: "Weren't trained for this? We'll get you there. Practical inclusion PD.", vote: true, remix: false },
+    { t: "Fill the gap your degree left. Real strategies for inclusive classrooms.", vote: true, remix: false },
+    { t: "Bridge what your degree missed. Hands-on strategies that work.", vote: true, remix: false },
+    { t: "Feel empowered to include every student. Monday will look different.", vote: true, remix: false },
+    { t: "Your program left gaps. We fill them with practical strategies.", vote: true, remix: false },
+  ]},
+  { id: "da", type: "d", label: "For Admins", countEl: "cc-da", containerEl: "s-da", max: 90, items: [
+    { t: "Your music teachers weren't trained for inclusion. We can help.", vote: true, remix: false, note: "63 \u2014 direct" },
+    { t: "Your team needs this. PD by music teachers who get it.", vote: true, remix: false },
+    { t: "PD teachers actually request. By music teachers, not outsiders.", vote: true, remix: false },
+    { t: "Every child in your district deserves music. Equip your team.", vote: true, remix: false },
+    { t: "Inclusion PD that fills the gap their programs left. We come to you.", vote: true, remix: false },
+  ]},
+  { id: "du", type: "d", label: "Universal", countEl: "cc-du", containerEl: "s-du", max: 90, items: [
+    { t: "Inclusion PD by music teachers. Practical. Hands-on.", vote: true, remix: false, note: "52 \u2014 staccato" },
+    { t: "Strategies you didn't learn in school. Virtual & in-person.", vote: true, remix: false },
+    { t: "The training music teachers actually need. Inclusive, adaptive, hands-on.", vote: true, remix: false },
+    { t: "Inclusion PD that fills the gap. By music teachers, for music teachers.", vote: true, remix: false },
+  ]},
+];
+
+// Generate stable IDs
+cats.forEach(cat => cat.items.forEach(item => { if (!item.id) item.id = slug(item.t); }));
+
+// ================================================
+// PERSISTENCE
+// ================================================
+function applyStore() {
+  const store = loadStore();
+  if (!store) return;
+  cats.forEach(cat => {
+    const saved = store[cat.id];
+    if (!saved) return;
+    cat.items.forEach(item => {
+      const s = saved[item.id];
+      if (!s) return;
+      if (s.vote !== undefined) item.vote = s.vote;
+      if (s.remix !== undefined) item.remix = s.remix;
+      if (s.t) item.t = s.t;
+    });
+  });
+}
+
+function persistAll() {
+  const store = {};
+  cats.forEach(cat => {
+    store[cat.id] = {};
+    cat.items.forEach(item => {
+      store[cat.id][item.id] = { vote: item.vote, remix: item.remix, t: item.t };
+    });
+  });
+  saveStore(store);
+}
+
+applyStore();
+
+// ================================================
+// RENDER
+// ================================================
+function render() {
+  cats.forEach(cat => {
+    const container = document.getElementById(cat.containerEl);
+    container.innerHTML = "";
+
+    cat.items.forEach(item => {
+      if (item.vote === false) return; // killed = hidden
+      renderRow(container, item, cat);
+    });
+
+    // Category count
+    const approved = cat.items.filter(i => i.vote === true).length;
+    const countEl = document.getElementById(cat.countEl);
+    countEl.textContent = `${approved} approved`;
+  });
+
+  renderStats();
+  renderPreviews();
+  renderApprovedSummary();
+  persistAll();
+}
+
+function renderRow(container, item, cat) {
+  const row = document.createElement("div");
+  let cls = "item";
+  if (item.vote === true && !item.remix) cls += " approved";
+  if (item.remix) cls += " remix";
+  row.className = cls;
+
+  // Vote buttons
+  const btns = document.createElement("div");
+  btns.className = "vote-btns";
+
+  // Approve
+  const approveBtn = document.createElement("button");
+  approveBtn.className = "vote-btn" + (item.vote === true ? " approve-on" : "");
+  approveBtn.textContent = "\u2713";
+  approveBtn.title = "Approve";
+  approveBtn.onclick = () => {
+    item.vote = item.vote === true ? null : true;
+    render();
+  };
+
+  // Kill
+  const killBtn = document.createElement("button");
+  killBtn.className = "vote-btn kill";
+  killBtn.textContent = "\u2717";
+  killBtn.title = "Kill \u2014 gone forever";
+  killBtn.onclick = () => {
+    if (confirm("Kill this copy? It will be hidden permanently.")) {
+      item.vote = false;
+      item.remix = false;
+      render();
+    }
+  };
+
+  // Remix
+  const remixBtn = document.createElement("button");
+  remixBtn.className = "vote-btn" + (item.remix ? " remix-on" : "");
+  remixBtn.textContent = "\uD83D\uDD04";
+  remixBtn.title = "Request remix";
+  remixBtn.onclick = () => {
+    item.remix = !item.remix;
+    render();
+  };
+
+  btns.append(approveBtn, killBtn, remixBtn);
+
+  // NEW badge
+  const newBadge = document.createElement("span");
+  if (item.vote === null) {
+    newBadge.className = "new-badge";
+    newBadge.textContent = "NEW";
+  }
+
+  // Text (contentEditable)
+  const text = document.createElement("span");
+  text.className = "item-text";
+  text.contentEditable = true;
+  text.textContent = item.t;
+  text.addEventListener("input", () => {
+    item.t = text.textContent;
+    updateMeta(meta, item.t.length, cat);
+    persistAll();
+  });
+  text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
+
+  // Meta (char count)
+  const meta = document.createElement("span");
+  updateMeta(meta, item.t.length, cat);
+
+  // Note
+  const noteEl = document.createElement("span");
+  if (item.note) {
+    noteEl.className = "item-note";
+    noteEl.textContent = item.note;
+    noteEl.title = item.note;
+  }
+
+  row.append(btns);
+  if (item.vote === null) row.append(newBadge);
+  row.append(text);
+  if (item.note) row.append(noteEl);
+  row.append(meta);
+
+  container.appendChild(row);
+}
+
+function updateMeta(el, len, cat) {
+  el.textContent = `${len}/${cat.max}`;
+  el.className = "item-meta";
+  if (len > cat.max) el.classList.add("over");
+  else if (cat.type === "d" && len >= DESC_SWEET[0] && len <= DESC_SWEET[1]) el.classList.add("sweet");
+}
+
+function renderStats() {
+  const hCats = cats.filter(c => c.type === "h");
+  const dCats = cats.filter(c => c.type === "d");
+
+  const hApproved = hCats.reduce((n, c) => n + c.items.filter(i => i.vote === true).length, 0);
+  const hUnvoted = hCats.reduce((n, c) => n + c.items.filter(i => i.vote === null).length, 0);
+  const hKilled = hCats.reduce((n, c) => n + c.items.filter(i => i.vote === false).length, 0);
+  const hRemix = hCats.reduce((n, c) => n + c.items.filter(i => i.remix).length, 0);
+
+  const dApproved = dCats.reduce((n, c) => n + c.items.filter(i => i.vote === true).length, 0);
+  const dUnvoted = dCats.reduce((n, c) => n + c.items.filter(i => i.vote === null).length, 0);
+  const dKilled = dCats.reduce((n, c) => n + c.items.filter(i => i.vote === false).length, 0);
+  const dRemix = dCats.reduce((n, c) => n + c.items.filter(i => i.remix).length, 0);
+
+  const bar = document.getElementById("statsBar");
+  let html = "";
+  html += `<span><strong>Headlines:</strong> <span class="stat-num green">${hApproved}</span> approved`;
+  if (hUnvoted > 0) html += ` \u00b7 <span class="stat-num amber">${hUnvoted}</span> unvoted`;
+  if (hRemix > 0) html += ` \u00b7 <span class="stat-num" style="color:#9334e6">${hRemix}</span> remix`;
+  if (hKilled > 0) html += ` \u00b7 <span class="stat-num red">${hKilled}</span> killed`;
+  html += `</span>`;
+  html += `<span class="stat-sep">|</span>`;
+  html += `<span><strong>Descriptions:</strong> <span class="stat-num green">${dApproved}</span> approved`;
+  if (dUnvoted > 0) html += ` \u00b7 <span class="stat-num amber">${dUnvoted}</span> unvoted`;
+  if (dRemix > 0) html += ` \u00b7 <span class="stat-num" style="color:#9334e6">${dRemix}</span> remix`;
+  if (dKilled > 0) html += ` \u00b7 <span class="stat-num red">${dKilled}</span> killed`;
+  html += `</span>`;
+  bar.innerHTML = html;
+}
+
+function renderApprovedSummary() {
+  const container = document.getElementById("approvedSummary");
+  const hApproved = [];
+  const dApproved = [];
+  cats.forEach(c => c.items.forEach(item => {
+    if (item.vote !== true) return;
+    (c.type === "h" ? hApproved : dApproved).push(item.t);
+  }));
+
+  let html = '<h4>Approved Headlines (' + hApproved.length + ')</h4>';
+  if (hApproved.length) {
+    hApproved.forEach((t, i) => html += `<div class="approved-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
+  } else {
+    html += '<div class="approved-empty">No headlines approved yet</div>';
+  }
+
+  html += '<h4 style="margin-top:14px;">Approved Descriptions (' + dApproved.length + ')</h4>';
+  if (dApproved.length) {
+    dApproved.forEach((t, i) => html += `<div class="approved-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
+  } else {
+    html += '<div class="approved-empty">No descriptions approved yet</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function esc(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ================================================
+// PREVIEW — 4 random Google Ad combos
+// ================================================
+function renderPreviews() {
+  const container = document.getElementById("previews");
+  container.innerHTML = "";
+  const hApproved = [], dApproved = [];
+  cats.forEach(c => c.items.forEach(item => { if (item.vote !== true) return; (c.type === "h" ? hApproved : dApproved).push(item.t); }));
+
+  if (hApproved.length < 3 || dApproved.length < 2) {
+    container.innerHTML = '<div style="font-size:12px;color:#999;font-style:italic;padding:8px 0;">Need at least 3 approved headlines and 2 approved descriptions for previews.</div>';
+    return;
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const h = pick(hApproved, 3);
+    const d = pick(dApproved, 2);
+    const card = document.createElement("div");
+    card.className = "preview-card";
+    card.innerHTML = `
+      <div class="pv-label">Combo ${i + 1}</div>
+      <div class="pv-h">${esc(h[0])} | ${esc(h[1])} | ${esc(h[2])}</div>
+      <div class="pv-u"><span class="badge">Ad</span> www.music-access.com</div>
+      <div class="pv-d">${esc(d[0])} ${esc(d[1])}</div>
+    `;
+    container.appendChild(card);
+  }
+}
+
+function pick(arr, n) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a.slice(0, n);
+}
+
+// ================================================
+// EXPORT
+// ================================================
+function showExport() {
+  const hApproved = [], dApproved = [], remixItems = [];
+  cats.forEach(c => c.items.forEach(item => {
+    if (item.vote === true) (c.type === "h" ? hApproved : dApproved).push(item.t);
+    if (item.remix) remixItems.push({ t: item.t, cat: c.label, type: c.type === "h" ? "headline" : "description" });
+  }));
+
+  let t = `MEDLEY COPY WORKSHEET \u2014 EXPORT\n${"=".repeat(42)}\n\n`;
+
+  t += `APPROVED HEADLINES (${hApproved.length}):\n`;
+  hApproved.forEach((text, i) => t += `  ${i + 1}. ${text} (${text.length}/30)\n`);
+
+  t += `\nAPPROVED DESCRIPTIONS (${dApproved.length}):\n`;
+  dApproved.forEach((text, i) => t += `  ${i + 1}. ${text} (${text.length}/90)\n`);
+
+  if (remixItems.length) {
+    t += `\nREMIX REQUESTS (${remixItems.length}):\n`;
+    remixItems.forEach((r, i) => t += `  ${i + 1}. [${r.cat}] ${r.t}\n`);
+  }
+
+  if (hApproved.length >= 3 && dApproved.length >= 2) {
+    t += "\nSAMPLE COMBOS:\n";
+    for (let i = 0; i < 5; i++) {
+      t += `\n  ${pick(hApproved, 3).join(" | ")}\n  ${pick(dApproved, 2).join(" ")}\n`;
+    }
+  }
+
+  document.getElementById("exportPre").textContent = t;
+  document.getElementById("overlay").classList.add("open");
+}
+
+function copyExport() {
+  navigator.clipboard.writeText(document.getElementById("exportPre").textContent).then(() => {
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "Copied!";
+    setTimeout(() => btn.textContent = "Copy to Clipboard", 1500);
+  });
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
