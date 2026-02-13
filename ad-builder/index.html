@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medley — Ad Copy</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid #e8e8e8; padding: 10px 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .topbar h1 { font-size: 15px; font-weight: 700; color: #333; white-space: nowrap; }
+  .counter-group { display: flex; gap: 12px; flex: 1; }
+  .counter-pill { display: flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 16px; font-size: 12px; font-weight: 600; }
+  .counter-pill.good { background: #e8f5e9; color: #2e7d32; }
+  .counter-pill.warn { background: #fff8e1; color: #f57f17; }
+  .counter-pill.over { background: #fce4ec; color: #c62828; }
+  .counter-pill .num { font-size: 16px; font-weight: 800; }
+  .save-status { font-size: 11px; color: #8da4be; transition: opacity 0.3s; }
+  .save-status.flash { color: #2e7d32; }
+  .topbar .refresh-btn { background: transparent; border: 1px solid #ddd; border-radius: 6px; padding: 4px 10px; font-size: 12px; color: #999; cursor: pointer; }
+  .topbar .refresh-btn:hover { color: #666; border-color: #ccc; }
+
+  /* Layout */
+  .layout { display: grid; grid-template-columns: 1fr 380px; min-height: 100vh; }
+
+  /* Main panel */
+  .worksheet { padding: 16px 24px 100px; overflow-y: auto; max-height: 100vh; }
+  .page-intro { padding: 8px 0 12px; font-size: 13px; color: #666; line-height: 1.6; }
+  .page-intro strong { color: #333; }
+
+  /* Campaign tabs */
+  .camp-tabs { display: flex; gap: 4px; margin: 4px 0 12px; }
+  .camp-tab { background: transparent; border: 1px solid #dadce0; border-radius: 8px; padding: 7px 18px; font-size: 13px; font-weight: 500; color: #666; cursor: pointer; transition: all 0.15s; }
+  .camp-tab:hover { background: #f5f5f5; color: #333; }
+  .camp-tab.active { background: #1a73e8; color: #fff; border-color: #1a73e8; font-weight: 600; cursor: default; }
+  .camp-tab.active:hover { background: #1a73e8; }
+
+  /* Section headers */
+  .section-type { font-size: 14px; color: #1a73e8; font-weight: 600; margin: 24px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .section-type:first-child { margin-top: 0; }
+  .section-type .limit { font-size: 11px; color: #999; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .section-type .ad-fmt { display: inline-block; font-size: 10px; color: #1a73e8; background: #e8f0fe; padding: 1px 8px; border-radius: 4px; letter-spacing: 1px; font-weight: 500; }
+  .section-type .ad-fmt-d { color: #1a0dab; background: #eef0ff; }
+
+  .cat-header { display: flex; align-items: center; gap: 8px; margin: 16px 0 2px; padding: 0 4px; }
+  .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; flex: 1; }
+  .cat-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .cat-badge.good { background: #e8f5e9; color: #2e7d32; }
+  .cat-badge.over { background: #fce4ec; color: #c62828; }
+  .cat-badge.under { background: #f5f5f5; color: #999; }
+
+  /* Items */
+  .item { --glow: #bdbdbd; position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; margin: 3px 0; transition: margin 0.12s ease, box-shadow 0.12s ease, background 0.15s, border-color 0.15s, opacity 0.15s; background: #fff; border: 1px solid transparent; }
+  .item:hover { border-color: #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .item.kept { --glow: #66bb6a; background: #f1f8f1; border-color: #c8e6c9; }
+  .item.kept.excess { --glow: #ef5350; background: #fef0f0; border-color: #f5c6c6; }
+  .item.available { --glow: #bdbdbd; background: #fff; }
+  .item.killed { opacity: 0.45; }
+  .item.killed .item-text { text-decoration: line-through; }
+  .item.dragging { opacity: 0.3; }
+
+  /* Drag indicators — gap opens with dashed outline ghost */
+  .item.drag-over-top { margin-top: 30px; box-shadow: inset 0 2px 0 0 var(--glow); }
+  .item.drag-over-bottom { margin-bottom: 30px; box-shadow: inset 0 -2px 0 0 var(--glow); }
+  .item.drag-neighbor-top { box-shadow: inset 0 1px 0 0 var(--glow); }
+  .item.drag-neighbor-bottom { box-shadow: inset 0 -1px 0 0 var(--glow); }
+
+  /* Insertion outline — ghost preview of where the dragged item will land */
+  .item.drag-over-top::before,
+  .item.drag-over-bottom::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 24px;
+    border: 2px dashed var(--glow);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+  .item.drag-over-top::before { bottom: calc(100% + 3px); }
+  .item.drag-over-bottom::after { top: calc(100% + 3px); }
+
+  .item.drag-will-excess { --glow: #ef5350; background: #fef0f0 !important; border-color: #f5c6c6 !important; }
+  .item.drag-will-excess .rank-num { color: #e53935; }
+
+  .drag-handle { cursor: grab; color: #bbb; font-size: 16px; padding: 4px 6px; user-select: none; flex-shrink: 0; letter-spacing: -1px; }
+  .drag-handle:active { cursor: grabbing; color: #666; }
+  .item:hover .drag-handle { color: #888; }
+
+  .rank-num { width: 18px; font-size: 10px; font-weight: 700; color: #66bb6a; text-align: center; flex-shrink: 0; }
+  .item.kept.excess .rank-num { color: #e53935; }
+
+  .vote-btns { display: flex; gap: 3px; flex-shrink: 0; }
+  .vote-btn { width: 26px; height: 26px; border: 1px solid #dadce0; background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; color: #bbb; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+  .vote-btn:hover { background: #f0f0f0; }
+  .vote-btn.kill:hover { background: #fce8e6; border-color: #d93025; color: #d93025; }
+  .vote-btn.remix-on { background: #f3eefa; border-color: #9334e6; color: #9334e6; }
+  .vote-btn.restore { color: #999; }
+  .vote-btn.restore:hover { background: #e6f4ea; border-color: #34a853; color: #137333; }
+
+  .item-text { flex: 1; font-size: 14px; padding: 2px 6px; border-radius: 3px; outline: none; min-width: 0; cursor: text; }
+  .item-text:focus { background: #eef1ff; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
+  .item.remix .item-text { background: #f3eefa; }
+
+  .shared-badge { font-size: 9px; color: #1a73e8; background: #e8f0fe; padding: 1px 6px; border-radius: 8px; flex-shrink: 0; white-space: nowrap; }
+  .share-toggle { font-size: 9px; padding: 2px 8px; border-radius: 8px; cursor: pointer; flex-shrink: 0; white-space: nowrap; transition: all 0.12s; font-family: inherit; }
+  .share-toggle.off { border: 1px dashed #ccc; background: transparent; color: #ccc; }
+  .share-toggle.off:hover { border-color: #1a73e8; color: #1a73e8; }
+  .share-toggle.on { border: 1px solid #1a73e8; background: #e8f0fe; color: #1a73e8; }
+  .share-toggle.on:hover { background: #d2e3fc; }
+  .item-note { font-size: 10px; color: #bbb; font-style: italic; flex-shrink: 0; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item-meta { font-size: 10px; color: #bbb; flex-shrink: 0; white-space: nowrap; min-width: 36px; text-align: right; }
+  .item-meta.over { color: #d93025; font-weight: bold; }
+  .item-meta.sweet { color: #137333; }
+
+  /* Cut line */
+  .cut-line { display: flex; align-items: center; gap: 8px; margin: 4px 8px; }
+  .cut-line-bar { flex: 1; height: 1px; border-top: 2px dashed #e0e0e0; }
+  .cut-line-label { font-size: 9px; color: #bbb; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .drop-zone { padding: 0; margin: 0; border: 2px dashed transparent; border-radius: 8px; transition: all 0.15s ease-out; text-align: center; font-size: 11px; color: transparent; height: 4px; }
+  .drop-zone.drag-active { height: 40px; border-color: rgba(26,115,232,0.15); color: rgba(26,115,232,0.25); display: flex; align-items: center; justify-content: center; }
+  .drop-zone.drag-hover { border-color: #1a73e8; background: #e8f0fe; color: #1a73e8; font-weight: 600; padding: 8px; height: auto; }
+  .drop-zone.drag-hover.drag-hover-excess { border-color: #e53935; background: #fef0f0; color: #c62828; }
+
+  /* Add your own — uses same .item layout */
+  .item.add-item { border: 1px dashed #ddd; background: #fafafa; }
+  .item.add-item:hover { border-color: #ccc; background: #f5f5f5; }
+  .item.add-item .add-icon { width: 28px; font-size: 16px; color: #ccc; text-align: center; flex-shrink: 0; }
+  .item.add-item .add-spacer { display: flex; gap: 3px; flex-shrink: 0; }
+  .item.add-item .add-spacer-btn { width: 26px; height: 26px; visibility: hidden; }
+  .item.add-item .add-field { flex: 1; font-size: 14px; font-family: inherit; padding: 2px 6px; border: none; background: transparent; outline: none; color: #333; min-width: 0; }
+  .item.add-item .add-field::placeholder { color: #bbb; }
+  .item.add-item .add-field:focus { background: #eef1ff; border-radius: 3px; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
+
+  /* Right panel */
+  .preview-panel { background: #f8f9fa; border-left: 1px solid #e5e5e5; padding: 24px 20px 100px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+  .preview-panel h3 { font-size: 14px; color: #1a73e8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .preview-panel .sub { font-size: 12px; color: #999; margin-bottom: 16px; }
+  .shuffle-btn { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+  .shuffle-btn:hover { background: #1557b0; }
+  .preview-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+  .pv-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+  .pv-h { font-size: 15px; color: #1a0dab; line-height: 1.3; margin-bottom: 2px; }
+  .pv-u { font-size: 12px; color: #006621; margin-bottom: 3px; }
+  .pv-u .badge { font-size: 10px; font-weight: bold; color: #006621; border: 1px solid #006621; border-radius: 2px; padding: 0 3px; margin-right: 3px; }
+  .pv-d { font-size: 12px; color: #4d5156; line-height: 1.4; }
+  .export-btn { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 16px; width: 100%; }
+  .export-btn:hover { background: #1557b0; }
+
+  /* Summary list */
+  .summary-section { margin-top: 20px; }
+  .summary-section h4 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
+  .summary-item { font-size: 12px; padding: 2px 0; color: #333; border-bottom: 1px solid #eee; }
+  .summary-item .rn { color: #bbb; font-size: 10px; margin-right: 4px; }
+
+  /* Bottom bar */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: #fff; border-top: 1px solid #e8e8e8; padding: 10px 24px; display: flex; gap: 8px; align-items: center; justify-content: center; box-shadow: 0 -1px 4px rgba(0,0,0,0.04); }
+  .nav-btn { background: transparent; color: #999; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .nav-btn:hover { color: #666; background: #f5f5f5; }
+  .nav-btn.active { background: #1a73e8; color: #fff; font-weight: 600; cursor: default; }
+  .nav-btn.active:hover { background: #1a73e8; }
+  .bar-sep { width: 1px; height: 20px; background: #e0e0e0; margin: 0 4px; }
+  .util-btn { background: transparent; color: #bbb; border: 1px solid #e8e8e8; border-radius: 6px; padding: 6px 14px; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .util-btn:hover { color: #888; background: #fafafa; }
+
+  /* Export overlay */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+  .overlay-box { background: #fff; border-radius: 12px; max-width: 700px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; }
+  .overlay-header { padding: 16px 24px 10px; border-bottom: 1px solid #e5e5e5; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 12px; }
+  .overlay-header h3 { font-size: 16px; flex: 1; }
+  .overlay-header button { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .overlay-header button.close-btn { background: #666; }
+  .overlay-body { padding: 16px 24px 24px; overflow-y: auto; flex: 1; }
+  .overlay-body pre { background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 13px; white-space: pre-wrap; line-height: 1.6; }
+
+  /* Collapsible sections */
+  .section-header { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; padding: 6px 4px; border-radius: 6px; transition: background 0.12s; }
+  .section-header:hover { background: #f5f5f5; }
+  .section-header .chevron { font-size: 12px; color: #999; transition: transform 0.2s; display: inline-block; width: 14px; text-align: center; }
+  .section-header .chevron.collapsed { transform: rotate(-90deg); }
+  .section-content.collapsed { display: none; }
+
+  /* Two-column category grid */
+  .section-content.grid-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; align-items: start; }
+  .cat-wrapper { min-width: 0; }
+
+  /* Match type pill */
+  .match-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; cursor: pointer; border: 1px solid #dadce0; background: #f8f9fa; color: #666; white-space: nowrap; flex-shrink: 0; transition: all 0.12s; text-transform: capitalize; font-family: inherit; }
+  .match-pill:hover { border-color: #1a73e8; color: #1a73e8; background: #e8f0fe; }
+  .match-pill.exact { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+  .match-pill.broad { background: #fff8e1; border-color: #f57f17; color: #f57f17; }
+
+  /* Keyword items */
+  .item.kw-item { padding-left: 16px; }
+  .item.kw-item .kw-icon { font-size: 14px; color: #ccc; flex-shrink: 0; width: 18px; text-align: center; }
+
+  /* AI Drawer */
+  .ai-fab { position: fixed; bottom: 70px; right: 24px; z-index: 250; width: 48px; height: 48px; border-radius: 50%; background: #1a73e8; color: #fff; border: none; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .ai-fab:hover { background: #1557b0; transform: scale(1.05); }
+  .ai-fab.open { background: #666; }
+
+  .ai-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 100vw; background: #fff; border-left: 1px solid #e5e5e5; z-index: 280; transform: translateX(100%); transition: transform 0.25s ease; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.08); }
+  .ai-drawer.open { transform: translateX(0); }
+
+  .ai-drawer-header { padding: 12px 16px; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; gap: 8px; }
+  .ai-drawer-header h3 { flex: 1; font-size: 14px; font-weight: 600; }
+  .ai-drawer-header button { background: transparent; border: none; cursor: pointer; font-size: 16px; color: #999; padding: 4px; }
+  .ai-drawer-header button:hover { color: #333; }
+
+  .ai-settings { padding: 12px 16px; border-bottom: 1px solid #e8e8e8; display: none; }
+  .ai-settings.open { display: block; }
+  .ai-settings label { font-size: 11px; color: #888; display: block; margin-bottom: 4px; }
+  .ai-settings input { width: 100%; padding: 6px 8px; border: 1px solid #dadce0; border-radius: 6px; font-size: 12px; font-family: monospace; }
+
+  .ai-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .ai-msg { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  .ai-msg.user { align-self: flex-end; background: #1a73e8; color: #fff; border-bottom-right-radius: 4px; }
+  .ai-msg.assistant { align-self: flex-start; background: #f1f3f4; color: #333; border-bottom-left-radius: 4px; }
+  .ai-msg.system { align-self: center; background: transparent; color: #999; font-size: 11px; font-style: italic; text-align: center; }
+
+  .ai-quick { padding: 8px 16px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid #f0f0f0; }
+  .ai-quick button { background: #f1f3f4; border: 1px solid #dadce0; border-radius: 16px; padding: 4px 12px; font-size: 11px; color: #555; cursor: pointer; font-family: inherit; transition: all 0.12s; }
+  .ai-quick button:hover { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+
+  .ai-input-area { padding: 12px 16px; border-top: 1px solid #e8e8e8; display: flex; gap: 8px; }
+  .ai-input-area textarea { flex: 1; resize: none; border: 1px solid #dadce0; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; height: 40px; max-height: 100px; outline: none; }
+  .ai-input-area textarea:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
+  .ai-input-area button { background: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .ai-input-area button:hover { background: #1557b0; }
+  .ai-input-area button:disabled { background: #ccc; cursor: not-allowed; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .preview-panel { position: relative; max-height: none; border-left: none; border-top: 1px solid #e5e5e5; }
+    .section-content.grid-cats { grid-template-columns: 1fr; }
+    .ai-drawer { width: 100%; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Medley Ad Copy</h1>
+  <div class="counter-group">
+    <div class="counter-pill" id="hPill"><span class="num" id="hNum">0</span>&nbsp;/ 15 headlines</div>
+    <div class="counter-pill" id="dPill"><span class="num" id="dNum">0</span>&nbsp;/ 4 descriptions</div>
+    <div class="counter-pill good" id="kwPill"><span class="num" id="kwNum">0</span>&nbsp;keywords</div>
+  </div>
+  <span class="save-status" id="saveStatus">Auto-saved</span>
+  <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+</div>
+
+<div class="layout">
+<div class="worksheet">
+
+  <div class="page-intro">
+    <strong>Two campaigns — Teachers and Admins.</strong> Items with a <span class="shared-badge" style="display:inline">Shared</span> badge live in both. Drag above the line to include, edit any text directly, or add your own.
+  </div>
+
+  <div class="camp-tabs">
+    <button class="camp-tab active" data-camp="t" onclick="switchCamp('t')">Teachers Campaign</button>
+    <button class="camp-tab" data-camp="a" onclick="switchCamp('a')">Admins Campaign</button>
+  </div>
+
+  <div id="catContent"></div>
+</div>
+
+<!-- Right panel -->
+<div class="preview-panel">
+  <h3>Live Preview — <span id="campLabel">Teachers</span></h3>
+  <p class="sub">Google will mix your headlines and descriptions — here's what that might look like</p>
+  <button class="shuffle-btn" onclick="renderPreviews()">Shuffle</button>
+  <div id="previews"></div>
+  <div class="summary-section" id="summary"></div>
+  <button class="export-btn" onclick="showExport()">Export Both Campaigns</button>
+</div>
+</div>
+
+<div class="bottom-bar">
+  <button class="nav-btn active">Ad Copy</button>
+  <button class="nav-btn" onclick="location.href='index.html'">Visual Preview</button>
+  <span class="bar-sep"></span>
+  <button class="util-btn" onclick="downloadBackup()">Download Backup</button>
+</div>
+
+<!-- AI Help -->
+<button class="ai-fab" id="aiFab" onclick="toggleAiDrawer()" title="AI Copy Helper">AI</button>
+<div class="ai-drawer" id="aiDrawer">
+  <div class="ai-drawer-header">
+    <h3>AI Copy Helper</h3>
+    <button onclick="toggleAiSettings()" title="Settings">&#9881;</button>
+    <button onclick="toggleAiDrawer()" title="Close">&#10005;</button>
+  </div>
+  <div class="ai-settings" id="aiSettings">
+    <label>Anthropic API Key</label>
+    <input type="password" id="aiKeyInput" placeholder="sk-ant-..." oninput="saveAiKey(this.value)">
+  </div>
+  <div class="ai-quick">
+    <button onclick="aiQuick('Suggest 3 new headlines for this campaign')">Suggest headlines</button>
+    <button onclick="aiQuick('Review my keywords — anything missing or redundant?')">Review keywords</button>
+    <button onclick="aiQuick('Improve my descriptions — shorter and punchier')">Improve descriptions</button>
+  </div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg system">Ask about your ad copy. I can see your current headlines, descriptions, and keywords.</div>
+  </div>
+  <div class="ai-input-area">
+    <textarea id="aiInput" placeholder="Ask about your copy..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"></textarea>
+    <button onclick="aiSend()" id="aiSendBtn">Send</button>
+  </div>
+</div>
+
+<!-- Export overlay -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="overlay-header">
+      <h3>Your Ad Copy — Both Campaigns</h3>
+      <button onclick="copyExport()" id="copyBtn">Copy to Clipboard</button>
+      <button class="close-btn" onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
+    </div>
+    <div class="overlay-body"><pre id="exportPre"></pre></div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "medley-ad-v3";
+const H_MAX = 15, D_MAX = 4;
+let collapsed = { h: false, d: false, k: true, n: true };
+const DESC_SWEET = [40, 65];
+
+// Cloud sync — Supabase project credentials
+const SUPABASE_URL = 'https://worozzwxctxiqskddkws.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_mS3Vjb8kIzY4wjOallo8Bg_x0xvjOIY';
+
+function loadStore() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; } }
+function saveStore(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50); }
+function pick(a, n) { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b.slice(0, n); }
+function esc(s) { const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+// =============================================
+// CAMPAIGN STATE
+// =============================================
+let activeCamp = "t"; // "t" = teachers, "a" = admins
+
+function getKeep(item) { return activeCamp === "t" ? item.keepT : item.keepA; }
+function setKeep(item, val) {
+  if (activeCamp === "t") item.keepT = val;
+  else item.keepA = val;
+}
+function getKilled(item) { return activeCamp === "t" ? item.killedT : item.killedA; }
+function setKilled(item, val) {
+  if (activeCamp === "t") item.killedT = val;
+  else item.killedA = val;
+}
+function getTarget(cat) { return activeCamp === "t" ? cat.targetT : cat.targetA; }
+
+// =============================================
+// DATA — two campaigns with shared items
+// camp: "t" = teachers only, "a" = admins only, "b" = both
+// keepT/keepA: above cut line per campaign
+// =============================================
+const cats = [
+  // --- HEADLINES ---
+  { id:"gap", type:"h", label:"The Gap", camps:"ta", targetT:3, targetA:3, max:30, items:[
+    { t:"Your Degree Didn't Cover This", camp:"t", keepT:true, keepA:false },
+    { t:"Not Trained for This?", camp:"b", keepT:true, keepA:true },
+    { t:"When Inclusion Feels Hard", camp:"b", keepT:true, keepA:false },
+    { t:"Bridge the Training Gap", camp:"a", keepT:false, keepA:true },
+    { t:"What Your Degree Missed", camp:"t", keepT:false, keepA:false },
+    { t:"The PD You Actually Need", camp:"b", keepT:false, keepA:true },
+    { t:"Teach Disabled Students", camp:"t", keepT:false, keepA:false },
+    { t:"Support Neurodivergent Kids", camp:"t", keepT:false, keepA:false },
+  ]},
+  { id:"promise", type:"h", label:"The Promise", camps:"ta", targetT:5, targetA:3, max:30, items:[
+    { t:"Tools for Monday Morning", camp:"t", keepT:true, keepA:false },
+    { t:"Strategies That Actually Work", camp:"b", keepT:true, keepA:true },
+    { t:"Teach the Kids You Have", camp:"t", keepT:true, keepA:false },
+    { t:"Feel Empowered to Teach", camp:"t", keepT:true, keepA:false },
+    { t:"Hands-On Music PD", camp:"b", keepT:true, keepA:true },
+    { t:"Music for ALL Learners", camp:"b", keepT:false, keepA:true },
+    { t:"Ready for Next Monday", camp:"t", keepT:false, keepA:false },
+    { t:"Build an Inclusive Program", camp:"a", keepT:false, keepA:false },
+    { t:"Joyful Inclusion Tools", camp:"t", keepT:false, keepA:false },
+    { t:"Build Staff Inclusion Skills", camp:"a", keepT:false, keepA:false },
+    { t:"Strengthen Your Music Team", camp:"a", keepT:false, keepA:false },
+  ]},
+  { id:"cred", type:"h", label:"Credibility", camps:"ta", targetT:4, targetA:6, max:30, items:[
+    { t:"By Music Teachers", camp:"b", keepT:true, keepA:true },
+    { t:"Real Teachers Not Consultants", camp:"b", keepT:true, keepA:true },
+    { t:"Humans, Not Curriculum", camp:"b", keepT:true, keepA:true, note:"Jess's philosophy" },
+    { t:"For Music Teachers", camp:"t", keepT:true, keepA:false },
+    { t:"Equip Your Music Teachers", camp:"a", keepT:false, keepA:true },
+    { t:"Schools & Districts", camp:"a", keepT:false, keepA:true },
+    { t:"Train Your Music Department", camp:"a", keepT:false, keepA:true },
+    { t:"Watch the Children", camp:"b", keepT:false, keepA:false, note:"Jess's mantra — save for retargeting" },
+    { t:"We See Kids, Not Labels", camp:"b", keepT:false, keepA:false, note:"Save for retargeting" },
+    { t:"Made by Music Teachers", camp:"b", keepT:false, keepA:false },
+    { t:"PD Teachers Actually Request", camp:"a", keepT:false, keepA:false },
+  ]},
+  { id:"cta", type:"h", label:"Format", camps:"ta", targetT:3, targetA:3, max:30, items:[
+    { t:"Inclusive Music PD", camp:"b", keepT:true, keepA:true },
+    { t:"Adaptive Music Ed", camp:"b", keepT:true, keepA:true },
+    { t:"Virtual & In-Person", camp:"b", keepT:true, keepA:true },
+    { t:"Music Inclusion Workshop", camp:"t", keepT:false, keepA:false },
+    { t:"Monday-Ready Music PD", camp:"t", keepT:false, keepA:false },
+    { t:"District-Wide Music PD", camp:"a", keepT:false, keepA:false },
+    { t:"Book Music PD for Staff", camp:"a", keepT:false, keepA:false },
+  ]},
+
+  // --- DESCRIPTIONS ---
+  { id:"dt", type:"d", label:"For Teachers", camps:"t", targetT:2, targetA:0, max:90, items:[
+    { t:"We teach what your degree didn't. By music teachers.", camp:"t", keepT:true, keepA:false },
+    { t:"You learned music. Not disability. We fix that.", camp:"t", keepT:true, keepA:false },
+    { t:"Not theory. Hands-on skills your program skipped. Use them Monday.", camp:"t", keepT:false, keepA:false },
+    { t:"Weren't trained for this? We'll get you there. Practical inclusion PD.", camp:"t", keepT:false, keepA:false },
+    { t:"Fill the gap your degree left. Real strategies for inclusive classrooms.", camp:"t", keepT:false, keepA:false },
+    { t:"Feel empowered to include every student. Monday will look different.", camp:"t", keepT:false, keepA:false },
+    { t:"You were trained for music, not disability. We bridge that gap.", camp:"t", keepT:false, keepA:false, note:"Original — longer version" },
+    { t:"Practical inclusion for real classrooms. By teachers.", camp:"t", keepT:false, keepA:false },
+  ]},
+  { id:"da", type:"d", label:"For Admins", camps:"a", targetT:0, targetA:2, max:90, items:[
+    { t:"Close the training gap in your music dept.", camp:"a", keepT:false, keepA:true },
+    { t:"Every child in your district deserves music. Equip your team.", camp:"a", keepT:false, keepA:true },
+    { t:"PD teachers actually request. By music teachers, not outsiders.", camp:"a", keepT:false, keepA:false },
+    { t:"Your music teachers weren't trained for inclusion. We can help.", camp:"a", keepT:false, keepA:false, note:"Original — longer version" },
+    { t:"PD music teachers love. Boost retention & inclusion.", camp:"a", keepT:false, keepA:false },
+    { t:"District-ready inclusion training. Virtual or on-site.", camp:"a", keepT:false, keepA:false },
+  ]},
+  { id:"du", type:"d", label:"Universal", camps:"ta", targetT:2, targetA:2, max:90, items:[
+    { t:"Inclusion PD by music teachers. Practical. Hands-on.", camp:"b", keepT:true, keepA:true },
+    { t:"Strategies you didn't learn in school. Virtual & in-person.", camp:"b", keepT:true, keepA:true },
+    { t:"The training music teachers actually need. Inclusive, adaptive, hands-on.", camp:"b", keepT:false, keepA:false },
+  ]},
+
+  // --- KEYWORDS ---
+  { id:"kw", type:"k", label:"Keywords", camps:"ta", max:0, items:[
+    // Existing (kept)
+    { t:"inclusive music education", camp:"b", match:"phrase" },
+    { t:"inclusive music workshop", camp:"b", match:"phrase" },
+    { t:"inclusive music PD", camp:"t", match:"phrase" },
+    { t:"adaptive music PD", camp:"b", match:"phrase" },
+    { t:"adaptive music ed", camp:"b", match:"phrase" },
+    { t:"neurodivergent music ed", camp:"t", match:"phrase" },
+    { t:"music teacher PD", camp:"t", match:"phrase" },
+    { t:"music IEP training", camp:"t", match:"phrase" },
+    { t:"music department training", camp:"a", match:"phrase" },
+    { t:"online music course", camp:"b", match:"exact" },
+    // Panel additions — high-intent commercial
+    { t:"music teacher professional development", camp:"a", match:"phrase" },
+    { t:"inclusive music professional development", camp:"t", match:"phrase" },
+    { t:"music inclusion workshop", camp:"t", match:"phrase" },
+    { t:"disability inclusive music education", camp:"b", match:"phrase" },
+    { t:"autistic students music class", camp:"t", match:"phrase" },
+    { t:"music pd for schools", camp:"a", match:"phrase" },
+    { t:"district music PD", camp:"a", match:"exact" },
+    { t:"adaptive music teacher workshop", camp:"t", match:"phrase" },
+  ]},
+
+  // --- NEGATIVE KEYWORDS ---
+  { id:"nk", type:"n", label:"Negative Keywords", camps:"ta", max:0, items:[
+    { t:"hiring", camp:"b", match:"phrase" },
+    { t:"guitar teacher", camp:"b", match:"phrase" },
+    { t:"IEP goals", camp:"b", match:"phrase" },
+    { t:"MTEL music prep", camp:"b", match:"phrase" },
+    { t:"special education law", camp:"b", match:"phrase" },
+    { t:"internship", camp:"b", match:"phrase" },
+    { t:"private piano teacher", camp:"b", match:"phrase" },
+    { t:"how to become a music teacher", camp:"b", match:"phrase" },
+    { t:"clinical music therapy", camp:"b", match:"phrase" },
+    { t:"hospital music therapy", camp:"b", match:"phrase" },
+    { t:"cheap", camp:"b", match:"phrase" },
+    { t:"salary", camp:"b", match:"phrase" },
+    { t:"private lessons", camp:"b", match:"phrase" },
+    { t:"violin lessons", camp:"b", match:"phrase" },
+    { t:"IEP accommodations", camp:"b", match:"phrase" },
+    { t:"how to write an IEP", camp:"b", match:"phrase" },
+    { t:"tutor", camp:"b", match:"phrase" },
+    { t:"free", camp:"b", match:"phrase" },
+    { t:"voice lessons", camp:"b", match:"phrase" },
+    { t:"careers", camp:"b", match:"phrase" },
+    { t:"music therapy for kids", camp:"b", match:"phrase" },
+    { t:"music therapy certification", camp:"b", match:"phrase" },
+    { t:"music teacher certification", camp:"b", match:"phrase" },
+    { t:"adaptive music lessons", camp:"b", match:"phrase" },
+    { t:"jobs", camp:"b", match:"phrase" },
+    { t:"DIY", camp:"b", match:"phrase" },
+    { t:"piano teacher", camp:"b", match:"phrase" },
+    // Panel additions — block resource-seekers & job-hunters
+    { t:"lesson plans", camp:"b", match:"phrase" },
+    { t:"worksheets", camp:"b", match:"phrase" },
+    { t:"curriculum", camp:"b", match:"phrase" },
+    { t:"printable", camp:"b", match:"phrase" },
+    { t:"YouTube", camp:"b", match:"phrase" },
+    { t:"degree", camp:"b", match:"phrase" },
+    { t:"masters program", camp:"b", match:"phrase" },
+    { t:"college course", camp:"b", match:"phrase" },
+    { t:"certification program", camp:"b", match:"phrase" },
+    { t:"homeschool", camp:"b", match:"phrase" },
+    { t:"kids music classes", camp:"b", match:"phrase" },
+    { t:"summer music camp", camp:"b", match:"phrase" },
+    { t:"music lesson plans free", camp:"b", match:"phrase" },
+    { t:"music education degree", camp:"b", match:"phrase" },
+    { t:"remote music teacher jobs", camp:"b", match:"phrase" },
+  ]},
+];
+
+// Generate stable IDs and defaults
+cats.forEach(cat => cat.items.forEach(item => {
+  if (!item.id) item.id = slug(item.t);
+  if (item.keepT === undefined) item.keepT = false;
+  if (item.keepA === undefined) item.keepA = false;
+  if (item.killedT === undefined) item.killedT = false;
+  if (item.killedA === undefined) item.killedA = false;
+  if (item.remix === undefined) item.remix = false;
+  if (item.match === undefined) item.match = "phrase";
+}));
+
+// =============================================
+// PERSISTENCE
+// =============================================
+function applyStore() {
+  const store = loadStore();
+  if (!store) return;
+  if (store._activeCamp) activeCamp = store._activeCamp;
+  if (store._collapsed) collapsed = { ...collapsed, ...store._collapsed };
+  cats.forEach(cat => {
+    const saved = store[cat.id];
+    if (!saved) return;
+    if (saved.items) {
+      cat.items.forEach(item => {
+        const s = saved.items[item.id];
+        if (!s) return;
+        if (s.keepT !== undefined) item.keepT = s.keepT;
+        if (s.keepA !== undefined) item.keepA = s.keepA;
+        if (s.killedT !== undefined) item.killedT = s.killedT;
+        if (s.killedA !== undefined) item.killedA = s.killedA;
+        if (s.remix !== undefined) item.remix = s.remix;
+        if (s.match) item.match = s.match;
+        if (s.camp) item.camp = s.camp;
+        if (s.t) item.t = s.t;
+      });
+      // Restore user-added items
+      Object.keys(saved.items).forEach(id => {
+        if (!cat.items.find(i => i.id === id)) {
+          const s = saved.items[id];
+          cat.items.push({ t:s.t, keepT:s.keepT||false, keepA:s.keepA||false, camp:s.camp||activeCamp, killedT:s.killedT||false, killedA:s.killedA||false, remix:s.remix||false, match:s.match||"phrase", id });
+        }
+      });
+    }
+    if (saved.order) {
+      const m = {}; saved.order.forEach((id,i) => m[id] = i);
+      cat.items.sort((a,b) => ((m[a.id]??999) - (m[b.id]??999)));
+    }
+  });
+}
+
+function persistAll() {
+  const store = { _activeCamp: activeCamp, _collapsed: collapsed };
+  cats.forEach(cat => {
+    store[cat.id] = {
+      order: cat.items.map(i => i.id),
+      items: {}
+    };
+    cat.items.forEach(item => {
+      store[cat.id].items[item.id] = { keepT:item.keepT, keepA:item.keepA, camp:item.camp, killedT:item.killedT, killedA:item.killedA, remix:item.remix, match:item.match, t:item.t };
+    });
+  });
+  saveStore(store);
+  flashSaved();
+  saveToCloud();
+}
+
+let saveTimer;
+function flashSaved(text) {
+  const el = document.getElementById("saveStatus");
+  if (!el) return;
+  el.textContent = text || "Saved";
+  el.classList.add("flash");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { el.textContent = "Auto-saved"; el.classList.remove("flash"); }, 1500);
+}
+
+function downloadBackup() {
+  const store = loadStore();
+  const blob = new Blob([JSON.stringify(store, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `medley-ad-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+applyStore();
+
+// =============================================
+// CLOUD SYNC (Supabase)
+// =============================================
+let db = null;
+if (SUPABASE_URL && SUPABASE_KEY && window.supabase) {
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
+let cloudSaveTimer, _syncing = false;
+
+function saveToCloud() {
+  if (!db || _syncing) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(async () => {
+    try {
+      const store = loadStore();
+      if (!store) return;
+      const { error } = await db.from('ad_state').upsert({
+        id: STORAGE_KEY,
+        data: store,
+        updated_at: new Date().toISOString()
+      });
+      if (!error) flashSaved("Synced \u2601");
+    } catch (e) { console.warn("Cloud save:", e); }
+  }, 2000);
+}
+
+async function loadFromCloud() {
+  if (!db) return;
+  try {
+    const { data, error } = await db
+      .from('ad_state')
+      .select('data')
+      .eq('id', STORAGE_KEY)
+      .single();
+    if (error || !data?.data) return;
+    const local = loadStore();
+    if (JSON.stringify(local) === JSON.stringify(data.data)) return;
+    _syncing = true;
+    saveStore(data.data);
+    applyStore();
+    render();
+    _syncing = false;
+    flashSaved("Synced \u2601");
+  } catch (e) { _syncing = false; console.warn("Cloud load:", e); }
+}
+
+// =============================================
+// CAMPAIGN SWITCHING
+// =============================================
+function switchCamp(camp) {
+  if (camp === activeCamp) return;
+  activeCamp = camp;
+  document.querySelectorAll(".camp-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.camp === camp);
+  });
+  document.getElementById("campLabel").textContent = camp === "t" ? "Teachers" : "Admins";
+  render();
+}
+
+// Set initial tab state
+document.querySelectorAll(".camp-tab").forEach(btn => {
+  btn.classList.toggle("active", btn.dataset.camp === activeCamp);
+});
+document.getElementById("campLabel").textContent = activeCamp === "t" ? "Teachers" : "Admins";
+
+// =============================================
+// DRAG STATE
+// =============================================
+let dragCat = null, dragItem = null;
+function clearDragIndicators() {
+  document.querySelectorAll(".drag-over-top,.drag-over-bottom,.drag-neighbor-top,.drag-neighbor-bottom,.drag-will-excess").forEach(el => {
+    el.classList.remove("drag-over-top","drag-over-bottom","drag-neighbor-top","drag-neighbor-bottom","drag-will-excess");
+    el.style.removeProperty('--glow');
+  });
+  document.querySelectorAll(".drag-hover-excess").forEach(el => el.classList.remove("drag-hover-excess"));
+}
+
+// =============================================
+// RENDER
+// =============================================
+function render() {
+  const content = document.getElementById("catContent");
+  content.innerHTML = "";
+
+  const typeOrder = ["h", "d", "k", "n"];
+  const typeLabels = {
+    h: 'Headlines <span class="limit">Give Google 15 &middot; it picks 3 per ad&ensp;<span class="ad-fmt">H &ndash; H &ndash; H</span></span>',
+    d: 'Descriptions <span class="limit">Give Google 4 &middot; it picks 2 per ad&ensp;<span class="ad-fmt ad-fmt-d">D&ensp;D</span></span>',
+    k: 'Keywords <span class="limit">Trigger your ad when people search these</span>',
+    n: 'Negative Keywords <span class="limit">Block your ad from these searches</span>'
+  };
+
+  typeOrder.forEach(type => {
+    const typeCats = cats.filter(c => c.type === type && c.camps.includes(activeCamp));
+    if (typeCats.length === 0) return;
+
+    const wrapper = document.createElement("div");
+    if (type !== "h") wrapper.style.marginTop = "32px";
+
+    // Clickable section header
+    const header = document.createElement("div");
+    header.className = "section-header section-type";
+    const chevron = document.createElement("span");
+    chevron.className = "chevron" + (collapsed[type] ? " collapsed" : "");
+    chevron.innerHTML = "&#9662;";
+    const label = document.createElement("span");
+    label.innerHTML = typeLabels[type];
+    header.append(chevron, label);
+    header.onclick = () => { collapsed[type] = !collapsed[type]; render(); };
+    wrapper.appendChild(header);
+
+    // Collapsible content
+    const sectionContent = document.createElement("div");
+    const gridClass = (type === "h" || type === "d") ? " grid-cats" : "";
+    sectionContent.className = "section-content" + gridClass + (collapsed[type] ? " collapsed" : "");
+    typeCats.forEach(cat => {
+      if (type === "k" || type === "n") renderKeywordCategory(sectionContent, cat);
+      else renderCategory(sectionContent, cat);
+    });
+    wrapper.appendChild(sectionContent);
+    content.appendChild(wrapper);
+  });
+
+  updateCounters();
+  renderPreviews();
+  renderSummary();
+  persistAll();
+}
+
+function renderCategory(parent, cat) {
+  const target = getTarget(cat);
+
+  // Filter items visible in this campaign
+  const visible = cat.items.filter(i => i.camp === activeCamp || i.camp === "b");
+  const kept = visible.filter(i => getKeep(i) && !getKilled(i));
+  const available = visible.filter(i => !getKeep(i) && !getKilled(i));
+  const killed = visible.filter(i => getKilled(i));
+
+  // Category header
+  const header = document.createElement("div");
+  header.className = "cat-header";
+  const h3 = document.createElement("h3");
+  h3.textContent = cat.label;
+  const badge = document.createElement("span");
+  badge.className = "cat-badge " + (kept.length === target ? "good" : kept.length > target ? "over" : "under");
+  badge.textContent = `${kept.length}/${target}`;
+  header.append(h3, badge);
+
+  // Container for items
+  const container = document.createElement("div");
+
+  // Kept items (above the line)
+  kept.forEach((item, i) => {
+    renderRow(container, item, i + 1, cat, "kept", i >= target);
+  });
+
+  // Drop zone + cut line
+  if (available.length > 0 || killed.length > 0) {
+    const zone = document.createElement("div");
+    zone.className = "drop-zone";
+    zone.textContent = "Drop here to include in ad";
+    zone.addEventListener("dragover", e => {
+      e.preventDefault();
+      if (dragCat !== cat) return;
+      clearDragIndicators();
+      zone.classList.add("drag-hover");
+      // Glow bottom edge of last kept item above the drop zone
+      const keptItems = container.querySelectorAll(".item.kept:not(.dragging)");
+      if (keptItems.length > 0) keptItems[keptItems.length - 1].classList.add("drag-neighbor-bottom");
+      // Excess preview — incoming item would be last in kept
+      if (!getKeep(dragItem) || getKilled(dragItem)) {
+        const tgt = getTarget(cat);
+        const keptCount = cat.items.filter(i =>
+          (i.camp === activeCamp || i.camp === "b") && getKeep(i) && !getKilled(i)
+        ).length;
+        if (keptCount >= tgt) {
+          zone.classList.add("drag-hover-excess");
+          // Red glow on neighbor edge to match the excess insertion
+          if (keptItems.length > 0) keptItems[keptItems.length - 1].style.setProperty('--glow', '#ef5350');
+        }
+      }
+    });
+    zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover", "drag-hover-excess"));
+    zone.addEventListener("drop", e => {
+      e.preventDefault(); zone.classList.remove("drag-hover");
+      if (dragCat !== cat || !dragItem) return;
+      setKeep(dragItem, true);
+      if (getKilled(dragItem)) setKilled(dragItem, false);
+      render();
+    });
+    container.appendChild(zone);
+
+    const line = document.createElement("div");
+    line.className = "cut-line";
+    line.innerHTML = `<span class="cut-line-label">${kept.length}/${target} in ad</span><div class="cut-line-bar"></div>`;
+    container.appendChild(line);
+  }
+
+  // Available items (below the line)
+  available.forEach(item => renderRow(container, item, null, cat, "available", false));
+
+  // Killed items
+  killed.forEach(item => renderKilledRow(container, item, cat));
+
+  // Add your own row
+  renderAddRow(container, cat);
+
+  const catWrapper = document.createElement("div");
+  catWrapper.className = "cat-wrapper";
+  catWrapper.append(header, container);
+  parent.appendChild(catWrapper);
+}
+
+function renderRow(container, item, rank, cat, state, isExcess) {
+  const row = document.createElement("div");
+  row.className = "item " + state + (isExcess ? " excess" : "") + (item.remix ? " remix" : "");
+  row.draggable = true;
+
+  // Drag handlers
+  row.addEventListener("dragstart", e => {
+    dragCat = cat; dragItem = item;
+    row.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    document.querySelectorAll(".drop-zone").forEach(z => z.classList.add("drag-active"));
+  });
+  row.addEventListener("dragend", () => {
+    row.classList.remove("dragging");
+    clearDragIndicators();
+    document.querySelectorAll(".drop-zone").forEach(z => z.classList.remove("drag-active"));
+  });
+  row.addEventListener("dragover", e => {
+    e.preventDefault();
+    if (dragCat !== cat) return;
+    clearDragIndicators();
+    const rect = row.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    const isTop = e.clientY < midY;
+    if (isTop) {
+      row.classList.add("drag-over-top");
+      const prev = row.previousElementSibling;
+      if (prev && prev.classList.contains("item")) prev.classList.add("drag-neighbor-bottom");
+    } else {
+      row.classList.add("drag-over-bottom");
+      const next = row.nextElementSibling;
+      if (next && next.classList.contains("item")) next.classList.add("drag-neighbor-top");
+    }
+
+    // Excess preview — only when dragging from available into kept area
+    const targetIsKept = getKeep(item) && !getKilled(item);
+    const dragIsKept = getKeep(dragItem) && !getKilled(dragItem);
+    if (targetIsKept && !dragIsKept) {
+      const tgt = getTarget(cat);
+      const keptRows = Array.from(row.parentElement.querySelectorAll(".item.kept:not(.dragging)"));
+      if (keptRows.length >= tgt) {
+        const hoverIdx = keptRows.indexOf(row);
+        const insertPos = isTop ? hoverIdx : hoverIdx + 1;
+        if (insertPos < tgt) {
+          // New item lands in green zone — last green item gets pushed to excess
+          keptRows[tgt - 1].classList.add("drag-will-excess");
+        } else {
+          // New item itself would be excess — show red glow on insertion edges
+          row.style.setProperty('--glow', '#ef5350');
+          const neighbor = isTop ? row.previousElementSibling : row.nextElementSibling;
+          if (neighbor && neighbor.classList.contains("item")) neighbor.style.setProperty('--glow', '#ef5350');
+        }
+      }
+    }
+  });
+  row.addEventListener("drop", e => {
+    e.preventDefault(); clearDragIndicators();
+    if (dragCat !== cat || !dragItem) return;
+    if (dragItem === item) return;
+
+    // Remove dragged item from array
+    const fromIdx = cat.items.indexOf(dragItem);
+    cat.items.splice(fromIdx, 1);
+
+    // Insert at new position
+    const toIdx = cat.items.indexOf(item);
+    const insertAfter = e.clientY >= row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+    cat.items.splice(insertAfter ? toIdx + 1 : toIdx, 0, dragItem);
+
+    // Match the keep state of where it was dropped (for active campaign)
+    setKeep(dragItem, getKeep(item));
+    if (getKilled(dragItem)) setKilled(dragItem, false);
+
+    render();
+  });
+
+  // Drag handle
+  const handle = document.createElement("span");
+  handle.className = "drag-handle";
+  handle.textContent = "\u2630";
+
+  // Rank
+  const rk = document.createElement("span");
+  rk.className = "rank-num";
+  rk.textContent = rank || "";
+
+  // Buttons
+  const btns = document.createElement("div");
+  btns.className = "vote-btns";
+
+  const killBtn = document.createElement("button");
+  killBtn.className = "vote-btn kill";
+  killBtn.textContent = "\u2717";
+  killBtn.title = "Remove";
+  killBtn.onclick = e => { e.stopPropagation(); setKilled(item, true); setKeep(item, false); item.remix = false; render(); };
+
+  const remixBtn = document.createElement("button");
+  remixBtn.className = "vote-btn" + (item.remix ? " remix-on" : "");
+  remixBtn.textContent = "\uD83D\uDD04";
+  remixBtn.title = "Flag for rewrite";
+  remixBtn.onclick = e => { e.stopPropagation(); item.remix = !item.remix; render(); };
+
+  btns.append(killBtn, remixBtn);
+
+  // Text — starts non-editable so dragging works; click-release enables editing
+  const text = document.createElement("span");
+  text.className = "item-text";
+  text.textContent = item.t;
+  text.addEventListener("mouseup", e => {
+    if (text.contentEditable === "true") return;
+    text.contentEditable = true;
+    text.focus();
+    const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+    if (range) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+  });
+  text.addEventListener("blur", () => { text.contentEditable = false; });
+  text.addEventListener("input", () => {
+    item.t = text.textContent;
+    item.id = slug(item.t);
+    persistAll();
+  });
+  text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
+
+  // Share toggle
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle " + (item.camp === "b" ? "on" : "off");
+  shareBtn.textContent = item.camp === "b" ? "Shared" : "Share";
+  shareBtn.title = item.camp === "b" ? "Remove from other campaign" : "Add to both campaigns";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    if (item.camp === "b") {
+      item.camp = activeCamp;
+      if (activeCamp === "t") { item.keepA = false; item.killedA = false; }
+      else { item.keepT = false; item.killedT = false; }
+    } else {
+      item.camp = "b";
+    }
+    render();
+  };
+
+  // Note
+  const noteEl = document.createElement("span");
+  if (item.note) {
+    noteEl.className = "item-note";
+    noteEl.textContent = item.note;
+    noteEl.title = item.note;
+  }
+
+  row.append(handle, rk, btns, text);
+  if (item.note) row.append(noteEl);
+  row.append(shareBtn);
+  container.appendChild(row);
+}
+
+function renderKilledRow(container, item, cat) {
+  const row = document.createElement("div");
+  row.className = "item killed";
+
+  const spacer = document.createElement("span");
+  spacer.style.width = "30px";
+  spacer.style.flexShrink = "0";
+
+  const rk = document.createElement("span");
+  rk.className = "rank-num";
+
+  const btns = document.createElement("div");
+  btns.className = "vote-btns";
+  const restoreBtn = document.createElement("button");
+  restoreBtn.className = "vote-btn restore";
+  restoreBtn.textContent = "\u2713";
+  restoreBtn.title = "Bring back";
+  restoreBtn.onclick = () => { setKilled(item, false); render(); };
+  btns.append(restoreBtn);
+
+  const text = document.createElement("span");
+  text.className = "item-text";
+  text.textContent = item.t;
+
+  const shareLabel = document.createElement("span");
+  if (item.camp === "b") {
+    shareLabel.className = "shared-badge";
+    shareLabel.textContent = "Shared";
+  }
+
+  row.append(spacer, rk, btns, text);
+  if (item.camp === "b") row.append(shareLabel);
+  container.appendChild(row);
+}
+
+function renderAddRow(container, cat) {
+  const row = document.createElement("div");
+  row.className = "item add-item";
+
+  const icon = document.createElement("span");
+  icon.className = "add-icon";
+  icon.textContent = "+";
+
+  const rk = document.createElement("span");
+  rk.className = "rank-num";
+
+  const btns = document.createElement("div");
+  btns.className = "add-spacer";
+  btns.innerHTML = '<span class="add-spacer-btn"></span><span class="add-spacer-btn"></span>';
+
+  const input = document.createElement("input");
+  input.className = "add-field";
+  input.type = "text";
+  input.placeholder = "Add your own \u2014 press Enter";
+  input.maxLength = cat.max;
+
+  // Share toggle for new items
+  let addShared = false;
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle off";
+  shareBtn.textContent = "Share";
+  shareBtn.title = "Add to both campaigns";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    addShared = !addShared;
+    shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
+    shareBtn.textContent = addShared ? "Shared" : "Share";
+    shareBtn.title = addShared ? "Will add to both campaigns" : "Add to both campaigns";
+  };
+
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const text = input.value.trim();
+    if (!text) return;
+    const camp = addShared ? "b" : activeCamp;
+    const newItem = { t: text, camp, keepT: false, keepA: false, killedT: false, killedA: false, remix: false, id: slug(text) };
+    cat.items.push(newItem);
+    render();
+  });
+
+  row.append(icon, rk, btns, input, shareBtn);
+  container.appendChild(row);
+}
+
+// =============================================
+// KEYWORD RENDERING
+// =============================================
+function renderKeywordCategory(parent, cat) {
+  const visible = cat.items.filter(i => i.camp === activeCamp || i.camp === "b");
+  const active = visible.filter(i => !getKilled(i));
+  const killed = visible.filter(i => getKilled(i));
+
+  const header = document.createElement("div");
+  header.className = "cat-header";
+  const h3 = document.createElement("h3");
+  h3.textContent = cat.type === "n" ? "Blocked Terms" : "Active Keywords";
+  const badge = document.createElement("span");
+  badge.className = "cat-badge good";
+  badge.textContent = active.length;
+  header.append(h3, badge);
+  parent.appendChild(header);
+
+  const container = document.createElement("div");
+  active.forEach(item => renderKeywordRow(container, item, cat));
+  killed.forEach(item => renderKeywordKilledRow(container, item, cat));
+  renderKeywordAddRow(container, cat);
+  parent.appendChild(container);
+}
+
+function renderKeywordRow(container, item, cat) {
+  const row = document.createElement("div");
+  row.className = "item kw-item";
+
+  const icon = document.createElement("span");
+  icon.className = "kw-icon";
+  icon.textContent = cat.type === "n" ? "\u2212" : "\u2022";
+
+  const btns = document.createElement("div");
+  btns.className = "vote-btns";
+  const killBtn = document.createElement("button");
+  killBtn.className = "vote-btn kill";
+  killBtn.textContent = "\u2717";
+  killBtn.title = "Remove";
+  killBtn.onclick = e => { e.stopPropagation(); setKilled(item, true); render(); };
+  btns.append(killBtn);
+
+  const text = document.createElement("span");
+  text.className = "item-text";
+  text.contentEditable = true;
+  text.textContent = item.t;
+  text.addEventListener("input", () => { item.t = text.textContent; item.id = slug(item.t); persistAll(); });
+  text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
+
+  const matchPill = document.createElement("button");
+  matchPill.className = "match-pill" + (item.match === "exact" ? " exact" : item.match === "broad" ? " broad" : "");
+  matchPill.textContent = item.match;
+  matchPill.title = "Click to change match type";
+  matchPill.onclick = e => {
+    e.stopPropagation();
+    const cycle = { phrase: "exact", exact: "broad", broad: "phrase" };
+    item.match = cycle[item.match] || "phrase";
+    render();
+  };
+
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle " + (item.camp === "b" ? "on" : "off");
+  shareBtn.textContent = item.camp === "b" ? "Shared" : "Share";
+  shareBtn.title = item.camp === "b" ? "Remove from other campaign" : "Add to both campaigns";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    if (item.camp === "b") {
+      item.camp = activeCamp;
+      if (activeCamp === "t") item.killedA = false;
+      else item.killedT = false;
+    } else {
+      item.camp = "b";
+    }
+    render();
+  };
+
+  row.append(icon, btns, text, matchPill, shareBtn);
+  container.appendChild(row);
+}
+
+function renderKeywordKilledRow(container, item, cat) {
+  const row = document.createElement("div");
+  row.className = "item kw-item killed";
+
+  const icon = document.createElement("span");
+  icon.className = "kw-icon";
+
+  const btns = document.createElement("div");
+  btns.className = "vote-btns";
+  const restoreBtn = document.createElement("button");
+  restoreBtn.className = "vote-btn restore";
+  restoreBtn.textContent = "\u2713";
+  restoreBtn.title = "Bring back";
+  restoreBtn.onclick = () => { setKilled(item, false); render(); };
+  btns.append(restoreBtn);
+
+  const text = document.createElement("span");
+  text.className = "item-text";
+  text.textContent = item.t;
+
+  const matchPill = document.createElement("span");
+  matchPill.className = "match-pill";
+  matchPill.textContent = item.match;
+
+  row.append(icon, btns, text, matchPill);
+  if (item.camp === "b") {
+    const shareLabel = document.createElement("span");
+    shareLabel.className = "shared-badge";
+    shareLabel.textContent = "Shared";
+    row.append(shareLabel);
+  }
+  container.appendChild(row);
+}
+
+function renderKeywordAddRow(container, cat) {
+  const row = document.createElement("div");
+  row.className = "item add-item kw-item";
+
+  const icon = document.createElement("span");
+  icon.className = "add-icon";
+  icon.textContent = "+";
+
+  const btns = document.createElement("div");
+  btns.className = "add-spacer";
+  btns.innerHTML = '<span class="add-spacer-btn"></span>';
+
+  const input = document.createElement("input");
+  input.className = "add-field";
+  input.type = "text";
+  input.placeholder = cat.type === "n" ? "Add negative keyword \u2014 press Enter" : "Add keyword \u2014 press Enter";
+
+  let addMatch = "phrase";
+  const matchPill = document.createElement("button");
+  matchPill.className = "match-pill";
+  matchPill.textContent = "phrase";
+  matchPill.title = "Click to change match type";
+  matchPill.onclick = e => {
+    e.stopPropagation();
+    const cycle = { phrase: "exact", exact: "broad", broad: "phrase" };
+    addMatch = cycle[addMatch];
+    matchPill.textContent = addMatch;
+    matchPill.className = "match-pill" + (addMatch === "exact" ? " exact" : addMatch === "broad" ? " broad" : "");
+  };
+
+  let addShared = cat.type === "n";
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
+  shareBtn.textContent = addShared ? "Shared" : "Share";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    addShared = !addShared;
+    shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
+    shareBtn.textContent = addShared ? "Shared" : "Share";
+  };
+
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const text = input.value.trim();
+    if (!text) return;
+    const camp = addShared ? "b" : activeCamp;
+    cat.items.push({ t: text, camp, match: addMatch, keepT: false, keepA: false, killedT: false, killedA: false, remix: false, id: slug(text) });
+    render();
+  });
+
+  row.append(icon, btns, input, matchPill, shareBtn);
+  container.appendChild(row);
+}
+
+function updateMeta(el, len, cat) {
+  el.textContent = `${len}/${cat.max}`;
+  el.className = "item-meta";
+  if (len > cat.max) el.classList.add("over");
+  else if (cat.type === "d" && len >= DESC_SWEET[0] && len <= DESC_SWEET[1]) el.classList.add("sweet");
+}
+
+// =============================================
+// COUNTERS — per active campaign
+// =============================================
+function updateCounters() {
+  let hKept = 0, dKept = 0, kwCount = 0;
+  cats.forEach(c => {
+    if (!c.camps.includes(activeCamp)) return;
+    c.items.forEach(item => {
+      if ((item.camp !== activeCamp && item.camp !== "b") || getKilled(item)) return;
+      if (c.type === "k") { kwCount++; return; }
+      if (!getKeep(item)) return;
+      if (c.type === "h") hKept++;
+      else if (c.type === "d") dKept++;
+    });
+  });
+
+  document.getElementById("hNum").textContent = hKept;
+  document.getElementById("dNum").textContent = dKept;
+  document.getElementById("kwNum").textContent = kwCount;
+
+  const hEl = document.getElementById("hPill");
+  const dEl = document.getElementById("dPill");
+  const kwEl = document.getElementById("kwPill");
+  hEl.className = "counter-pill " + (hKept === H_MAX ? "good" : hKept > H_MAX ? "over" : "warn");
+  dEl.className = "counter-pill " + (dKept === D_MAX ? "good" : dKept > D_MAX ? "over" : "warn");
+  kwEl.className = "counter-pill good";
+}
+
+// =============================================
+// PREVIEWS — per active campaign
+// =============================================
+function getKeptForCamp(camp) {
+  const hKept = [], dKept = [];
+  cats.forEach(c => {
+    if (!c.camps.includes(camp)) return;
+    c.items.forEach(item => {
+      const killed = camp === "t" ? item.killedT : item.killedA;
+      if ((item.camp !== camp && item.camp !== "b") || killed) return;
+      const keep = camp === "t" ? item.keepT : item.keepA;
+      if (!keep) return;
+      (c.type === "h" ? hKept : dKept).push(item.t);
+    });
+  });
+  return { hKept, dKept };
+}
+
+function renderPreviews() {
+  const container = document.getElementById("previews");
+  container.innerHTML = "";
+  const { hKept, dKept } = getKeptForCamp(activeCamp);
+
+  if (hKept.length < 3 || dKept.length < 2) {
+    container.innerHTML = '<div style="font-size:12px;color:#999;font-style:italic;padding:8px 0;">Need at least 3 headlines and 2 descriptions above the line for previews.</div>';
+    return;
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const h = pick(hKept, 3), d = pick(dKept, 2);
+    const card = document.createElement("div");
+    card.className = "preview-card";
+    card.innerHTML = `<div class="pv-label">Combo ${i+1}</div><div class="pv-h">${esc(h[0])} | ${esc(h[1])} | ${esc(h[2])}</div><div class="pv-u"><span class="badge">Ad</span> www.music-access.com</div><div class="pv-d">${esc(d[0])} ${esc(d[1])}</div>`;
+    container.appendChild(card);
+  }
+}
+
+function renderSummary() {
+  const container = document.getElementById("summary");
+  const { hKept, dKept } = getKeptForCamp(activeCamp);
+  const campName = activeCamp === "t" ? "Teachers" : "Admins";
+
+  let html = `<h4>${campName}: ${hKept.length} headlines, ${dKept.length} descriptions</h4>`;
+  hKept.forEach((t, i) => html += `<div class="summary-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
+  if (dKept.length) {
+    html += '<div style="margin-top:8px;"></div>';
+    dKept.forEach((t, i) => html += `<div class="summary-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
+  }
+  container.innerHTML = html;
+}
+
+// =============================================
+// KEYWORD HELPERS
+// =============================================
+function getKeywordsForCamp(camp, type) {
+  const kws = [];
+  cats.forEach(c => {
+    if (c.type !== type || !c.camps.includes(camp)) return;
+    c.items.forEach(item => {
+      const killed = camp === "t" ? item.killedT : item.killedA;
+      if ((item.camp !== camp && item.camp !== "b") || killed) return;
+      kws.push({ t: item.t, match: item.match });
+    });
+  });
+  return kws;
+}
+
+// =============================================
+// EXPORT — both campaigns
+// =============================================
+function showExport() {
+  const tData = getKeptForCamp("t");
+  const aData = getKeptForCamp("a");
+  const tKw = getKeywordsForCamp("t", "k");
+  const aKw = getKeywordsForCamp("a", "k");
+  const tNeg = getKeywordsForCamp("t", "n");
+  const aNeg = getKeywordsForCamp("a", "n");
+  const remixItems = [];
+  cats.forEach(c => c.items.forEach(item => {
+    if (item.remix && (!item.killedT || !item.killedA)) remixItems.push({ t: item.t, cat: c.label, type: c.type === "h" ? "headline" : "description" });
+  }));
+
+  let t = `MEDLEY AD COPY \u2014 TWO CAMPAIGNS\n${"=".repeat(44)}\n`;
+
+  // Teachers
+  t += `\n\nTEACHERS CAMPAIGN\n${"-".repeat(30)}\n`;
+  t += `\nHeadlines (${tData.hKept.length}/${H_MAX}):\n`;
+  tData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
+  t += `\nDescriptions (${tData.dKept.length}/${D_MAX}):\n`;
+  tData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+  if (tKw.length) {
+    t += `\nKeywords (${tKw.length}):\n`;
+    tKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
+  if (tNeg.length) {
+    t += `\nNegative Keywords (${tNeg.length}):\n`;
+    tNeg.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
+
+  // Admins
+  t += `\n\nADMINS CAMPAIGN\n${"-".repeat(30)}\n`;
+  t += `\nHeadlines (${aData.hKept.length}/${H_MAX}):\n`;
+  aData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
+  t += `\nDescriptions (${aData.dKept.length}/${D_MAX}):\n`;
+  aData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+  if (aKw.length) {
+    t += `\nKeywords (${aKw.length}):\n`;
+    aKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
+  if (aNeg.length) {
+    t += `\nNegative Keywords (${aNeg.length}):\n`;
+    aNeg.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
+
+  // Shared items
+  const sharedH = tData.hKept.filter(h => aData.hKept.includes(h));
+  const sharedD = tData.dKept.filter(d => aData.dKept.includes(d));
+  if (sharedH.length || sharedD.length) {
+    t += `\n\nSHARED ACROSS BOTH\n${"-".repeat(30)}\n`;
+    if (sharedH.length) {
+      t += `\nHeadlines (${sharedH.length}):\n`;
+      sharedH.forEach((text, i) => t += `  ${i+1}. ${text}\n`);
+    }
+    if (sharedD.length) {
+      t += `\nDescriptions (${sharedD.length}):\n`;
+      sharedD.forEach((text, i) => t += `  ${i+1}. ${text}\n`);
+    }
+  }
+
+  if (remixItems.length) {
+    t += `\n\nFLAGGED FOR REWRITE (${remixItems.length}):\n`;
+    remixItems.forEach((r, i) => t += `  ${i+1}. [${r.cat}] ${r.t}\n`);
+  }
+
+  // Sample combos per campaign
+  if (tData.hKept.length >= 3 && tData.dKept.length >= 2) {
+    t += "\n\nSAMPLE COMBOS \u2014 TEACHERS:\n";
+    for (let i = 0; i < 3; i++) t += `\n  ${pick(tData.hKept, 3).join(" | ")}\n  ${pick(tData.dKept, 2).join(" ")}\n`;
+  }
+  if (aData.hKept.length >= 3 && aData.dKept.length >= 2) {
+    t += "\n\nSAMPLE COMBOS \u2014 ADMINS:\n";
+    for (let i = 0; i < 3; i++) t += `\n  ${pick(aData.hKept, 3).join(" | ")}\n  ${pick(aData.dKept, 2).join(" ")}\n`;
+  }
+
+  document.getElementById("exportPre").textContent = t;
+  document.getElementById("overlay").classList.add("open");
+}
+
+function copyExport() {
+  navigator.clipboard.writeText(document.getElementById("exportPre").textContent).then(() => {
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "Copied!";
+    setTimeout(() => btn.textContent = "Copy to Clipboard", 1500);
+  });
+}
+
+// =============================================
+// AI DRAWER
+// =============================================
+const AI_KEY_STORAGE = "medley-ai-key";
+let aiChatHistory = [];
+
+function toggleAiDrawer() {
+  const drawer = document.getElementById("aiDrawer");
+  const fab = document.getElementById("aiFab");
+  const isOpen = drawer.classList.toggle("open");
+  fab.classList.toggle("open", isOpen);
+  if (isOpen) {
+    document.getElementById("aiKeyInput").value = localStorage.getItem(AI_KEY_STORAGE) || "";
+  }
+}
+
+function toggleAiSettings() {
+  document.getElementById("aiSettings").classList.toggle("open");
+}
+
+function saveAiKey(val) {
+  localStorage.setItem(AI_KEY_STORAGE, val.trim());
+}
+
+function aiQuick(prompt) {
+  document.getElementById("aiInput").value = prompt;
+  aiSend();
+}
+
+function buildAdContext() {
+  const campName = activeCamp === "t" ? "Teachers" : "Admins";
+  const { hKept, dKept } = getKeptForCamp(activeCamp);
+  const kws = getKeywordsForCamp(activeCamp, "k");
+  const negs = getKeywordsForCamp(activeCamp, "n");
+
+  let ctx = `Current campaign: ${campName}\n`;
+  ctx += `\nHeadlines in ad (${hKept.length}/15):\n`;
+  hKept.forEach((h, i) => ctx += `  ${i+1}. ${h} [${h.length} chars]\n`);
+
+  const belowH = [];
+  cats.filter(c => c.type === "h" && c.camps.includes(activeCamp)).forEach(c => {
+    c.items.forEach(item => {
+      if ((item.camp === activeCamp || item.camp === "b") && !getKeep(item) && !getKilled(item))
+        belowH.push(item.t);
+    });
+  });
+  if (belowH.length) {
+    ctx += `\nHeadlines below the line (available but not selected):\n`;
+    belowH.forEach((h, i) => ctx += `  ${i+1}. ${h} [${h.length} chars]\n`);
+  }
+
+  ctx += `\nDescriptions in ad (${dKept.length}/4):\n`;
+  dKept.forEach((d, i) => ctx += `  ${i+1}. ${d} [${d.length} chars]\n`);
+
+  const belowD = [];
+  cats.filter(c => c.type === "d" && c.camps.includes(activeCamp)).forEach(c => {
+    c.items.forEach(item => {
+      if ((item.camp === activeCamp || item.camp === "b") && !getKeep(item) && !getKilled(item))
+        belowD.push(item.t);
+    });
+  });
+  if (belowD.length) {
+    ctx += `\nDescriptions below the line:\n`;
+    belowD.forEach((d, i) => ctx += `  ${i+1}. ${d} [${d.length} chars]\n`);
+  }
+
+  if (kws.length) {
+    ctx += `\nKeywords (${kws.length}):\n`;
+    kws.forEach((kw, i) => ctx += `  ${i+1}. ${kw.t} [${kw.match}]\n`);
+  }
+  if (negs.length) {
+    ctx += `\nNegative keywords (${negs.length}):\n`;
+    negs.forEach((kw, i) => ctx += `  ${i+1}. ${kw.t}\n`);
+  }
+
+  return ctx;
+}
+
+const AI_SYSTEM = `You are a Google Ads copy assistant for Medley Music Access & Inclusion (music-access.com).
+
+About Medley: Professional development for inclusive & adaptive music education. Founded by Jess Corwin and Jen Kass — music teachers teaching music teachers.
+
+VOICE RULES — follow these exactly:
+- "disabled" not "special needs" — disability is not a bad word
+- "autistic" (identity-first, not "has autism" or "ASD")
+- "nonspeaking" (not "nonverbal")
+- "support needs" (not "functioning level")
+- "neurodivergent" / "neurodivergence" (not "disorder")
+- We fix the TRAINING GAP, not the students
+- Peer voice — "we are teachers, not professors"
+- Practical and Monday-ready, not theoretical
+- Joy in the work, not duty or charity
+
+GOOGLE ADS CONSTRAINTS:
+- Headlines: max 30 characters each, need 15 total
+- Descriptions: max 90 characters each, need 4 total, sweet spot 40-65 chars
+- Keep copy direct and scannable — shorter is better
+- No hard CTAs ("Enroll Now!") — invite exploration
+- No generic motivational platitudes
+- Two campaigns: Teachers (searching for their own PD) and Admins (buying PD for staff)
+
+When suggesting copy, always include character counts in brackets like [24 chars].
+Be concise. Give specific, usable suggestions, not theory.`;
+
+async function aiSend() {
+  const input = document.getElementById("aiInput");
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const key = localStorage.getItem(AI_KEY_STORAGE);
+  if (!key) {
+    document.getElementById("aiSettings").classList.add("open");
+    addAiMsg("system", "Enter your Anthropic API key first.");
+    return;
+  }
+
+  addAiMsg("user", msg);
+  input.value = "";
+
+  const context = buildAdContext();
+  aiChatHistory.push({ role: "user", content: `[Current ad state]\n${context}\n\n[Question]\n${msg}` });
+
+  const assistantEl = addAiMsg("assistant", "...");
+  const sendBtn = document.getElementById("aiSendBtn");
+  sendBtn.disabled = true;
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: 1024,
+        system: AI_SYSTEM,
+        messages: aiChatHistory,
+        stream: true
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      assistantEl.textContent = `Error ${resp.status}: ${err.slice(0, 200)}`;
+      aiChatHistory.pop();
+      sendBtn.disabled = false;
+      return;
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = "";
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split("\n");
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const data = line.slice(6);
+          if (data === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+              fullText += parsed.delta.text;
+              assistantEl.textContent = fullText;
+              assistantEl.parentElement.scrollTop = assistantEl.parentElement.scrollHeight;
+            }
+          } catch {}
+        }
+      }
+    }
+
+    if (fullText) aiChatHistory.push({ role: "assistant", content: fullText });
+    else { assistantEl.textContent = "No response received."; aiChatHistory.pop(); }
+  } catch (err) {
+    assistantEl.textContent = `Network error: ${err.message}`;
+    aiChatHistory.pop();
+  }
+
+  sendBtn.disabled = false;
+}
+
+function addAiMsg(role, text) {
+  const container = document.getElementById("aiMessages");
+  const el = document.createElement("div");
+  el.className = "ai-msg " + role;
+  el.textContent = text;
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+  return el;
+}
+
+// Init
+render();
+loadFromCloud();
+</script>
+</body>
+</html>
