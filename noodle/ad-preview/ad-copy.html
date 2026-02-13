@@ -151,6 +151,23 @@
   .overlay-body { padding: 16px 24px 24px; overflow-y: auto; flex: 1; }
   .overlay-body pre { background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 13px; white-space: pre-wrap; line-height: 1.6; }
 
+  /* Collapsible sections */
+  .section-header { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; padding: 6px 4px; border-radius: 6px; transition: background 0.12s; }
+  .section-header:hover { background: #f5f5f5; }
+  .section-header .chevron { font-size: 12px; color: #999; transition: transform 0.2s; display: inline-block; width: 14px; text-align: center; }
+  .section-header .chevron.collapsed { transform: rotate(-90deg); }
+  .section-content.collapsed { display: none; }
+
+  /* Match type pill */
+  .match-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; cursor: pointer; border: 1px solid #dadce0; background: #f8f9fa; color: #666; white-space: nowrap; flex-shrink: 0; transition: all 0.12s; text-transform: capitalize; font-family: inherit; }
+  .match-pill:hover { border-color: #1a73e8; color: #1a73e8; background: #e8f0fe; }
+  .match-pill.exact { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+  .match-pill.broad { background: #fff8e1; border-color: #f57f17; color: #f57f17; }
+
+  /* Keyword items */
+  .item.kw-item { padding-left: 16px; }
+  .item.kw-item .kw-icon { font-size: 14px; color: #ccc; flex-shrink: 0; width: 18px; text-align: center; }
+
   @media (max-width: 900px) {
     .layout { grid-template-columns: 1fr; }
     .preview-panel { position: relative; max-height: none; border-left: none; border-top: 1px solid #e5e5e5; }
@@ -164,6 +181,7 @@
   <div class="counter-group">
     <div class="counter-pill" id="hPill"><span class="num" id="hNum">0</span>&nbsp;/ 15 headlines</div>
     <div class="counter-pill" id="dPill"><span class="num" id="dNum">0</span>&nbsp;/ 4 descriptions</div>
+    <div class="counter-pill good" id="kwPill"><span class="num" id="kwNum">0</span>&nbsp;keywords</div>
   </div>
   <span class="save-status" id="saveStatus">Auto-saved</span>
   <button class="refresh-btn" onclick="location.reload()">Refresh</button>
@@ -215,8 +233,9 @@
 </div>
 
 <script>
-const STORAGE_KEY = "medley-ad-v2";
+const STORAGE_KEY = "medley-ad-v3";
 const H_MAX = 15, D_MAX = 4;
+let collapsed = { h: false, d: false, k: true, n: true };
 const DESC_SWEET = [40, 65];
 
 function loadStore() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; } }
@@ -306,6 +325,52 @@ const cats = [
     { t:"Strategies you didn't learn in school. Virtual & in-person.", camp:"b", keepT:true, keepA:true },
     { t:"The training music teachers actually need. Inclusive, adaptive, hands-on.", camp:"b", keepT:false, keepA:false },
   ]},
+
+  // --- KEYWORDS ---
+  { id:"kw", type:"k", label:"Keywords", camps:"ta", max:0, items:[
+    { t:"inclusive music education", camp:"b", match:"phrase" },
+    { t:"inclusive music workshop", camp:"b", match:"phrase" },
+    { t:"inclusive music PD", camp:"t", match:"phrase" },
+    { t:"adaptive music PD", camp:"b", match:"phrase" },
+    { t:"adaptive music ed", camp:"b", match:"phrase" },
+    { t:"neurodivergent music ed", camp:"t", match:"phrase" },
+    { t:"music teacher PD", camp:"t", match:"phrase" },
+    { t:"music IEP training", camp:"t", match:"phrase" },
+    { t:"music department training", camp:"a", match:"phrase" },
+    { t:"special needs music training", camp:"b", match:"phrase" },
+    { t:"online music course", camp:"b", match:"phrase" },
+  ]},
+
+  // --- NEGATIVE KEYWORDS ---
+  { id:"nk", type:"n", label:"Negative Keywords", camps:"ta", max:0, items:[
+    { t:"hiring", camp:"b", match:"phrase" },
+    { t:"guitar teacher", camp:"b", match:"phrase" },
+    { t:"IEP goals", camp:"b", match:"phrase" },
+    { t:"MTEL music prep", camp:"b", match:"phrase" },
+    { t:"special education law", camp:"b", match:"phrase" },
+    { t:"internship", camp:"b", match:"phrase" },
+    { t:"private piano teacher", camp:"b", match:"phrase" },
+    { t:"how to become a music teacher", camp:"b", match:"phrase" },
+    { t:"clinical music therapy", camp:"b", match:"phrase" },
+    { t:"hospital music therapy", camp:"b", match:"phrase" },
+    { t:"cheap", camp:"b", match:"phrase" },
+    { t:"salary", camp:"b", match:"phrase" },
+    { t:"private lessons", camp:"b", match:"phrase" },
+    { t:"violin lessons", camp:"b", match:"phrase" },
+    { t:"IEP accommodations", camp:"b", match:"phrase" },
+    { t:"how to write an IEP", camp:"b", match:"phrase" },
+    { t:"tutor", camp:"b", match:"phrase" },
+    { t:"free", camp:"b", match:"phrase" },
+    { t:"voice lessons", camp:"b", match:"phrase" },
+    { t:"careers", camp:"b", match:"phrase" },
+    { t:"music therapy for kids", camp:"b", match:"phrase" },
+    { t:"music therapy certification", camp:"b", match:"phrase" },
+    { t:"music teacher certification", camp:"b", match:"phrase" },
+    { t:"adaptive music lessons", camp:"b", match:"phrase" },
+    { t:"jobs", camp:"b", match:"phrase" },
+    { t:"DIY", camp:"b", match:"phrase" },
+    { t:"piano teacher", camp:"b", match:"phrase" },
+  ]},
 ];
 
 // Generate stable IDs and defaults
@@ -316,6 +381,7 @@ cats.forEach(cat => cat.items.forEach(item => {
   if (item.killedT === undefined) item.killedT = false;
   if (item.killedA === undefined) item.killedA = false;
   if (item.remix === undefined) item.remix = false;
+  if (item.match === undefined) item.match = "phrase";
 }));
 
 // =============================================
@@ -325,6 +391,7 @@ function applyStore() {
   const store = loadStore();
   if (!store) return;
   if (store._activeCamp) activeCamp = store._activeCamp;
+  if (store._collapsed) collapsed = { ...collapsed, ...store._collapsed };
   cats.forEach(cat => {
     const saved = store[cat.id];
     if (!saved) return;
@@ -337,6 +404,7 @@ function applyStore() {
         if (s.killedT !== undefined) item.killedT = s.killedT;
         if (s.killedA !== undefined) item.killedA = s.killedA;
         if (s.remix !== undefined) item.remix = s.remix;
+        if (s.match) item.match = s.match;
         if (s.camp) item.camp = s.camp;
         if (s.t) item.t = s.t;
       });
@@ -344,7 +412,7 @@ function applyStore() {
       Object.keys(saved.items).forEach(id => {
         if (!cat.items.find(i => i.id === id)) {
           const s = saved.items[id];
-          cat.items.push({ t:s.t, keepT:s.keepT||false, keepA:s.keepA||false, camp:s.camp||activeCamp, killedT:s.killedT||false, killedA:s.killedA||false, remix:s.remix||false, id });
+          cat.items.push({ t:s.t, keepT:s.keepT||false, keepA:s.keepA||false, camp:s.camp||activeCamp, killedT:s.killedT||false, killedA:s.killedA||false, remix:s.remix||false, match:s.match||"phrase", id });
         }
       });
     }
@@ -356,14 +424,14 @@ function applyStore() {
 }
 
 function persistAll() {
-  const store = { _activeCamp: activeCamp };
+  const store = { _activeCamp: activeCamp, _collapsed: collapsed };
   cats.forEach(cat => {
     store[cat.id] = {
       order: cat.items.map(i => i.id),
       items: {}
     };
     cat.items.forEach(item => {
-      store[cat.id].items[item.id] = { keepT:item.keepT, keepA:item.keepA, camp:item.camp, killedT:item.killedT, killedA:item.killedA, remix:item.remix, t:item.t };
+      store[cat.id].items[item.id] = { keepT:item.keepT, keepA:item.keepA, camp:item.camp, killedT:item.killedT, killedA:item.killedA, remix:item.remix, match:item.match, t:item.t };
     });
   });
   saveStore(store);
@@ -423,23 +491,42 @@ function render() {
   const content = document.getElementById("catContent");
   content.innerHTML = "";
 
-  let lastType = "";
-  cats.forEach(cat => {
-    if (!cat.camps.includes(activeCamp)) return;
+  const typeOrder = ["h", "d", "k", "n"];
+  const typeLabels = {
+    h: 'Headlines <span class="limit">Google picks 3 of your 15 per impression</span>',
+    d: 'Descriptions <span class="limit">Google picks 2 of your 4 per impression</span>',
+    k: 'Keywords <span class="limit">Phrase, exact, or broad match</span>',
+    n: 'Negative Keywords <span class="limit">Block unwanted searches</span>'
+  };
 
-    // Section header on type change
-    if (cat.type !== lastType) {
-      lastType = cat.type;
-      const section = document.createElement("div");
-      section.className = "section-type";
-      if (cat.type === "d") section.style.marginTop = "32px";
-      section.innerHTML = cat.type === "h"
-        ? 'Headlines <span class="limit">Google picks 3 of your 15 per impression</span>'
-        : 'Descriptions <span class="limit">Google picks 2 of your 4 per impression</span>';
-      content.appendChild(section);
-    }
+  typeOrder.forEach(type => {
+    const typeCats = cats.filter(c => c.type === type && c.camps.includes(activeCamp));
+    if (typeCats.length === 0) return;
 
-    renderCategory(content, cat);
+    const wrapper = document.createElement("div");
+    if (type !== "h") wrapper.style.marginTop = "32px";
+
+    // Clickable section header
+    const header = document.createElement("div");
+    header.className = "section-header section-type";
+    const chevron = document.createElement("span");
+    chevron.className = "chevron" + (collapsed[type] ? " collapsed" : "");
+    chevron.innerHTML = "&#9662;";
+    const label = document.createElement("span");
+    label.innerHTML = typeLabels[type];
+    header.append(chevron, label);
+    header.onclick = () => { collapsed[type] = !collapsed[type]; render(); };
+    wrapper.appendChild(header);
+
+    // Collapsible content
+    const sectionContent = document.createElement("div");
+    sectionContent.className = "section-content" + (collapsed[type] ? " collapsed" : "");
+    typeCats.forEach(cat => {
+      if (type === "k" || type === "n") renderKeywordCategory(sectionContent, cat);
+      else renderCategory(sectionContent, cat);
+    });
+    wrapper.appendChild(sectionContent);
+    content.appendChild(wrapper);
   });
 
   updateCounters();
@@ -729,6 +816,174 @@ function renderAddRow(container, cat) {
   container.appendChild(row);
 }
 
+// =============================================
+// KEYWORD RENDERING
+// =============================================
+function renderKeywordCategory(parent, cat) {
+  const visible = cat.items.filter(i => i.camp === activeCamp || i.camp === "b");
+  const active = visible.filter(i => !getKilled(i));
+  const killed = visible.filter(i => getKilled(i));
+
+  const header = document.createElement("div");
+  header.className = "cat-header";
+  const h3 = document.createElement("h3");
+  h3.textContent = cat.type === "n" ? "Blocked Terms" : "Active Keywords";
+  const badge = document.createElement("span");
+  badge.className = "cat-badge good";
+  badge.textContent = active.length;
+  header.append(h3, badge);
+  parent.appendChild(header);
+
+  const container = document.createElement("div");
+  active.forEach(item => renderKeywordRow(container, item, cat));
+  killed.forEach(item => renderKeywordKilledRow(container, item, cat));
+  renderKeywordAddRow(container, cat);
+  parent.appendChild(container);
+}
+
+function renderKeywordRow(container, item, cat) {
+  const row = document.createElement("div");
+  row.className = "item kw-item";
+
+  const icon = document.createElement("span");
+  icon.className = "kw-icon";
+  icon.textContent = cat.type === "n" ? "\u2212" : "\u2022";
+
+  const btns = document.createElement("div");
+  btns.className = "vote-btns";
+  const killBtn = document.createElement("button");
+  killBtn.className = "vote-btn kill";
+  killBtn.textContent = "\u2717";
+  killBtn.title = "Remove";
+  killBtn.onclick = e => { e.stopPropagation(); setKilled(item, true); render(); };
+  btns.append(killBtn);
+
+  const text = document.createElement("span");
+  text.className = "item-text";
+  text.contentEditable = true;
+  text.textContent = item.t;
+  text.addEventListener("input", () => { item.t = text.textContent; item.id = slug(item.t); persistAll(); });
+  text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
+
+  const matchPill = document.createElement("button");
+  matchPill.className = "match-pill" + (item.match === "exact" ? " exact" : item.match === "broad" ? " broad" : "");
+  matchPill.textContent = item.match;
+  matchPill.title = "Click to change match type";
+  matchPill.onclick = e => {
+    e.stopPropagation();
+    const cycle = { phrase: "exact", exact: "broad", broad: "phrase" };
+    item.match = cycle[item.match] || "phrase";
+    render();
+  };
+
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle " + (item.camp === "b" ? "on" : "off");
+  shareBtn.textContent = item.camp === "b" ? "Shared" : "Share";
+  shareBtn.title = item.camp === "b" ? "Remove from other campaign" : "Add to both campaigns";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    if (item.camp === "b") {
+      item.camp = activeCamp;
+      if (activeCamp === "t") item.killedA = false;
+      else item.killedT = false;
+    } else {
+      item.camp = "b";
+    }
+    render();
+  };
+
+  row.append(icon, btns, text, matchPill, shareBtn);
+  container.appendChild(row);
+}
+
+function renderKeywordKilledRow(container, item, cat) {
+  const row = document.createElement("div");
+  row.className = "item kw-item killed";
+
+  const icon = document.createElement("span");
+  icon.className = "kw-icon";
+
+  const btns = document.createElement("div");
+  btns.className = "vote-btns";
+  const restoreBtn = document.createElement("button");
+  restoreBtn.className = "vote-btn restore";
+  restoreBtn.textContent = "\u2713";
+  restoreBtn.title = "Bring back";
+  restoreBtn.onclick = () => { setKilled(item, false); render(); };
+  btns.append(restoreBtn);
+
+  const text = document.createElement("span");
+  text.className = "item-text";
+  text.textContent = item.t;
+
+  const matchPill = document.createElement("span");
+  matchPill.className = "match-pill";
+  matchPill.textContent = item.match;
+
+  row.append(icon, btns, text, matchPill);
+  if (item.camp === "b") {
+    const shareLabel = document.createElement("span");
+    shareLabel.className = "shared-badge";
+    shareLabel.textContent = "Shared";
+    row.append(shareLabel);
+  }
+  container.appendChild(row);
+}
+
+function renderKeywordAddRow(container, cat) {
+  const row = document.createElement("div");
+  row.className = "item add-item kw-item";
+
+  const icon = document.createElement("span");
+  icon.className = "add-icon";
+  icon.textContent = "+";
+
+  const btns = document.createElement("div");
+  btns.className = "add-spacer";
+  btns.innerHTML = '<span class="add-spacer-btn"></span>';
+
+  const input = document.createElement("input");
+  input.className = "add-field";
+  input.type = "text";
+  input.placeholder = cat.type === "n" ? "Add negative keyword \u2014 press Enter" : "Add keyword \u2014 press Enter";
+
+  let addMatch = "phrase";
+  const matchPill = document.createElement("button");
+  matchPill.className = "match-pill";
+  matchPill.textContent = "phrase";
+  matchPill.title = "Click to change match type";
+  matchPill.onclick = e => {
+    e.stopPropagation();
+    const cycle = { phrase: "exact", exact: "broad", broad: "phrase" };
+    addMatch = cycle[addMatch];
+    matchPill.textContent = addMatch;
+    matchPill.className = "match-pill" + (addMatch === "exact" ? " exact" : addMatch === "broad" ? " broad" : "");
+  };
+
+  let addShared = cat.type === "n";
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
+  shareBtn.textContent = addShared ? "Shared" : "Share";
+  shareBtn.onclick = e => {
+    e.stopPropagation();
+    addShared = !addShared;
+    shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
+    shareBtn.textContent = addShared ? "Shared" : "Share";
+  };
+
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const text = input.value.trim();
+    if (!text) return;
+    const camp = addShared ? "b" : activeCamp;
+    cat.items.push({ t: text, camp, match: addMatch, keepT: false, keepA: false, killedT: false, killedA: false, remix: false, id: slug(text) });
+    render();
+  });
+
+  row.append(icon, btns, input, matchPill, shareBtn);
+  container.appendChild(row);
+}
+
 function updateMeta(el, len, cat) {
   el.textContent = `${len}/${cat.max}`;
   el.className = "item-meta";
@@ -740,23 +995,28 @@ function updateMeta(el, len, cat) {
 // COUNTERS — per active campaign
 // =============================================
 function updateCounters() {
-  let hKept = 0, dKept = 0;
+  let hKept = 0, dKept = 0, kwCount = 0;
   cats.forEach(c => {
     if (!c.camps.includes(activeCamp)) return;
     c.items.forEach(item => {
-      if ((item.camp !== activeCamp && item.camp !== "b") || getKilled(item) || !getKeep(item)) return;
+      if ((item.camp !== activeCamp && item.camp !== "b") || getKilled(item)) return;
+      if (c.type === "k") { kwCount++; return; }
+      if (!getKeep(item)) return;
       if (c.type === "h") hKept++;
-      else dKept++;
+      else if (c.type === "d") dKept++;
     });
   });
 
   document.getElementById("hNum").textContent = hKept;
   document.getElementById("dNum").textContent = dKept;
+  document.getElementById("kwNum").textContent = kwCount;
 
   const hEl = document.getElementById("hPill");
   const dEl = document.getElementById("dPill");
+  const kwEl = document.getElementById("kwPill");
   hEl.className = "counter-pill " + (hKept === H_MAX ? "good" : hKept > H_MAX ? "over" : "warn");
   dEl.className = "counter-pill " + (dKept === D_MAX ? "good" : dKept > D_MAX ? "over" : "warn");
+  kwEl.className = "counter-pill good";
 }
 
 // =============================================
@@ -811,11 +1071,31 @@ function renderSummary() {
 }
 
 // =============================================
+// KEYWORD HELPERS
+// =============================================
+function getKeywordsForCamp(camp, type) {
+  const kws = [];
+  cats.forEach(c => {
+    if (c.type !== type || !c.camps.includes(camp)) return;
+    c.items.forEach(item => {
+      const killed = camp === "t" ? item.killedT : item.killedA;
+      if ((item.camp !== camp && item.camp !== "b") || killed) return;
+      kws.push({ t: item.t, match: item.match });
+    });
+  });
+  return kws;
+}
+
+// =============================================
 // EXPORT — both campaigns
 // =============================================
 function showExport() {
   const tData = getKeptForCamp("t");
   const aData = getKeptForCamp("a");
+  const tKw = getKeywordsForCamp("t", "k");
+  const aKw = getKeywordsForCamp("a", "k");
+  const tNeg = getKeywordsForCamp("t", "n");
+  const aNeg = getKeywordsForCamp("a", "n");
   const remixItems = [];
   cats.forEach(c => c.items.forEach(item => {
     if (item.remix && (!item.killedT || !item.killedA)) remixItems.push({ t: item.t, cat: c.label, type: c.type === "h" ? "headline" : "description" });
@@ -829,6 +1109,14 @@ function showExport() {
   tData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
   t += `\nDescriptions (${tData.dKept.length}/${D_MAX}):\n`;
   tData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+  if (tKw.length) {
+    t += `\nKeywords (${tKw.length}):\n`;
+    tKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
+  if (tNeg.length) {
+    t += `\nNegative Keywords (${tNeg.length}):\n`;
+    tNeg.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
 
   // Admins
   t += `\n\nADMINS CAMPAIGN\n${"-".repeat(30)}\n`;
@@ -836,6 +1124,14 @@ function showExport() {
   aData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
   t += `\nDescriptions (${aData.dKept.length}/${D_MAX}):\n`;
   aData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+  if (aKw.length) {
+    t += `\nKeywords (${aKw.length}):\n`;
+    aKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
+  if (aNeg.length) {
+    t += `\nNegative Keywords (${aNeg.length}):\n`;
+    aNeg.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+  }
 
   // Shared items
   const sharedH = tData.hKept.filter(h => aData.hKept.includes(h));
