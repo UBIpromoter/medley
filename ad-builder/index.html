@@ -287,31 +287,6 @@
   <button class="util-btn" onclick="downloadBackup()">Download Backup</button>
 </div>
 
-<!-- AI Help -->
-<button class="ai-fab" id="aiFab" onclick="toggleAiDrawer()" title="AI Copy Helper">AI</button>
-<div class="ai-drawer" id="aiDrawer">
-  <div class="ai-drawer-header">
-    <h3>AI Copy Helper</h3>
-    <button onclick="toggleAiSettings()" title="Settings">&#9881;</button>
-    <button onclick="toggleAiDrawer()" title="Close">&#10005;</button>
-  </div>
-  <div class="ai-settings" id="aiSettings">
-    <label>OpenRouter API Key</label>
-    <input type="password" id="aiKeyInput" placeholder="sk-or-..." oninput="saveAiKey(this.value)">
-  </div>
-  <div class="ai-quick">
-    <button onclick="aiQuick('Suggest 3 new headlines for this campaign')">Suggest headlines</button>
-    <button onclick="aiQuick('Review my keywords — anything missing or redundant?')">Review keywords</button>
-    <button onclick="aiQuick('Improve my descriptions — shorter and punchier')">Improve descriptions</button>
-  </div>
-  <div class="ai-messages" id="aiMessages">
-    <div class="ai-msg system">Ask about your ad copy. I can see your current headlines, descriptions, and keywords.</div>
-  </div>
-  <div class="ai-input-area">
-    <textarea id="aiInput" placeholder="Ask about your copy..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"></textarea>
-    <button onclick="aiSend()" id="aiSendBtn">Send</button>
-  </div>
-</div>
 
 <!-- Export overlay -->
 <div class="overlay" id="overlay">
