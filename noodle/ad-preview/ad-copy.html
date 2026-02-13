@@ -275,6 +275,8 @@ const cats = [
     { t:"Bridge the Training Gap", camp:"a", keepT:false, keepA:true },
     { t:"What Your Degree Missed", camp:"t", keepT:false, keepA:false },
     { t:"The PD You Actually Need", camp:"b", keepT:false, keepA:true },
+    { t:"Teach Disabled Students", camp:"t", keepT:false, keepA:false, note:"Panel: disability-explicit" },
+    { t:"Support Neurodivergent Kids", camp:"t", keepT:false, keepA:false, note:"Panel: disability-explicit" },
   ]},
   { id:"promise", type:"h", label:"The Promise", camps:"ta", targetT:5, targetA:3, max:30, items:[
     { t:"Tools for Monday Morning", camp:"t", keepT:true, keepA:false },
@@ -285,14 +287,18 @@ const cats = [
     { t:"Music for ALL Learners", camp:"b", keepT:false, keepA:true },
     { t:"Ready for Next Monday", camp:"t", keepT:false, keepA:false },
     { t:"Build an Inclusive Program", camp:"a", keepT:false, keepA:false },
+    { t:"Joyful Inclusion Tools", camp:"t", keepT:false, keepA:false, note:"Panel: joy angle" },
+    { t:"Build Staff Inclusion Skills", camp:"a", keepT:false, keepA:false, note:"Panel: admin capacity" },
+    { t:"Strengthen Your Music Team", camp:"a", keepT:false, keepA:false, note:"Panel: admin ROI" },
   ]},
   { id:"cred", type:"h", label:"Credibility", camps:"ta", targetT:3, targetA:3, max:30, items:[
     { t:"By Music Teachers", camp:"b", keepT:true, keepA:true },
     { t:"Real Teachers Not Consultants", camp:"b", keepT:true, keepA:true },
     { t:"Humans, Not Curriculum", camp:"b", keepT:true, keepA:true, note:"Jess's philosophy" },
-    { t:"Watch the Children", camp:"b", keepT:false, keepA:false, note:"Jess's mantra" },
-    { t:"We See Kids, Not Labels", camp:"b", keepT:false, keepA:false },
+    { t:"Watch the Children", camp:"b", keepT:false, keepA:false, note:"Jess's mantra — save for retargeting" },
+    { t:"We See Kids, Not Labels", camp:"b", keepT:false, keepA:false, note:"Save for retargeting" },
     { t:"Made by Music Teachers", camp:"b", keepT:false, keepA:false },
+    { t:"PD Teachers Actually Request", camp:"a", keepT:false, keepA:false, note:"Panel: admin trust" },
   ]},
   { id:"aud", type:"h", label:"Audience", camps:"ta", targetT:1, targetA:3, max:30, items:[
     { t:"For Music Teachers", camp:"t", keepT:true, keepA:false },
@@ -304,21 +310,30 @@ const cats = [
     { t:"Inclusive Music PD", camp:"b", keepT:true, keepA:true },
     { t:"Adaptive Music Ed", camp:"b", keepT:true, keepA:true },
     { t:"Virtual & In-Person", camp:"b", keepT:true, keepA:true },
+    { t:"Music Inclusion Workshop", camp:"t", keepT:false, keepA:false, note:"Panel: commercial intent" },
+    { t:"Monday-Ready Music PD", camp:"t", keepT:false, keepA:false, note:"Panel: urgency" },
+    { t:"District-Wide Music PD", camp:"a", keepT:false, keepA:false, note:"Panel: admin scale" },
+    { t:"Book Music PD for Staff", camp:"a", keepT:false, keepA:false, note:"Panel: purchasing language" },
   ]},
 
   // --- DESCRIPTIONS ---
   { id:"dt", type:"d", label:"For Teachers", camps:"t", targetT:2, targetA:0, max:90, items:[
     { t:"We teach what your degree didn't. By music teachers.", camp:"t", keepT:true, keepA:false },
-    { t:"You were trained for music, not disability. We bridge that gap.", camp:"t", keepT:true, keepA:false },
+    { t:"You learned music. Not disability. We fix that.", camp:"t", keepT:true, keepA:false, note:"Panel rewrite — punchier" },
     { t:"Not theory. Hands-on skills your program skipped. Use them Monday.", camp:"t", keepT:false, keepA:false },
     { t:"Weren't trained for this? We'll get you there. Practical inclusion PD.", camp:"t", keepT:false, keepA:false },
     { t:"Fill the gap your degree left. Real strategies for inclusive classrooms.", camp:"t", keepT:false, keepA:false },
     { t:"Feel empowered to include every student. Monday will look different.", camp:"t", keepT:false, keepA:false },
+    { t:"You were trained for music, not disability. We bridge that gap.", camp:"t", keepT:false, keepA:false, note:"Original — longer version" },
+    { t:"Practical inclusion for real classrooms. By teachers.", camp:"t", keepT:false, keepA:false, note:"Panel add" },
   ]},
   { id:"da", type:"d", label:"For Admins", camps:"a", targetT:0, targetA:2, max:90, items:[
-    { t:"Your music teachers weren't trained for inclusion. We can help.", camp:"a", keepT:false, keepA:true },
+    { t:"Close the training gap in your music dept.", camp:"a", keepT:false, keepA:true, note:"Panel rewrite — operational" },
     { t:"Every child in your district deserves music. Equip your team.", camp:"a", keepT:false, keepA:true },
     { t:"PD teachers actually request. By music teachers, not outsiders.", camp:"a", keepT:false, keepA:false },
+    { t:"Your music teachers weren't trained for inclusion. We can help.", camp:"a", keepT:false, keepA:false, note:"Original — longer version" },
+    { t:"PD music teachers love. Boost retention & inclusion.", camp:"a", keepT:false, keepA:false, note:"Panel add — ROI" },
+    { t:"District-ready inclusion training. Virtual or on-site.", camp:"a", keepT:false, keepA:false, note:"Panel add — format" },
   ]},
   { id:"du", type:"d", label:"Universal", camps:"ta", targetT:2, targetA:2, max:90, items:[
     { t:"Inclusion PD by music teachers. Practical. Hands-on.", camp:"b", keepT:true, keepA:true },
@@ -328,6 +343,7 @@ const cats = [
 
   // --- KEYWORDS ---
   { id:"kw", type:"k", label:"Keywords", camps:"ta", max:0, items:[
+    // Existing (kept)
     { t:"inclusive music education", camp:"b", match:"phrase" },
     { t:"inclusive music workshop", camp:"b", match:"phrase" },
     { t:"inclusive music PD", camp:"t", match:"phrase" },
@@ -337,8 +353,16 @@ const cats = [
     { t:"music teacher PD", camp:"t", match:"phrase" },
     { t:"music IEP training", camp:"t", match:"phrase" },
     { t:"music department training", camp:"a", match:"phrase" },
-    { t:"special needs music training", camp:"b", match:"phrase" },
-    { t:"online music course", camp:"b", match:"phrase" },
+    { t:"online music course", camp:"b", match:"exact" },
+    // Panel additions — high-intent commercial
+    { t:"music teacher professional development", camp:"a", match:"phrase" },
+    { t:"inclusive music professional development", camp:"t", match:"phrase" },
+    { t:"music inclusion workshop", camp:"t", match:"phrase" },
+    { t:"disability inclusive music education", camp:"b", match:"phrase" },
+    { t:"autistic students music class", camp:"t", match:"phrase" },
+    { t:"music pd for schools", camp:"a", match:"phrase" },
+    { t:"district music PD", camp:"a", match:"exact" },
+    { t:"adaptive music teacher workshop", camp:"t", match:"phrase" },
   ]},
 
   // --- NEGATIVE KEYWORDS ---
@@ -370,6 +394,22 @@ const cats = [
     { t:"jobs", camp:"b", match:"phrase" },
     { t:"DIY", camp:"b", match:"phrase" },
     { t:"piano teacher", camp:"b", match:"phrase" },
+    // Panel additions — block resource-seekers & job-hunters
+    { t:"lesson plans", camp:"b", match:"phrase" },
+    { t:"worksheets", camp:"b", match:"phrase" },
+    { t:"curriculum", camp:"b", match:"phrase" },
+    { t:"printable", camp:"b", match:"phrase" },
+    { t:"YouTube", camp:"b", match:"phrase" },
+    { t:"degree", camp:"b", match:"phrase" },
+    { t:"masters program", camp:"b", match:"phrase" },
+    { t:"college course", camp:"b", match:"phrase" },
+    { t:"certification program", camp:"b", match:"phrase" },
+    { t:"homeschool", camp:"b", match:"phrase" },
+    { t:"kids music classes", camp:"b", match:"phrase" },
+    { t:"summer music camp", camp:"b", match:"phrase" },
+    { t:"music lesson plans free", camp:"b", match:"phrase" },
+    { t:"music education degree", camp:"b", match:"phrase" },
+    { t:"remote music teacher jobs", camp:"b", match:"phrase" },
   ]},
 ];
 
