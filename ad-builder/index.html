@@ -251,7 +251,7 @@
     <div class="counter-pill good" id="kwPill"><span class="num" id="kwNum">0</span>&nbsp;keywords</div>
   </div>
   <span class="save-status" id="saveStatus">Auto-saved</span>
-  <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+  <button class="refresh-btn" onclick="caches.keys().then(k=>k.forEach(n=>caches.delete(n)));location.href=location.pathname+'?'+Date.now()">Refresh</button>
 </div>
 
 <div class="layout">
