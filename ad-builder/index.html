@@ -326,6 +326,16 @@
 </div>
 
 <script>
+// Simple access gate — keeps casual visitors out (not real security)
+// Password persists per tab via sessionStorage
+(function() {
+  if (sessionStorage.getItem('medley-auth')) return;
+  const pw = prompt('Password:');
+  if (pw === 'medley2026') { sessionStorage.setItem('medley-auth', '1'); return; }
+  document.body.innerHTML = '<p style="padding:40px;color:#999;font-family:sans-serif">Nope.</p>';
+  throw new Error('auth');
+})();
+
 const STORAGE_KEY = "medley-ad-v3";
 const H_MAX = 15, D_MAX = 4;
 let collapsed = { h: false, d: false, k: true, n: true };
