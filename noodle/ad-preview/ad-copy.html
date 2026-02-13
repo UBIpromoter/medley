@@ -41,6 +41,8 @@
   .section-type { font-size: 14px; color: #1a73e8; font-weight: 600; margin: 24px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
   .section-type:first-child { margin-top: 0; }
   .section-type .limit { font-size: 11px; color: #999; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .section-type .ad-fmt { display: inline-block; font-size: 10px; color: #1a73e8; background: #e8f0fe; padding: 1px 8px; border-radius: 4px; letter-spacing: 1px; font-weight: 500; }
+  .section-type .ad-fmt-d { color: #1a0dab; background: #eef0ff; }
 
   .cat-header { display: flex; align-items: center; gap: 8px; margin: 16px 0 2px; padding: 0 4px; }
   .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; flex: 1; }
@@ -50,16 +52,23 @@
   .cat-badge.under { background: #f5f5f5; color: #999; }
 
   /* Items */
-  .item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; margin: 3px 0; transition: all 0.15s; background: #fff; border: 1px solid transparent; }
+  .item { --glow: #bdbdbd; position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; margin: 3px 0; transition: margin 0.08s ease-out, background 0.15s, border-color 0.15s, opacity 0.15s; background: #fff; border: 1px solid transparent; }
   .item:hover { border-color: #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-  .item.kept { background: #f1f8f1; border-color: #c8e6c9; }
-  .item.kept.excess { background: #fef0f0; border-color: #f5c6c6; }
-  .item.available { background: #fff; }
+  .item.kept { --glow: #66bb6a; background: #f1f8f1; border-color: #c8e6c9; }
+  .item.kept.excess { --glow: #ef5350; background: #fef0f0; border-color: #f5c6c6; }
+  .item.available { --glow: #bdbdbd; background: #fff; }
   .item.killed { opacity: 0.45; }
   .item.killed .item-text { text-decoration: line-through; }
   .item.dragging { opacity: 0.3; }
-  .item.drag-over-top { box-shadow: 0 -3px 0 0 #1a73e8; margin-top: 6px; }
-  .item.drag-over-bottom { box-shadow: 0 3px 0 0 #1a73e8; margin-bottom: 6px; }
+
+  /* Drag indicators — inset box-shadow follows border-radius exactly */
+  .item.drag-over-top { margin-top: 20px; box-shadow: inset 0 2px 0 0 var(--glow); }
+  .item.drag-over-bottom { margin-bottom: 20px; box-shadow: inset 0 -2px 0 0 var(--glow); }
+  .item.drag-neighbor-top { box-shadow: inset 0 1px 0 0 var(--glow); }
+  .item.drag-neighbor-bottom { box-shadow: inset 0 -1px 0 0 var(--glow); }
+
+  .item.drag-will-excess { --glow: #ef5350; background: #fef0f0 !important; border-color: #f5c6c6 !important; }
+  .item.drag-will-excess .rank-num { color: #e53935; }
 
   .drag-handle { cursor: grab; color: #bbb; font-size: 16px; padding: 4px 6px; user-select: none; flex-shrink: 0; letter-spacing: -1px; }
   .drag-handle:active { cursor: grabbing; color: #666; }
@@ -76,7 +85,7 @@
   .vote-btn.restore { color: #999; }
   .vote-btn.restore:hover { background: #e6f4ea; border-color: #34a853; color: #137333; }
 
-  .item-text { flex: 1; font-size: 14px; padding: 2px 6px; border-radius: 3px; outline: none; min-width: 0; }
+  .item-text { flex: 1; font-size: 14px; padding: 2px 6px; border-radius: 3px; outline: none; min-width: 0; cursor: text; }
   .item-text:focus { background: #eef1ff; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
   .item.remix .item-text { background: #f3eefa; }
 
@@ -96,8 +105,10 @@
   .cut-line-bar { flex: 1; height: 1px; border-top: 2px dashed #e0e0e0; }
   .cut-line-label { font-size: 9px; color: #bbb; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  .drop-zone { padding: 0; margin: 0; border: 2px dashed transparent; border-radius: 8px; transition: all 0.2s; text-align: center; font-size: 11px; color: transparent; height: 4px; }
+  .drop-zone { padding: 0; margin: 0; border: 2px dashed transparent; border-radius: 8px; transition: all 0.15s ease-out; text-align: center; font-size: 11px; color: transparent; height: 4px; }
+  .drop-zone.drag-active { height: 32px; border-color: rgba(26,115,232,0.12); }
   .drop-zone.drag-hover { border-color: #1a73e8; background: #e8f0fe; color: #1a73e8; font-weight: 600; padding: 8px; height: auto; }
+  .drop-zone.drag-hover.drag-hover-excess { border-color: #e53935; background: #fef0f0; color: #c62828; }
 
   /* Add your own — uses same .item layout */
   .item.add-item { border: 1px dashed #ddd; background: #fafafa; }
@@ -158,6 +169,10 @@
   .section-header .chevron.collapsed { transform: rotate(-90deg); }
   .section-content.collapsed { display: none; }
 
+  /* Two-column category grid */
+  .section-content.grid-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; align-items: start; }
+  .cat-wrapper { min-width: 0; }
+
   /* Match type pill */
   .match-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; cursor: pointer; border: 1px solid #dadce0; background: #f8f9fa; color: #666; white-space: nowrap; flex-shrink: 0; transition: all 0.12s; text-transform: capitalize; font-family: inherit; }
   .match-pill:hover { border-color: #1a73e8; color: #1a73e8; background: #e8f0fe; }
@@ -168,9 +183,46 @@
   .item.kw-item { padding-left: 16px; }
   .item.kw-item .kw-icon { font-size: 14px; color: #ccc; flex-shrink: 0; width: 18px; text-align: center; }
 
+  /* AI Drawer */
+  .ai-fab { position: fixed; bottom: 70px; right: 24px; z-index: 250; width: 48px; height: 48px; border-radius: 50%; background: #1a73e8; color: #fff; border: none; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .ai-fab:hover { background: #1557b0; transform: scale(1.05); }
+  .ai-fab.open { background: #666; }
+
+  .ai-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 100vw; background: #fff; border-left: 1px solid #e5e5e5; z-index: 280; transform: translateX(100%); transition: transform 0.25s ease; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.08); }
+  .ai-drawer.open { transform: translateX(0); }
+
+  .ai-drawer-header { padding: 12px 16px; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; gap: 8px; }
+  .ai-drawer-header h3 { flex: 1; font-size: 14px; font-weight: 600; }
+  .ai-drawer-header button { background: transparent; border: none; cursor: pointer; font-size: 16px; color: #999; padding: 4px; }
+  .ai-drawer-header button:hover { color: #333; }
+
+  .ai-settings { padding: 12px 16px; border-bottom: 1px solid #e8e8e8; display: none; }
+  .ai-settings.open { display: block; }
+  .ai-settings label { font-size: 11px; color: #888; display: block; margin-bottom: 4px; }
+  .ai-settings input { width: 100%; padding: 6px 8px; border: 1px solid #dadce0; border-radius: 6px; font-size: 12px; font-family: monospace; }
+
+  .ai-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .ai-msg { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  .ai-msg.user { align-self: flex-end; background: #1a73e8; color: #fff; border-bottom-right-radius: 4px; }
+  .ai-msg.assistant { align-self: flex-start; background: #f1f3f4; color: #333; border-bottom-left-radius: 4px; }
+  .ai-msg.system { align-self: center; background: transparent; color: #999; font-size: 11px; font-style: italic; text-align: center; }
+
+  .ai-quick { padding: 8px 16px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid #f0f0f0; }
+  .ai-quick button { background: #f1f3f4; border: 1px solid #dadce0; border-radius: 16px; padding: 4px 12px; font-size: 11px; color: #555; cursor: pointer; font-family: inherit; transition: all 0.12s; }
+  .ai-quick button:hover { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+
+  .ai-input-area { padding: 12px 16px; border-top: 1px solid #e8e8e8; display: flex; gap: 8px; }
+  .ai-input-area textarea { flex: 1; resize: none; border: 1px solid #dadce0; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; height: 40px; max-height: 100px; outline: none; }
+  .ai-input-area textarea:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.12); }
+  .ai-input-area button { background: #1a73e8; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .ai-input-area button:hover { background: #1557b0; }
+  .ai-input-area button:disabled { background: #ccc; cursor: not-allowed; }
+
   @media (max-width: 900px) {
     .layout { grid-template-columns: 1fr; }
     .preview-panel { position: relative; max-height: none; border-left: none; border-top: 1px solid #e5e5e5; }
+    .section-content.grid-cats { grid-template-columns: 1fr; }
+    .ai-drawer { width: 100%; }
   }
 </style>
 </head>
@@ -218,6 +270,32 @@
   <button class="nav-btn" onclick="location.href='index.html'">Visual Preview</button>
   <span class="bar-sep"></span>
   <button class="util-btn" onclick="downloadBackup()">Download Backup</button>
+</div>
+
+<!-- AI Help -->
+<button class="ai-fab" id="aiFab" onclick="toggleAiDrawer()" title="AI Copy Helper">AI</button>
+<div class="ai-drawer" id="aiDrawer">
+  <div class="ai-drawer-header">
+    <h3>AI Copy Helper</h3>
+    <button onclick="toggleAiSettings()" title="Settings">&#9881;</button>
+    <button onclick="toggleAiDrawer()" title="Close">&#10005;</button>
+  </div>
+  <div class="ai-settings" id="aiSettings">
+    <label>Anthropic API Key</label>
+    <input type="password" id="aiKeyInput" placeholder="sk-ant-..." oninput="saveAiKey(this.value)">
+  </div>
+  <div class="ai-quick">
+    <button onclick="aiQuick('Suggest 3 new headlines for this campaign')">Suggest headlines</button>
+    <button onclick="aiQuick('Review my keywords — anything missing or redundant?')">Review keywords</button>
+    <button onclick="aiQuick('Improve my descriptions — shorter and punchier')">Improve descriptions</button>
+  </div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg system">Ask about your ad copy. I can see your current headlines, descriptions, and keywords.</div>
+  </div>
+  <div class="ai-input-area">
+    <textarea id="aiInput" placeholder="Ask about your copy..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"></textarea>
+    <button onclick="aiSend()" id="aiSendBtn">Send</button>
+  </div>
 </div>
 
 <!-- Export overlay -->
@@ -275,8 +353,8 @@ const cats = [
     { t:"Bridge the Training Gap", camp:"a", keepT:false, keepA:true },
     { t:"What Your Degree Missed", camp:"t", keepT:false, keepA:false },
     { t:"The PD You Actually Need", camp:"b", keepT:false, keepA:true },
-    { t:"Teach Disabled Students", camp:"t", keepT:false, keepA:false, note:"Panel: disability-explicit" },
-    { t:"Support Neurodivergent Kids", camp:"t", keepT:false, keepA:false, note:"Panel: disability-explicit" },
+    { t:"Teach Disabled Students", camp:"t", keepT:false, keepA:false },
+    { t:"Support Neurodivergent Kids", camp:"t", keepT:false, keepA:false },
   ]},
   { id:"promise", type:"h", label:"The Promise", camps:"ta", targetT:5, targetA:3, max:30, items:[
     { t:"Tools for Monday Morning", camp:"t", keepT:true, keepA:false },
@@ -287,53 +365,51 @@ const cats = [
     { t:"Music for ALL Learners", camp:"b", keepT:false, keepA:true },
     { t:"Ready for Next Monday", camp:"t", keepT:false, keepA:false },
     { t:"Build an Inclusive Program", camp:"a", keepT:false, keepA:false },
-    { t:"Joyful Inclusion Tools", camp:"t", keepT:false, keepA:false, note:"Panel: joy angle" },
-    { t:"Build Staff Inclusion Skills", camp:"a", keepT:false, keepA:false, note:"Panel: admin capacity" },
-    { t:"Strengthen Your Music Team", camp:"a", keepT:false, keepA:false, note:"Panel: admin ROI" },
+    { t:"Joyful Inclusion Tools", camp:"t", keepT:false, keepA:false },
+    { t:"Build Staff Inclusion Skills", camp:"a", keepT:false, keepA:false },
+    { t:"Strengthen Your Music Team", camp:"a", keepT:false, keepA:false },
   ]},
-  { id:"cred", type:"h", label:"Credibility", camps:"ta", targetT:3, targetA:3, max:30, items:[
+  { id:"cred", type:"h", label:"Credibility", camps:"ta", targetT:4, targetA:6, max:30, items:[
     { t:"By Music Teachers", camp:"b", keepT:true, keepA:true },
     { t:"Real Teachers Not Consultants", camp:"b", keepT:true, keepA:true },
     { t:"Humans, Not Curriculum", camp:"b", keepT:true, keepA:true, note:"Jess's philosophy" },
-    { t:"Watch the Children", camp:"b", keepT:false, keepA:false, note:"Jess's mantra — save for retargeting" },
-    { t:"We See Kids, Not Labels", camp:"b", keepT:false, keepA:false, note:"Save for retargeting" },
-    { t:"Made by Music Teachers", camp:"b", keepT:false, keepA:false },
-    { t:"PD Teachers Actually Request", camp:"a", keepT:false, keepA:false, note:"Panel: admin trust" },
-  ]},
-  { id:"aud", type:"h", label:"Audience", camps:"ta", targetT:1, targetA:3, max:30, items:[
     { t:"For Music Teachers", camp:"t", keepT:true, keepA:false },
     { t:"Equip Your Music Teachers", camp:"a", keepT:false, keepA:true },
     { t:"Schools & Districts", camp:"a", keepT:false, keepA:true },
     { t:"Train Your Music Department", camp:"a", keepT:false, keepA:true },
+    { t:"Watch the Children", camp:"b", keepT:false, keepA:false, note:"Jess's mantra — save for retargeting" },
+    { t:"We See Kids, Not Labels", camp:"b", keepT:false, keepA:false, note:"Save for retargeting" },
+    { t:"Made by Music Teachers", camp:"b", keepT:false, keepA:false },
+    { t:"PD Teachers Actually Request", camp:"a", keepT:false, keepA:false },
   ]},
   { id:"cta", type:"h", label:"Format", camps:"ta", targetT:3, targetA:3, max:30, items:[
     { t:"Inclusive Music PD", camp:"b", keepT:true, keepA:true },
     { t:"Adaptive Music Ed", camp:"b", keepT:true, keepA:true },
     { t:"Virtual & In-Person", camp:"b", keepT:true, keepA:true },
-    { t:"Music Inclusion Workshop", camp:"t", keepT:false, keepA:false, note:"Panel: commercial intent" },
-    { t:"Monday-Ready Music PD", camp:"t", keepT:false, keepA:false, note:"Panel: urgency" },
-    { t:"District-Wide Music PD", camp:"a", keepT:false, keepA:false, note:"Panel: admin scale" },
-    { t:"Book Music PD for Staff", camp:"a", keepT:false, keepA:false, note:"Panel: purchasing language" },
+    { t:"Music Inclusion Workshop", camp:"t", keepT:false, keepA:false },
+    { t:"Monday-Ready Music PD", camp:"t", keepT:false, keepA:false },
+    { t:"District-Wide Music PD", camp:"a", keepT:false, keepA:false },
+    { t:"Book Music PD for Staff", camp:"a", keepT:false, keepA:false },
   ]},
 
   // --- DESCRIPTIONS ---
   { id:"dt", type:"d", label:"For Teachers", camps:"t", targetT:2, targetA:0, max:90, items:[
     { t:"We teach what your degree didn't. By music teachers.", camp:"t", keepT:true, keepA:false },
-    { t:"You learned music. Not disability. We fix that.", camp:"t", keepT:true, keepA:false, note:"Panel rewrite — punchier" },
+    { t:"You learned music. Not disability. We fix that.", camp:"t", keepT:true, keepA:false },
     { t:"Not theory. Hands-on skills your program skipped. Use them Monday.", camp:"t", keepT:false, keepA:false },
     { t:"Weren't trained for this? We'll get you there. Practical inclusion PD.", camp:"t", keepT:false, keepA:false },
     { t:"Fill the gap your degree left. Real strategies for inclusive classrooms.", camp:"t", keepT:false, keepA:false },
     { t:"Feel empowered to include every student. Monday will look different.", camp:"t", keepT:false, keepA:false },
     { t:"You were trained for music, not disability. We bridge that gap.", camp:"t", keepT:false, keepA:false, note:"Original — longer version" },
-    { t:"Practical inclusion for real classrooms. By teachers.", camp:"t", keepT:false, keepA:false, note:"Panel add" },
+    { t:"Practical inclusion for real classrooms. By teachers.", camp:"t", keepT:false, keepA:false },
   ]},
   { id:"da", type:"d", label:"For Admins", camps:"a", targetT:0, targetA:2, max:90, items:[
-    { t:"Close the training gap in your music dept.", camp:"a", keepT:false, keepA:true, note:"Panel rewrite — operational" },
+    { t:"Close the training gap in your music dept.", camp:"a", keepT:false, keepA:true },
     { t:"Every child in your district deserves music. Equip your team.", camp:"a", keepT:false, keepA:true },
     { t:"PD teachers actually request. By music teachers, not outsiders.", camp:"a", keepT:false, keepA:false },
     { t:"Your music teachers weren't trained for inclusion. We can help.", camp:"a", keepT:false, keepA:false, note:"Original — longer version" },
-    { t:"PD music teachers love. Boost retention & inclusion.", camp:"a", keepT:false, keepA:false, note:"Panel add — ROI" },
-    { t:"District-ready inclusion training. Virtual or on-site.", camp:"a", keepT:false, keepA:false, note:"Panel add — format" },
+    { t:"PD music teachers love. Boost retention & inclusion.", camp:"a", keepT:false, keepA:false },
+    { t:"District-ready inclusion training. Virtual or on-site.", camp:"a", keepT:false, keepA:false },
   ]},
   { id:"du", type:"d", label:"Universal", camps:"ta", targetT:2, targetA:2, max:90, items:[
     { t:"Inclusion PD by music teachers. Practical. Hands-on.", camp:"b", keepT:true, keepA:true },
@@ -523,6 +599,10 @@ document.getElementById("campLabel").textContent = activeCamp === "t" ? "Teacher
 // DRAG STATE
 // =============================================
 let dragCat = null, dragItem = null;
+function clearDragIndicators() {
+  document.querySelectorAll(".drag-over-top,.drag-over-bottom,.drag-neighbor-top,.drag-neighbor-bottom,.drag-will-excess").forEach(el => el.classList.remove("drag-over-top","drag-over-bottom","drag-neighbor-top","drag-neighbor-bottom","drag-will-excess"));
+  document.querySelectorAll(".drag-hover-excess").forEach(el => el.classList.remove("drag-hover-excess"));
+}
 
 // =============================================
 // RENDER
@@ -533,10 +613,10 @@ function render() {
 
   const typeOrder = ["h", "d", "k", "n"];
   const typeLabels = {
-    h: 'Headlines <span class="limit">Google picks 3 of your 15 per impression</span>',
-    d: 'Descriptions <span class="limit">Google picks 2 of your 4 per impression</span>',
-    k: 'Keywords <span class="limit">Phrase, exact, or broad match</span>',
-    n: 'Negative Keywords <span class="limit">Block unwanted searches</span>'
+    h: 'Headlines <span class="limit">Give Google 15 &middot; it picks 3 per ad&ensp;<span class="ad-fmt">H &ndash; H &ndash; H</span></span>',
+    d: 'Descriptions <span class="limit">Give Google 4 &middot; it picks 2 per ad&ensp;<span class="ad-fmt ad-fmt-d">D&ensp;D</span></span>',
+    k: 'Keywords <span class="limit">Trigger your ad when people search these</span>',
+    n: 'Negative Keywords <span class="limit">Block your ad from these searches</span>'
   };
 
   typeOrder.forEach(type => {
@@ -560,7 +640,8 @@ function render() {
 
     // Collapsible content
     const sectionContent = document.createElement("div");
-    sectionContent.className = "section-content" + (collapsed[type] ? " collapsed" : "");
+    const gridClass = (type === "h" || type === "d") ? " grid-cats" : "";
+    sectionContent.className = "section-content" + gridClass + (collapsed[type] ? " collapsed" : "");
     typeCats.forEach(cat => {
       if (type === "k" || type === "n") renderKeywordCategory(sectionContent, cat);
       else renderCategory(sectionContent, cat);
@@ -593,7 +674,6 @@ function renderCategory(parent, cat) {
   badge.className = "cat-badge " + (kept.length === target ? "good" : kept.length > target ? "over" : "under");
   badge.textContent = `${kept.length}/${target}`;
   header.append(h3, badge);
-  parent.appendChild(header);
 
   // Container for items
   const container = document.createElement("div");
@@ -608,8 +688,24 @@ function renderCategory(parent, cat) {
     const zone = document.createElement("div");
     zone.className = "drop-zone";
     zone.textContent = "Drop here to include in ad";
-    zone.addEventListener("dragover", e => { e.preventDefault(); if (dragCat === cat) zone.classList.add("drag-hover"); });
-    zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover"));
+    zone.addEventListener("dragover", e => {
+      e.preventDefault();
+      if (dragCat !== cat) return;
+      clearDragIndicators();
+      zone.classList.add("drag-hover");
+      // Glow bottom edge of last kept item above the drop zone
+      const keptItems = container.querySelectorAll(".item.kept:not(.dragging)");
+      if (keptItems.length > 0) keptItems[keptItems.length - 1].classList.add("drag-neighbor-bottom");
+      // Excess preview — incoming item would be last in kept
+      if (!getKeep(dragItem) || getKilled(dragItem)) {
+        const tgt = getTarget(cat);
+        const keptCount = cat.items.filter(i =>
+          (i.camp === activeCamp || i.camp === "b") && getKeep(i) && !getKilled(i)
+        ).length;
+        if (keptCount >= tgt) zone.classList.add("drag-hover-excess");
+      }
+    });
+    zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover", "drag-hover-excess"));
     zone.addEventListener("drop", e => {
       e.preventDefault(); zone.classList.remove("drag-hover");
       if (dragCat !== cat || !dragItem) return;
@@ -634,7 +730,10 @@ function renderCategory(parent, cat) {
   // Add your own row
   renderAddRow(container, cat);
 
-  parent.appendChild(container);
+  const catWrapper = document.createElement("div");
+  catWrapper.className = "cat-wrapper";
+  catWrapper.append(header, container);
+  parent.appendChild(catWrapper);
 }
 
 function renderRow(container, item, rank, cat, state, isExcess) {
@@ -647,22 +746,45 @@ function renderRow(container, item, rank, cat, state, isExcess) {
     dragCat = cat; dragItem = item;
     row.classList.add("dragging");
     e.dataTransfer.effectAllowed = "move";
+    document.querySelectorAll(".drop-zone").forEach(z => z.classList.add("drag-active"));
   });
   row.addEventListener("dragend", () => {
     row.classList.remove("dragging");
-    document.querySelectorAll(".drag-over-top,.drag-over-bottom").forEach(el => el.classList.remove("drag-over-top","drag-over-bottom"));
+    clearDragIndicators();
+    document.querySelectorAll(".drop-zone").forEach(z => z.classList.remove("drag-active"));
   });
   row.addEventListener("dragover", e => {
     e.preventDefault();
     if (dragCat !== cat) return;
+    clearDragIndicators();
     const rect = row.getBoundingClientRect();
     const midY = rect.top + rect.height / 2;
-    row.classList.toggle("drag-over-top", e.clientY < midY);
-    row.classList.toggle("drag-over-bottom", e.clientY >= midY);
+    if (e.clientY < midY) {
+      row.classList.add("drag-over-top");
+      const prev = row.previousElementSibling;
+      if (prev && prev.classList.contains("item")) prev.classList.add("drag-neighbor-bottom");
+    } else {
+      row.classList.add("drag-over-bottom");
+      const next = row.nextElementSibling;
+      if (next && next.classList.contains("item")) next.classList.add("drag-neighbor-top");
+    }
+
+    // Excess preview — if dropping here would push category over target
+    const targetIsKept = getKeep(item) && !getKilled(item);
+    const dragIsKept = getKeep(dragItem) && !getKilled(dragItem);
+    if (targetIsKept && !dragIsKept) {
+      const target = getTarget(cat);
+      const keptCount = cat.items.filter(i =>
+        (i.camp === activeCamp || i.camp === "b") && getKeep(i) && !getKilled(i)
+      ).length;
+      if (keptCount >= target) {
+        const keptRows = row.parentElement.querySelectorAll(".item.kept:not(.dragging)");
+        if (keptRows.length > 0) keptRows[keptRows.length - 1].classList.add("drag-will-excess");
+      }
+    }
   });
-  row.addEventListener("dragleave", () => row.classList.remove("drag-over-top","drag-over-bottom"));
   row.addEventListener("drop", e => {
-    e.preventDefault(); row.classList.remove("drag-over-top","drag-over-bottom");
+    e.preventDefault(); clearDragIndicators();
     if (dragCat !== cat || !dragItem) return;
     if (dragItem === item) return;
 
@@ -710,15 +832,21 @@ function renderRow(container, item, rank, cat, state, isExcess) {
 
   btns.append(killBtn, remixBtn);
 
-  // Text
+  // Text — starts non-editable so dragging works; click-release enables editing
   const text = document.createElement("span");
   text.className = "item-text";
-  text.contentEditable = true;
   text.textContent = item.t;
+  text.addEventListener("mouseup", e => {
+    if (text.contentEditable === "true") return;
+    text.contentEditable = true;
+    text.focus();
+    const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+    if (range) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+  });
+  text.addEventListener("blur", () => { text.contentEditable = false; });
   text.addEventListener("input", () => {
     item.t = text.textContent;
     item.id = slug(item.t);
-    updateMeta(meta, item.t.length, cat);
     persistAll();
   });
   text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
@@ -748,13 +876,9 @@ function renderRow(container, item, rank, cat, state, isExcess) {
     noteEl.title = item.note;
   }
 
-  // Char count
-  const meta = document.createElement("span");
-  updateMeta(meta, item.t.length, cat);
-
-  row.append(handle, rk, btns, text, shareBtn);
+  row.append(handle, rk, btns, text);
   if (item.note) row.append(noteEl);
-  row.append(meta);
+  row.append(shareBtn);
   container.appendChild(row);
 }
 
@@ -788,12 +912,8 @@ function renderKilledRow(container, item, cat) {
     shareLabel.textContent = "Shared";
   }
 
-  const meta = document.createElement("span");
-  updateMeta(meta, item.t.length, cat);
-
   row.append(spacer, rk, btns, text);
   if (item.camp === "b") row.append(shareLabel);
-  row.append(meta);
   container.appendChild(row);
 }
 
@@ -832,16 +952,6 @@ function renderAddRow(container, cat) {
     shareBtn.title = addShared ? "Will add to both campaigns" : "Add to both campaigns";
   };
 
-  const meta = document.createElement("span");
-  meta.className = "item-meta";
-  meta.textContent = `0/${cat.max}`;
-
-  input.addEventListener("input", () => {
-    const len = input.value.length;
-    meta.textContent = `${len}/${cat.max}`;
-    meta.className = "item-meta" + (len > cat.max ? " over" : "");
-  });
-
   input.addEventListener("keydown", e => {
     if (e.key !== "Enter") return;
     const text = input.value.trim();
@@ -852,7 +962,7 @@ function renderAddRow(container, cat) {
     render();
   });
 
-  row.append(icon, rk, btns, input, shareBtn, meta);
+  row.append(icon, rk, btns, input, shareBtn);
   container.appendChild(row);
 }
 
@@ -1213,6 +1323,207 @@ function copyExport() {
     btn.textContent = "Copied!";
     setTimeout(() => btn.textContent = "Copy to Clipboard", 1500);
   });
+}
+
+// =============================================
+// AI DRAWER
+// =============================================
+const AI_KEY_STORAGE = "medley-ai-key";
+let aiChatHistory = [];
+
+function toggleAiDrawer() {
+  const drawer = document.getElementById("aiDrawer");
+  const fab = document.getElementById("aiFab");
+  const isOpen = drawer.classList.toggle("open");
+  fab.classList.toggle("open", isOpen);
+  if (isOpen) {
+    document.getElementById("aiKeyInput").value = localStorage.getItem(AI_KEY_STORAGE) || "";
+  }
+}
+
+function toggleAiSettings() {
+  document.getElementById("aiSettings").classList.toggle("open");
+}
+
+function saveAiKey(val) {
+  localStorage.setItem(AI_KEY_STORAGE, val.trim());
+}
+
+function aiQuick(prompt) {
+  document.getElementById("aiInput").value = prompt;
+  aiSend();
+}
+
+function buildAdContext() {
+  const campName = activeCamp === "t" ? "Teachers" : "Admins";
+  const { hKept, dKept } = getKeptForCamp(activeCamp);
+  const kws = getKeywordsForCamp(activeCamp, "k");
+  const negs = getKeywordsForCamp(activeCamp, "n");
+
+  let ctx = `Current campaign: ${campName}\n`;
+  ctx += `\nHeadlines in ad (${hKept.length}/15):\n`;
+  hKept.forEach((h, i) => ctx += `  ${i+1}. ${h} [${h.length} chars]\n`);
+
+  const belowH = [];
+  cats.filter(c => c.type === "h" && c.camps.includes(activeCamp)).forEach(c => {
+    c.items.forEach(item => {
+      if ((item.camp === activeCamp || item.camp === "b") && !getKeep(item) && !getKilled(item))
+        belowH.push(item.t);
+    });
+  });
+  if (belowH.length) {
+    ctx += `\nHeadlines below the line (available but not selected):\n`;
+    belowH.forEach((h, i) => ctx += `  ${i+1}. ${h} [${h.length} chars]\n`);
+  }
+
+  ctx += `\nDescriptions in ad (${dKept.length}/4):\n`;
+  dKept.forEach((d, i) => ctx += `  ${i+1}. ${d} [${d.length} chars]\n`);
+
+  const belowD = [];
+  cats.filter(c => c.type === "d" && c.camps.includes(activeCamp)).forEach(c => {
+    c.items.forEach(item => {
+      if ((item.camp === activeCamp || item.camp === "b") && !getKeep(item) && !getKilled(item))
+        belowD.push(item.t);
+    });
+  });
+  if (belowD.length) {
+    ctx += `\nDescriptions below the line:\n`;
+    belowD.forEach((d, i) => ctx += `  ${i+1}. ${d} [${d.length} chars]\n`);
+  }
+
+  if (kws.length) {
+    ctx += `\nKeywords (${kws.length}):\n`;
+    kws.forEach((kw, i) => ctx += `  ${i+1}. ${kw.t} [${kw.match}]\n`);
+  }
+  if (negs.length) {
+    ctx += `\nNegative keywords (${negs.length}):\n`;
+    negs.forEach((kw, i) => ctx += `  ${i+1}. ${kw.t}\n`);
+  }
+
+  return ctx;
+}
+
+const AI_SYSTEM = `You are a Google Ads copy assistant for Medley Music Access & Inclusion (music-access.com).
+
+About Medley: Professional development for inclusive & adaptive music education. Founded by Jess Corwin and Jen Kass — music teachers teaching music teachers.
+
+VOICE RULES — follow these exactly:
+- "disabled" not "special needs" — disability is not a bad word
+- "autistic" (identity-first, not "has autism" or "ASD")
+- "nonspeaking" (not "nonverbal")
+- "support needs" (not "functioning level")
+- "neurodivergent" / "neurodivergence" (not "disorder")
+- We fix the TRAINING GAP, not the students
+- Peer voice — "we are teachers, not professors"
+- Practical and Monday-ready, not theoretical
+- Joy in the work, not duty or charity
+
+GOOGLE ADS CONSTRAINTS:
+- Headlines: max 30 characters each, need 15 total
+- Descriptions: max 90 characters each, need 4 total, sweet spot 40-65 chars
+- Keep copy direct and scannable — shorter is better
+- No hard CTAs ("Enroll Now!") — invite exploration
+- No generic motivational platitudes
+- Two campaigns: Teachers (searching for their own PD) and Admins (buying PD for staff)
+
+When suggesting copy, always include character counts in brackets like [24 chars].
+Be concise. Give specific, usable suggestions, not theory.`;
+
+async function aiSend() {
+  const input = document.getElementById("aiInput");
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const key = localStorage.getItem(AI_KEY_STORAGE);
+  if (!key) {
+    document.getElementById("aiSettings").classList.add("open");
+    addAiMsg("system", "Enter your Anthropic API key first.");
+    return;
+  }
+
+  addAiMsg("user", msg);
+  input.value = "";
+
+  const context = buildAdContext();
+  aiChatHistory.push({ role: "user", content: `[Current ad state]\n${context}\n\n[Question]\n${msg}` });
+
+  const assistantEl = addAiMsg("assistant", "...");
+  const sendBtn = document.getElementById("aiSendBtn");
+  sendBtn.disabled = true;
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: 1024,
+        system: AI_SYSTEM,
+        messages: aiChatHistory,
+        stream: true
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      assistantEl.textContent = `Error ${resp.status}: ${err.slice(0, 200)}`;
+      aiChatHistory.pop();
+      sendBtn.disabled = false;
+      return;
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = "";
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split("\n");
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const data = line.slice(6);
+          if (data === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+              fullText += parsed.delta.text;
+              assistantEl.textContent = fullText;
+              assistantEl.parentElement.scrollTop = assistantEl.parentElement.scrollHeight;
+            }
+          } catch {}
+        }
+      }
+    }
+
+    if (fullText) aiChatHistory.push({ role: "assistant", content: fullText });
+    else { assistantEl.textContent = "No response received."; aiChatHistory.pop(); }
+  } catch (err) {
+    assistantEl.textContent = `Network error: ${err.message}`;
+    aiChatHistory.pop();
+  }
+
+  sendBtn.disabled = false;
+}
+
+function addAiMsg(role, text) {
+  const container = document.getElementById("aiMessages");
+  const el = document.createElement("div");
+  el.className = "ai-msg " + role;
+  el.textContent = text;
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+  return el;
 }
 
 // Init
