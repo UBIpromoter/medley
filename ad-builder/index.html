@@ -296,8 +296,8 @@
     <button onclick="toggleAiDrawer()" title="Close">&#10005;</button>
   </div>
   <div class="ai-settings" id="aiSettings">
-    <label>Anthropic API Key</label>
-    <input type="password" id="aiKeyInput" placeholder="sk-ant-..." oninput="saveAiKey(this.value)">
+    <label>OpenRouter API Key</label>
+    <input type="password" id="aiKeyInput" placeholder="sk-or-..." oninput="saveAiKey(this.value)">
   </div>
   <div class="ai-quick">
     <button onclick="aiQuick('Suggest 3 new headlines for this campaign')">Suggest headlines</button>
@@ -1529,7 +1529,7 @@ async function aiSend() {
   const key = localStorage.getItem(AI_KEY_STORAGE);
   if (!key) {
     document.getElementById("aiSettings").classList.add("open");
-    addAiMsg("system", "Enter your Anthropic API key first.");
+    addAiMsg("system", "Enter your OpenRouter API key in settings (gear icon).");
     return;
   }
 
@@ -1544,19 +1544,19 @@ async function aiSend() {
   sendBtn.disabled = true;
 
   try {
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    const messages = [{ role: "system", content: AI_SYSTEM }, ...aiChatHistory];
+    const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
-        "content-type": "application/json"
+        "Authorization": "Bearer " + key,
+        "Content-Type": "application/json",
+        "HTTP-Referer": location.href,
+        "X-Title": "Medley Ad Builder"
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-5-20250929",
+        model: "anthropic/claude-sonnet-4-5-20250929",
+        messages,
         max_tokens: 1024,
-        system: AI_SYSTEM,
-        messages: aiChatHistory,
         stream: true
       })
     });
@@ -1588,8 +1588,9 @@ async function aiSend() {
           if (data === "[DONE]") continue;
           try {
             const parsed = JSON.parse(data);
-            if (parsed.type === "content_block_delta" && parsed.delta?.text) {
-              fullText += parsed.delta.text;
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              fullText += content;
               assistantEl.textContent = fullText;
               assistantEl.parentElement.scrollTop = assistantEl.parentElement.scrollHeight;
             }
