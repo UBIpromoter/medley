@@ -52,7 +52,7 @@
   .cat-badge.under { background: #f5f5f5; color: #999; }
 
   /* Items */
-  .item { --glow: #bdbdbd; position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; margin: 3px 0; transition: margin 0.08s ease-out, background 0.15s, border-color 0.15s, opacity 0.15s; background: #fff; border: 1px solid transparent; }
+  .item { --glow: #bdbdbd; position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; margin: 3px 0; transition: margin 0.12s ease, box-shadow 0.12s ease, background 0.15s, border-color 0.15s, opacity 0.15s; background: #fff; border: 1px solid transparent; }
   .item:hover { border-color: #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
   .item.kept { --glow: #66bb6a; background: #f1f8f1; border-color: #c8e6c9; }
   .item.kept.excess { --glow: #ef5350; background: #fef0f0; border-color: #f5c6c6; }
@@ -61,11 +61,25 @@
   .item.killed .item-text { text-decoration: line-through; }
   .item.dragging { opacity: 0.3; }
 
-  /* Drag indicators — inset box-shadow follows border-radius exactly */
-  .item.drag-over-top { margin-top: 20px; box-shadow: inset 0 2px 0 0 var(--glow); }
-  .item.drag-over-bottom { margin-bottom: 20px; box-shadow: inset 0 -2px 0 0 var(--glow); }
+  /* Drag indicators — gap opens with dashed outline ghost */
+  .item.drag-over-top { margin-top: 30px; box-shadow: inset 0 2px 0 0 var(--glow); }
+  .item.drag-over-bottom { margin-bottom: 30px; box-shadow: inset 0 -2px 0 0 var(--glow); }
   .item.drag-neighbor-top { box-shadow: inset 0 1px 0 0 var(--glow); }
   .item.drag-neighbor-bottom { box-shadow: inset 0 -1px 0 0 var(--glow); }
+
+  /* Insertion outline — ghost preview of where the dragged item will land */
+  .item.drag-over-top::before,
+  .item.drag-over-bottom::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 24px;
+    border: 2px dashed var(--glow);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+  .item.drag-over-top::before { bottom: calc(100% + 3px); }
+  .item.drag-over-bottom::after { top: calc(100% + 3px); }
 
   .item.drag-will-excess { --glow: #ef5350; background: #fef0f0 !important; border-color: #f5c6c6 !important; }
   .item.drag-will-excess .rank-num { color: #e53935; }
@@ -106,7 +120,7 @@
   .cut-line-label { font-size: 9px; color: #bbb; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
   .drop-zone { padding: 0; margin: 0; border: 2px dashed transparent; border-radius: 8px; transition: all 0.15s ease-out; text-align: center; font-size: 11px; color: transparent; height: 4px; }
-  .drop-zone.drag-active { height: 32px; border-color: rgba(26,115,232,0.12); }
+  .drop-zone.drag-active { height: 40px; border-color: rgba(26,115,232,0.15); color: rgba(26,115,232,0.25); display: flex; align-items: center; justify-content: center; }
   .drop-zone.drag-hover { border-color: #1a73e8; background: #e8f0fe; color: #1a73e8; font-weight: 600; padding: 8px; height: auto; }
   .drop-zone.drag-hover.drag-hover-excess { border-color: #e53935; background: #fef0f0; color: #c62828; }
 
@@ -600,7 +614,10 @@ document.getElementById("campLabel").textContent = activeCamp === "t" ? "Teacher
 // =============================================
 let dragCat = null, dragItem = null;
 function clearDragIndicators() {
-  document.querySelectorAll(".drag-over-top,.drag-over-bottom,.drag-neighbor-top,.drag-neighbor-bottom,.drag-will-excess").forEach(el => el.classList.remove("drag-over-top","drag-over-bottom","drag-neighbor-top","drag-neighbor-bottom","drag-will-excess"));
+  document.querySelectorAll(".drag-over-top,.drag-over-bottom,.drag-neighbor-top,.drag-neighbor-bottom,.drag-will-excess").forEach(el => {
+    el.classList.remove("drag-over-top","drag-over-bottom","drag-neighbor-top","drag-neighbor-bottom","drag-will-excess");
+    el.style.removeProperty('--glow');
+  });
   document.querySelectorAll(".drag-hover-excess").forEach(el => el.classList.remove("drag-hover-excess"));
 }
 
@@ -702,7 +719,11 @@ function renderCategory(parent, cat) {
         const keptCount = cat.items.filter(i =>
           (i.camp === activeCamp || i.camp === "b") && getKeep(i) && !getKilled(i)
         ).length;
-        if (keptCount >= tgt) zone.classList.add("drag-hover-excess");
+        if (keptCount >= tgt) {
+          zone.classList.add("drag-hover-excess");
+          // Red glow on neighbor edge to match the excess insertion
+          if (keptItems.length > 0) keptItems[keptItems.length - 1].style.setProperty('--glow', '#ef5350');
+        }
       }
     });
     zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover", "drag-hover-excess"));
@@ -759,7 +780,8 @@ function renderRow(container, item, rank, cat, state, isExcess) {
     clearDragIndicators();
     const rect = row.getBoundingClientRect();
     const midY = rect.top + rect.height / 2;
-    if (e.clientY < midY) {
+    const isTop = e.clientY < midY;
+    if (isTop) {
       row.classList.add("drag-over-top");
       const prev = row.previousElementSibling;
       if (prev && prev.classList.contains("item")) prev.classList.add("drag-neighbor-bottom");
@@ -769,17 +791,24 @@ function renderRow(container, item, rank, cat, state, isExcess) {
       if (next && next.classList.contains("item")) next.classList.add("drag-neighbor-top");
     }
 
-    // Excess preview — if dropping here would push category over target
+    // Excess preview — only when dragging from available into kept area
     const targetIsKept = getKeep(item) && !getKilled(item);
     const dragIsKept = getKeep(dragItem) && !getKilled(dragItem);
     if (targetIsKept && !dragIsKept) {
-      const target = getTarget(cat);
-      const keptCount = cat.items.filter(i =>
-        (i.camp === activeCamp || i.camp === "b") && getKeep(i) && !getKilled(i)
-      ).length;
-      if (keptCount >= target) {
-        const keptRows = row.parentElement.querySelectorAll(".item.kept:not(.dragging)");
-        if (keptRows.length > 0) keptRows[keptRows.length - 1].classList.add("drag-will-excess");
+      const tgt = getTarget(cat);
+      const keptRows = Array.from(row.parentElement.querySelectorAll(".item.kept:not(.dragging)"));
+      if (keptRows.length >= tgt) {
+        const hoverIdx = keptRows.indexOf(row);
+        const insertPos = isTop ? hoverIdx : hoverIdx + 1;
+        if (insertPos < tgt) {
+          // New item lands in green zone — last green item gets pushed to excess
+          keptRows[tgt - 1].classList.add("drag-will-excess");
+        } else {
+          // New item itself would be excess — show red glow on insertion edges
+          row.style.setProperty('--glow', '#ef5350');
+          const neighbor = isTop ? row.previousElementSibling : row.nextElementSibling;
+          if (neighbor && neighbor.classList.contains("item")) neighbor.style.setProperty('--glow', '#ef5350');
+        }
       }
     }
   });
