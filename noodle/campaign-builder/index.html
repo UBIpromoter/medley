@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medley — Ad Copy</title>
+<title>Medley — Campaign Builder</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; min-height: 100vh; }
@@ -31,8 +31,8 @@
   .page-intro strong { color: #333; }
 
   /* Campaign tabs */
-  .camp-tabs { display: flex; gap: 4px; margin: 4px 0 12px; }
-  .camp-tab { background: transparent; border: 1px solid #dadce0; border-radius: 8px; padding: 7px 18px; font-size: 13px; font-weight: 500; color: #666; cursor: pointer; transition: all 0.15s; }
+  .camp-tabs { display: flex; gap: 3px; }
+  .camp-tab { background: transparent; border: 1px solid #dadce0; border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: #888; cursor: pointer; transition: all 0.15s; font-family: inherit; }
   .camp-tab:hover { background: #f5f5f5; color: #333; }
   .camp-tab.active { background: #1a73e8; color: #fff; border-color: #1a73e8; font-weight: 600; cursor: default; }
   .camp-tab.active:hover { background: #1a73e8; }
@@ -45,25 +45,30 @@
   .section-type .ad-fmt-d { color: #1a0dab; background: #eef0ff; }
 
   .cat-header { display: flex; align-items: center; gap: 8px; margin: 16px 0 2px; padding: 0 4px; }
-  .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; flex: 1; }
+  .cat-header.clickable { cursor: pointer; user-select: none; }
+  .cat-header.clickable:hover h3 { color: #555; }
+  .cat-header .cat-chev { font-size: 10px; color: #bbb; transition: transform 0.15s; }
+  .cat-header .cat-chev.collapsed { transform: rotate(-90deg); }
+  .cat-header h3 { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; flex: 1; transition: color 0.12s; }
   .cat-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
   .cat-badge.good { background: #e8f5e9; color: #2e7d32; }
   .cat-badge.over { background: #fce4ec; color: #c62828; }
   .cat-badge.under { background: #f5f5f5; color: #999; }
 
   /* Items */
-  .item { --glow: #bdbdbd; position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; margin: 3px 0; transition: margin 0.12s ease, box-shadow 0.12s ease, background 0.15s, border-color 0.15s, opacity 0.15s; background: #fff; border: 1px solid transparent; }
-  .item:hover { border-color: #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .item { --glow: #bdbdbd; position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; margin: 3px 0; transition: margin 80ms ease-out, box-shadow 80ms ease, background 0.15s, border-color 0.15s, opacity 0.15s; background: #fff; border: 1px solid #e0e0e0; }
+  .item:hover { border-color: #ccc; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
   .item.kept { --glow: #66bb6a; background: #f1f8f1; border-color: #c8e6c9; }
   .item.kept.excess { --glow: #ef5350; background: #fef0f0; border-color: #f5c6c6; }
-  .item.available { --glow: #bdbdbd; background: #fff; }
-  .item.killed { opacity: 0.45; }
+  .item.available { --glow: #bdbdbd; background: #fff; border-color: #e8e8e8; }
+  .item.killed { opacity: 0.5; border-color: #eee; }
+  .item.killed.drag-over-top, .item.killed.drag-over-bottom { opacity: 0.7; }
   .item.killed .item-text { text-decoration: line-through; }
-  .item.dragging { opacity: 0.3; }
+  .item.dragging { opacity: 0; max-height: 0 !important; padding: 0 !important; margin: 0 !important; border-width: 0 !important; overflow: hidden; min-height: 0; pointer-events: none; transition: none; }
 
-  /* Drag indicators — gap opens with dashed outline ghost */
-  .item.drag-over-top { margin-top: 30px; box-shadow: inset 0 2px 0 0 var(--glow); }
-  .item.drag-over-bottom { margin-bottom: 30px; box-shadow: inset 0 -2px 0 0 var(--glow); }
+  /* Drag indicators — full-height gap opens with dashed outline ghost */
+  .item.drag-over-top { margin-top: var(--drag-h, 38px); box-shadow: inset 0 2px 0 0 var(--glow); }
+  .item.drag-over-bottom { margin-bottom: var(--drag-h, 38px); box-shadow: inset 0 -2px 0 0 var(--glow); }
   .item.drag-neighbor-top { box-shadow: inset 0 1px 0 0 var(--glow); }
   .item.drag-neighbor-bottom { box-shadow: inset 0 -1px 0 0 var(--glow); }
 
@@ -72,11 +77,12 @@
   .item.drag-over-bottom::after {
     content: '';
     position: absolute;
-    left: 0; right: 0;
-    height: 24px;
+    left: 4px; right: 4px;
+    height: calc(var(--drag-h, 38px) - 6px);
     border: 2px dashed var(--glow);
     border-radius: 6px;
     pointer-events: none;
+    background: color-mix(in srgb, var(--glow) 4%, transparent);
   }
   .item.drag-over-top::before { bottom: calc(100% + 3px); }
   .item.drag-over-bottom::after { top: calc(100% + 3px); }
@@ -183,13 +189,17 @@
   .section-header .chevron.collapsed { transform: rotate(-90deg); }
   .section-content.collapsed { display: none; }
 
-  /* Two-column category grid */
+  /* Category grids */
   .section-content.grid-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; align-items: start; }
+  .section-content.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 16px; align-items: start; }
   .cat-wrapper { min-width: 0; }
 
   /* Match type pill */
   .match-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; cursor: pointer; border: 1px solid #dadce0; background: #f8f9fa; color: #666; white-space: nowrap; flex-shrink: 0; transition: all 0.12s; text-transform: capitalize; font-family: inherit; }
   .match-pill:hover { border-color: #1a73e8; color: #1a73e8; background: #e8f0fe; }
+  .match-pill.default { width: 0; padding: 0; border: none; background: none; overflow: hidden; opacity: 0; }
+  .item:hover .match-pill.default { width: auto; padding: 2px 8px; border: 1px solid #e8e8e8; opacity: 0.5; }
+  .item:hover .match-pill.default::after { content: "phrase"; }
   .match-pill.exact { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
   .match-pill.broad { background: #fff8e1; border-color: #f57f17; color: #f57f17; }
 
@@ -210,6 +220,8 @@
   /* Keyword items */
   .item.kw-item { padding-left: 16px; }
   .item.kw-item .kw-icon { font-size: 14px; color: #ccc; flex-shrink: 0; width: 18px; text-align: center; }
+  .item.kw-overlap { background: #fff8e1; border: 1px solid #ffe082; }
+  .item.kw-overlap .kw-icon { color: #e65100; }
 
   /* AI Drawer */
   .ai-fab { position: fixed; bottom: 70px; right: 24px; z-index: 250; width: 48px; height: 48px; border-radius: 50%; background: #1a73e8; color: #fff; border: none; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
@@ -249,7 +261,7 @@
   @media (max-width: 900px) {
     .layout { grid-template-columns: 1fr; }
     .preview-panel { position: relative; max-height: none; border-left: none; border-top: 1px solid #e5e5e5; }
-    .section-content.grid-cats { grid-template-columns: 1fr; }
+    .section-content.grid-cats, .section-content.grid-3 { grid-template-columns: 1fr; }
     .ai-drawer { width: 100%; }
   }
 </style>
@@ -258,11 +270,16 @@
 <body>
 
 <div class="topbar">
-  <h1>Medley Ad Copy</h1>
+  <h1>Medley Campaigns</h1>
+  <div class="camp-tabs">
+    <button class="camp-tab active" data-camp="t" onclick="switchCamp('t')">Teachers</button>
+    <button class="camp-tab" data-camp="a" onclick="switchCamp('a')">Admins</button>
+  </div>
   <div class="counter-group">
-    <div class="counter-pill" id="hPill"><span class="num" id="hNum">0</span>&nbsp;/ 15 headlines</div>
-    <div class="counter-pill" id="dPill"><span class="num" id="dNum">0</span>&nbsp;/ 4 descriptions</div>
-    <div class="counter-pill good" id="kwPill"><span class="num" id="kwNum">0</span>&nbsp;keywords</div>
+    <div class="counter-pill" id="hPill"><span class="num" id="hNum">0</span>&nbsp;/ 15 H</div>
+    <div class="counter-pill" id="dPill"><span class="num" id="dNum">0</span>&nbsp;/ 4 D</div>
+    <div class="counter-pill good" id="kwPill"><span class="num" id="kwNum">0</span>&nbsp;KW</div>
+    <div class="counter-pill" id="overlapPill" title="Keywords shared between both campaigns"><span class="num" id="overlapNum">0</span>&nbsp;shared</div>
   </div>
   <span class="save-status" id="saveStatus">Auto-saved</span>
   <button class="refresh-btn" onclick="location.reload(true)">Refresh</button>
@@ -272,12 +289,7 @@
 <div class="worksheet">
 
   <div class="page-intro">
-    <strong>Two campaigns — Teachers and Admins.</strong> Items with a <span class="shared-badge" style="display:inline">Shared</span> badge live in both. Drag above the line to include, edit any text directly, or add your own.
-  </div>
-
-  <div class="camp-tabs">
-    <button class="camp-tab active" data-camp="t" onclick="switchCamp('t')">Teachers Campaign</button>
-    <button class="camp-tab" data-camp="a" onclick="switchCamp('a')">Admins Campaign</button>
+    <strong>Two campaigns that don't compete.</strong> Teachers search for their own PD. Admins search to train their staff. Keywords are organized by campaign. Shared keywords trigger both.
   </div>
 
   <div id="catContent"></div>
@@ -290,6 +302,13 @@
   <button class="shuffle-btn" onclick="renderPreviews()">Shuffle</button>
   <div id="previews"></div>
   <div class="summary-section" id="summary"></div>
+
+  <!-- Campaign Health -->
+  <div class="summary-section" id="healthSection" style="margin-top:20px;">
+    <h4 style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:8px;">Campaign Separation</h4>
+    <div id="healthContent"></div>
+  </div>
+
   <button class="export-btn" onclick="showExport()">Export Both Campaigns</button>
 </div>
 </div>
@@ -321,9 +340,10 @@
   throw new Error('auth');
 })();
 
-const STORAGE_KEY = "medley-ad-v3";
+const STORAGE_KEY = "medley-campaign-v1";
 const H_MAX = 15, D_MAX = 4;
-let collapsed = { h: false, d: false, k: true, n: true };
+let collapsed = { h: false, d: false, k: false, n: false };
+let collapsedCats = {}; // per-category collapse state, keyed by cat.id
 const DESC_SWEET = [40, 65];
 
 // Cloud sync — Supabase project credentials
@@ -335,6 +355,26 @@ function saveStore(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50); }
 function pick(a, n) { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b.slice(0, n); }
 function esc(s) { const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+// =============================================
+// CAMPAIGN INTENT — defines what separates the two campaigns
+// =============================================
+const CAMP_INTENT = {
+  t: {
+    name: "Teachers",
+    who: "The teacher themselves",
+    intent: "I need skills for my classroom",
+    signals: ["my students", "my classroom", "classroom", "strategies", "teach", "trained", "skills", "learn", "I need", "hands-on"],
+    negSignals: ["district", "staff training", "department", "team PD", "school-wide", "administrator", "principal", "hire", "budget"],
+  },
+  a: {
+    name: "Admins",
+    who: "Principal, director, or coordinator",
+    intent: "My staff needs training",
+    signals: ["district", "department", "staff", "team", "school-wide", "equip", "train your", "PD for teachers", "build your"],
+    negSignals: ["my students", "my classroom", "I wasn't trained", "feel empowered", "teach the kids"],
+  }
+};
 
 // =============================================
 // CAMPAIGN STATE
@@ -353,6 +393,81 @@ function setKilled(item, val) {
 }
 function getTarget(cat) { return activeCamp === "t" ? cat.targetT : cat.targetA; }
 function getPin(item) { return activeCamp === "t" ? item.pinT : item.pinA; }
+
+// =============================================
+// CAMPAIGN SEPARATION HELPERS
+// =============================================
+
+// Count keywords shared across both campaigns
+function getOverlapCount() {
+  let count = 0;
+  cats.forEach(c => {
+    if (c.type !== "k") return;
+    c.items.forEach(item => {
+      if (item.camp === "b" && !item.killedT && !item.killedA) count++;
+    });
+  });
+  return count;
+}
+
+// Check if a headline/description text matches the campaign audience
+function getAudienceMatch(text, camp) {
+  const t = text.toLowerCase();
+  const intent = CAMP_INTENT[camp];
+  const other = camp === "t" ? "a" : "t";
+  const otherIntent = CAMP_INTENT[other];
+  // Check if it contains signals from the OTHER campaign
+  for (const sig of otherIntent.signals) {
+    if (t.includes(sig.toLowerCase())) return { match: "mismatch", signal: sig };
+  }
+  // Check if it contains signals from THIS campaign
+  for (const sig of intent.signals) {
+    if (t.includes(sig.toLowerCase())) return { match: "good", signal: sig };
+  }
+  return { match: "neutral" };
+}
+
+// Generate suggested cross-negatives for a campaign
+function getSuggestedNegatives(camp) {
+  const intent = CAMP_INTENT[camp];
+  // Get existing negatives for this campaign
+  const existing = new Set();
+  cats.forEach(c => {
+    if (c.type !== "n") return;
+    c.items.forEach(item => {
+      if ((item.camp === camp || item.camp === "b") && !getKilled(item)) {
+        existing.add(item.t.toLowerCase());
+      }
+    });
+  });
+  // Suggest negatives from the camp's negSignals that aren't already added
+  return intent.negSignals.filter(s => !existing.has(s.toLowerCase()));
+}
+
+// Get campaign health score
+function getCampaignHealth(camp) {
+  let total = 0, mismatches = 0, totalCopy = 0;
+  cats.forEach(c => {
+    if (c.type === "k") {
+      c.items.forEach(item => {
+        if (item.killedT && item.killedA) return;
+        if (item.camp === camp || item.camp === "b") total++;
+      });
+    }
+    if ((c.type === "h" || c.type === "d") && c.camps.includes(camp)) {
+      c.items.forEach(item => {
+        const keep = camp === "t" ? item.keepT : item.keepA;
+        const killed = camp === "t" ? item.killedT : item.killedA;
+        if (!keep || killed || (item.camp !== camp && item.camp !== "b")) return;
+        totalCopy++;
+        const check = getAudienceMatch(item.t, camp);
+        if (check.match === "mismatch") mismatches++;
+      });
+    }
+  });
+  const sugNeg = getSuggestedNegatives(camp);
+  return { total, mismatches, totalCopy, suggestedNegatives: sugNeg.length };
+}
 function setPin(item, val) {
   if (activeCamp === "t") item.pinT = val;
   else item.pinA = val;
@@ -437,74 +552,103 @@ const cats = [
   ]},
 
   // --- KEYWORDS ---
-  { id:"kw", type:"k", label:"Keywords", camps:"ta", max:0, items:[
-    // Existing (kept)
+  { id:"kw-shared", type:"k", label:"Shared Keywords", camps:"ta", max:0, items:[
     { t:"inclusive music education", camp:"b", match:"phrase" },
     { t:"inclusive music workshop", camp:"b", match:"phrase" },
-    { t:"inclusive music PD", camp:"t", match:"phrase" },
     { t:"adaptive music PD", camp:"b", match:"phrase" },
     { t:"adaptive music ed", camp:"b", match:"phrase" },
+    { t:"online music course", camp:"b", match:"exact" },
+    { t:"disability inclusive music education", camp:"b", match:"phrase" },
+  ]},
+  { id:"kw-teachers", type:"k", label:"Teachers Keywords", camps:"t", max:0, items:[
+    { t:"inclusive music PD", camp:"t", match:"phrase" },
     { t:"neurodivergent music ed", camp:"t", match:"phrase" },
     { t:"music teacher PD", camp:"t", match:"phrase" },
     { t:"music IEP training", camp:"t", match:"phrase" },
-    { t:"music department training", camp:"a", match:"phrase" },
-    { t:"online music course", camp:"b", match:"exact" },
-    // Panel additions — high-intent commercial
-    { t:"music teacher professional development", camp:"a", match:"phrase" },
     { t:"inclusive music professional development", camp:"t", match:"phrase" },
     { t:"music inclusion workshop", camp:"t", match:"phrase" },
-    { t:"disability inclusive music education", camp:"b", match:"phrase" },
     { t:"autistic students music class", camp:"t", match:"phrase" },
+    { t:"adaptive music teacher workshop", camp:"t", match:"phrase" },
+  ]},
+  { id:"kw-admins", type:"k", label:"Admins Keywords", camps:"a", max:0, items:[
+    { t:"music department training", camp:"a", match:"phrase" },
+    { t:"music teacher professional development", camp:"a", match:"phrase" },
     { t:"music pd for schools", camp:"a", match:"phrase" },
     { t:"district music PD", camp:"a", match:"exact" },
-    { t:"adaptive music teacher workshop", camp:"t", match:"phrase" },
   ]},
 
   // --- NEGATIVE KEYWORDS ---
-  { id:"nk", type:"n", label:"Negative Keywords", camps:"ta", max:0, items:[
+  // Shared: block irrelevant traffic from both campaigns
+  { id:"nk-shared", type:"n", label:"Shared Negatives", camps:"ta", max:0, items:[
     { t:"hiring", camp:"b", match:"phrase" },
-    { t:"guitar teacher", camp:"b", match:"phrase" },
-    { t:"IEP goals", camp:"b", match:"phrase" },
-    { t:"MTEL music prep", camp:"b", match:"phrase" },
-    { t:"special education law", camp:"b", match:"phrase" },
-    { t:"internship", camp:"b", match:"phrase" },
-    { t:"private piano teacher", camp:"b", match:"phrase" },
-    { t:"how to become a music teacher", camp:"b", match:"phrase" },
-    { t:"clinical music therapy", camp:"b", match:"phrase" },
-    { t:"hospital music therapy", camp:"b", match:"phrase" },
-    { t:"cheap", camp:"b", match:"phrase" },
+    { t:"jobs", camp:"b", match:"phrase" },
+    { t:"careers", camp:"b", match:"phrase" },
     { t:"salary", camp:"b", match:"phrase" },
+    { t:"internship", camp:"b", match:"phrase" },
+    { t:"remote music teacher jobs", camp:"b", match:"phrase" },
+    { t:"guitar teacher", camp:"b", match:"phrase" },
+    { t:"piano teacher", camp:"b", match:"phrase" },
+    { t:"private piano teacher", camp:"b", match:"phrase" },
     { t:"private lessons", camp:"b", match:"phrase" },
     { t:"violin lessons", camp:"b", match:"phrase" },
-    { t:"IEP accommodations", camp:"b", match:"phrase" },
-    { t:"how to write an IEP", camp:"b", match:"phrase" },
-    { t:"tutor", camp:"b", match:"phrase" },
-    { t:"free", camp:"b", match:"phrase" },
     { t:"voice lessons", camp:"b", match:"phrase" },
-    { t:"careers", camp:"b", match:"phrase" },
+    { t:"tutor", camp:"b", match:"phrase" },
+    { t:"clinical music therapy", camp:"b", match:"phrase" },
+    { t:"hospital music therapy", camp:"b", match:"phrase" },
     { t:"music therapy for kids", camp:"b", match:"phrase" },
     { t:"music therapy certification", camp:"b", match:"phrase" },
     { t:"music teacher certification", camp:"b", match:"phrase" },
-    { t:"adaptive music lessons", camp:"b", match:"phrase" },
-    { t:"jobs", camp:"b", match:"phrase" },
+    { t:"how to become a music teacher", camp:"b", match:"phrase" },
+    { t:"music education degree", camp:"b", match:"phrase" },
+    { t:"MTEL music prep", camp:"b", match:"phrase" },
+    { t:"degree", camp:"b", match:"phrase" },
+    { t:"masters program", camp:"b", match:"phrase" },
+    { t:"college course", camp:"b", match:"phrase" },
+    { t:"certification program", camp:"b", match:"phrase" },
+    { t:"special education law", camp:"b", match:"phrase" },
+    { t:"IEP goals", camp:"b", match:"phrase" },
+    { t:"IEP accommodations", camp:"b", match:"phrase" },
+    { t:"how to write an IEP", camp:"b", match:"phrase" },
+    { t:"cheap", camp:"b", match:"phrase" },
+    { t:"free", camp:"b", match:"phrase" },
     { t:"DIY", camp:"b", match:"phrase" },
-    { t:"piano teacher", camp:"b", match:"phrase" },
-    // Panel additions — block resource-seekers & job-hunters
     { t:"lesson plans", camp:"b", match:"phrase" },
     { t:"worksheets", camp:"b", match:"phrase" },
     { t:"curriculum", camp:"b", match:"phrase" },
     { t:"printable", camp:"b", match:"phrase" },
     { t:"YouTube", camp:"b", match:"phrase" },
-    { t:"degree", camp:"b", match:"phrase" },
-    { t:"masters program", camp:"b", match:"phrase" },
-    { t:"college course", camp:"b", match:"phrase" },
-    { t:"certification program", camp:"b", match:"phrase" },
     { t:"homeschool", camp:"b", match:"phrase" },
     { t:"kids music classes", camp:"b", match:"phrase" },
     { t:"summer music camp", camp:"b", match:"phrase" },
     { t:"music lesson plans free", camp:"b", match:"phrase" },
-    { t:"music education degree", camp:"b", match:"phrase" },
-    { t:"remote music teacher jobs", camp:"b", match:"phrase" },
+    { t:"adaptive music lessons", camp:"b", match:"phrase" },
+  ]},
+  // Teachers campaign: block admin-intent searches
+  { id:"nk-teachers", type:"n", label:"Teachers Negatives", camps:"t", max:0, items:[
+    { t:"district", camp:"t", match:"phrase" },
+    { t:"staff training", camp:"t", match:"phrase" },
+    { t:"department training", camp:"t", match:"phrase" },
+    { t:"school-wide", camp:"t", match:"phrase" },
+    { t:"administrator", camp:"t", match:"phrase" },
+    { t:"principal", camp:"t", match:"phrase" },
+    { t:"for my team", camp:"t", match:"phrase" },
+    { t:"train your", camp:"t", match:"phrase" },
+    { t:"equip your", camp:"t", match:"phrase" },
+    { t:"budget", camp:"t", match:"phrase" },
+    { t:"PD for teachers", camp:"t", match:"phrase" },
+    { t:"hire", camp:"t", match:"phrase" },
+  ]},
+  // Admins campaign: block teacher-intent searches
+  { id:"nk-admins", type:"n", label:"Admins Negatives", camps:"a", max:0, items:[
+    { t:"my students", camp:"a", match:"phrase" },
+    { t:"my classroom", camp:"a", match:"phrase" },
+    { t:"classroom strategies", camp:"a", match:"phrase" },
+    { t:"I wasn't trained", camp:"a", match:"phrase" },
+    { t:"feel empowered", camp:"a", match:"phrase" },
+    { t:"teach the kids", camp:"a", match:"phrase" },
+    { t:"not trained for this", camp:"a", match:"phrase" },
+    { t:"hands-on skills", camp:"a", match:"phrase" },
+    { t:"Monday morning", camp:"a", match:"phrase" },
   ]},
 ];
 
@@ -529,6 +673,7 @@ function applyStore() {
   if (!store) return;
   if (store._activeCamp) activeCamp = store._activeCamp;
   if (store._collapsed) collapsed = { ...collapsed, ...store._collapsed };
+  if (store._collapsedCats) collapsedCats = { ...collapsedCats, ...store._collapsedCats };
   cats.forEach(cat => {
     const saved = store[cat.id];
     if (!saved) return;
@@ -563,7 +708,7 @@ function applyStore() {
 }
 
 function persistAll() {
-  const store = { _activeCamp: activeCamp, _collapsed: collapsed };
+  const store = { _activeCamp: activeCamp, _collapsed: collapsed, _collapsedCats: collapsedCats };
   cats.forEach(cat => {
     store[cat.id] = {
       order: cat.items.map(i => i.id),
@@ -670,12 +815,115 @@ document.getElementById("campLabel").textContent = activeCamp === "t" ? "Teacher
 // DRAG STATE
 // =============================================
 let dragCat = null, dragItem = null;
+let dropCat = null, dropItem = null, dropAfter = false;
+let dropZoneCat = null; // for drop-zone drops (keep=true)
+let lastDragEl = null, lastDragSide = null; // anti-jitter: skip if same target+side
+let dragRow = null; // reference to source DOM element for direct move
+
+// Custom drag ghost — replaces browser's native ghost to eliminate snap-back
+let dragGhost = null, dragGhostOff = { x: 0, y: 0 };
+function startDragGhost(row, e) {
+  const ghost = row.cloneNode(true);
+  const rect = row.getBoundingClientRect();
+  const x = rect.left, y = rect.top;
+  ghost.style.cssText = `position:fixed;left:0;top:0;z-index:9999;pointer-events:none;width:${rect.width}px;opacity:0.85;transform:translate3d(${x}px,${y}px,0) rotate(0.5deg);box-shadow:0 6px 20px rgba(0,0,0,0.18);border-radius:8px;margin:0;background:#fff;will-change:transform;`;
+  document.body.appendChild(ghost);
+  dragGhost = ghost;
+  dragGhostOff = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  // Set gap height to match dragged item
+  document.body.style.setProperty('--drag-h', rect.height + 'px');
+  // Hide native drag ghost — must be in DOM for Safari
+  const blank = document.createElement("canvas");
+  blank.width = blank.height = 1;
+  blank.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0;";
+  document.body.appendChild(blank);
+  e.dataTransfer.setDragImage(blank, 0, 0);
+  requestAnimationFrame(() => blank.remove());
+}
+function endDragGhost() {
+  if (dragGhost) { dragGhost.remove(); dragGhost = null; }
+  document.body.style.removeProperty('--drag-h');
+}
+document.addEventListener("dragover", e => {
+  if (dragGhost) {
+    const gx = e.clientX - dragGhostOff.x, gy = e.clientY - dragGhostOff.y;
+    dragGhost.style.transform = `translate3d(${gx}px,${gy}px,0) rotate(0.5deg)`;
+  }
+});
+
+function commitDrag() {
+  if (!dragCat || !dragItem) { dragCat = dragItem = dropCat = dropItem = dropZoneCat = null; lastDragEl = lastDragSide = null; dragRow = null; return; }
+
+  // Find the visual target before clearing anything
+  const indicator = document.querySelector(".drag-over-top,.drag-over-bottom");
+  const zoneEl = document.querySelector(".drag-hover");
+
+  if (!indicator && !zoneEl && !dropZoneCat) {
+    dragCat = dragItem = dropCat = dropItem = dropZoneCat = null; lastDragEl = lastDragSide = null; dragRow = null;
+    return;
+  }
+
+  // --- Instant DOM move: move the row visually before full render ---
+  if (dragRow) {
+    if (indicator) {
+      const after = indicator.classList.contains("drag-over-bottom");
+      indicator.parentNode.insertBefore(dragRow, after ? indicator.nextSibling : indicator);
+    } else if (zoneEl) {
+      zoneEl.parentNode.insertBefore(dragRow, zoneEl);
+    }
+    // Kill transitions so it appears instantly (no 150ms opacity fade-in)
+    dragRow.style.transition = 'none';
+    dragRow.classList.remove("dragging");
+    const landed = dragRow;
+    dragRow = null;
+    // Re-enable transitions next frame
+    requestAnimationFrame(() => landed.style.transition = '');
+  }
+
+  // --- Update data model ---
+  if (dropZoneCat) {
+    const cat = dropZoneCat;
+    if (dragCat !== cat) {
+      dragCat.items.splice(dragCat.items.indexOf(dragItem), 1);
+      cat.items.push(dragItem);
+      if (cat.type === "k" || cat.type === "n") {
+        dragItem.camp = cat.camps === "ta" ? "b" : cat.camps;
+      }
+    }
+    setKeep(dragItem, true);
+    if (getKilled(dragItem)) setKilled(dragItem, false);
+  } else if (dropCat && dropItem && dropItem !== dragItem) {
+    if (dragCat !== dropCat) {
+      dragCat.items.splice(dragCat.items.indexOf(dragItem), 1);
+      if (dropCat.type === "k" || dropCat.type === "n") {
+        dragItem.camp = dropCat.camps === "ta" ? "b" : dropCat.camps;
+      }
+    } else {
+      dropCat.items.splice(dropCat.items.indexOf(dragItem), 1);
+    }
+    const toIdx = dropCat.items.indexOf(dropItem);
+    dropCat.items.splice(dropAfter ? toIdx + 1 : toIdx, 0, dragItem);
+    if (dropCat.type === "h" || dropCat.type === "d") {
+      setKeep(dragItem, getKeep(dropItem));
+      if (getKilled(dragItem) && !getKilled(dropItem)) setKilled(dragItem, false);
+    }
+  }
+
+  dragCat = dragItem = dropCat = dropItem = dropZoneCat = null; lastDragEl = lastDragSide = null;
+
+  // Deferred full render — fixes ranks, badges, state after 2 frames
+  // Frame 1: user sees instant move. Frame 2: full cleanup.
+  requestAnimationFrame(() => requestAnimationFrame(render));
+}
+
 function clearDragIndicators() {
   document.querySelectorAll(".drag-over-top,.drag-over-bottom,.drag-neighbor-top,.drag-neighbor-bottom,.drag-will-excess").forEach(el => {
+    el.style.transition = 'none'; // instant gap close, no 80ms margin animation
     el.classList.remove("drag-over-top","drag-over-bottom","drag-neighbor-top","drag-neighbor-bottom","drag-will-excess");
     el.style.removeProperty('--glow');
+    requestAnimationFrame(() => el.style.transition = '');
   });
-  document.querySelectorAll(".drag-hover-excess").forEach(el => el.classList.remove("drag-hover-excess"));
+  document.querySelectorAll(".drag-hover,.drag-hover-excess").forEach(el => el.classList.remove("drag-hover","drag-hover-excess"));
 }
 
 // =============================================
@@ -683,7 +931,7 @@ function clearDragIndicators() {
 // =============================================
 function render() {
   const content = document.getElementById("catContent");
-  content.innerHTML = "";
+  const frag = document.createDocumentFragment();
 
   const typeOrder = ["h", "d", "k", "n"];
   const typeLabels = {
@@ -694,7 +942,7 @@ function render() {
   };
 
   typeOrder.forEach(type => {
-    const typeCats = cats.filter(c => c.type === type && c.camps.includes(activeCamp));
+    const typeCats = cats.filter(c => c.type === type && (c.type === "n" || c.type === "k" || c.camps.includes(activeCamp)));
     if (typeCats.length === 0) return;
 
     const wrapper = document.createElement("div");
@@ -712,22 +960,72 @@ function render() {
     header.onclick = () => { collapsed[type] = !collapsed[type]; render(); };
     wrapper.appendChild(header);
 
+    // Match type explainer (keywords section only)
+    if (type === "k" && !collapsed[type]) {
+      const explainer = document.createElement("div");
+      explainer.innerHTML = `
+        <div style="margin:4px 0 8px;font-size:12px;">
+          <div style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#888;padding:2px 4px;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'; this.querySelector('.exp-chev').textContent=this.nextElementSibling.style.display==='none'?'▸':'▾'">
+            <span class="exp-chev" style="font-size:10px;">▸</span>
+            <span>What do <strong>phrase</strong>, <strong>exact</strong>, and <strong>broad</strong> mean?</span>
+          </div>
+          <div style="display:none;padding:8px 12px;margin:4px 0;background:#f8f9fa;border-radius:8px;border:1px solid #e8e8e8;line-height:1.7;font-size:12px;color:#444;">
+            <p>Each keyword has a <strong>match type</strong> that controls how loosely Google matches it to real searches. Click the pill next to any keyword to change it.</p>
+            <div style="margin:10px 0 6px;">
+              <span style="display:inline-block;padding:2px 8px;border-radius:10px;border:1px solid #dadce0;background:#f8f9fa;font-size:10px;font-weight:600;color:#666;">phrase</span>
+              <span style="margin-left:6px;">The search must contain your words <strong>in that order</strong>, but can have other words around them.</span>
+            </div>
+            <div style="padding:0 0 0 12px;font-size:11px;color:#666;margin-bottom:8px;">
+              Your keyword: <em>"inclusive music PD"</em><br>
+              ✓ Matches: <em>best inclusive music PD near me</em><br>
+              ✗ Won't match: <em>PD for inclusive music</em> (wrong order)
+            </div>
+            <div style="margin:6px 0;">
+              <span style="display:inline-block;padding:2px 8px;border-radius:10px;border:1px solid #1a73e8;background:#e8f0fe;font-size:10px;font-weight:600;color:#1a73e8;">exact</span>
+              <span style="margin-left:6px;">The search must mean <strong>essentially the same thing</strong>. Tightest control, fewest impressions.</span>
+            </div>
+            <div style="padding:0 0 0 12px;font-size:11px;color:#666;margin-bottom:8px;">
+              Your keyword: <em>[district music PD]</em><br>
+              ✓ Matches: <em>music PD for districts</em> (same meaning)<br>
+              ✗ Won't match: <em>district music teacher jobs</em> (different intent)
+            </div>
+            <div style="margin:6px 0;">
+              <span style="display:inline-block;padding:2px 8px;border-radius:10px;border:1px solid #f57f17;background:#fff8e1;font-size:10px;font-weight:600;color:#f57f17;">broad</span>
+              <span style="margin-left:6px;">Google matches anything it thinks is <strong>related</strong>. Most volume, least control.</span>
+            </div>
+            <div style="padding:0 0 0 12px;font-size:11px;color:#666;margin-bottom:8px;">
+              Your keyword: <em>inclusive music education</em><br>
+              ✓ Could match: <em>adaptive teaching music classroom</em><br>
+              ⚠ Could also match: <em>music therapy degree programs</em> (not what you want)
+            </div>
+            <p style="margin-top:10px;font-size:11px;color:#888;"><strong>For Medley's budget, phrase is the right default</strong> — specific enough to avoid wasted spend, loose enough to get impressions. Use exact for your highest-value terms, broad only if you want to discover new searches.</p>
+          </div>
+        </div>`;
+      wrapper.appendChild(explainer);
+    }
+
     // Collapsible content
     const sectionContent = document.createElement("div");
-    const gridClass = (type === "h" || type === "d") ? " grid-cats" : "";
+    const gridClass = (type === "k" || type === "n") ? " grid-3" : " grid-cats";
     sectionContent.className = "section-content" + gridClass + (collapsed[type] ? " collapsed" : "");
     typeCats.forEach(cat => {
       if (type === "k" || type === "n") renderKeywordCategory(sectionContent, cat);
       else renderCategory(sectionContent, cat);
     });
     wrapper.appendChild(sectionContent);
-    content.appendChild(wrapper);
+    frag.appendChild(wrapper);
   });
 
+  // Atomic swap — no blank frame
+  content.replaceChildren(frag);
   updateCounters();
-  renderPreviews();
-  renderSummary();
-  persistAll();
+  // Defer non-critical side panel updates so the main content paints first
+  requestAnimationFrame(() => {
+    renderPreviews();
+    renderSummary();
+    renderHealth();
+    persistAll();
+  });
 }
 
 function renderCategory(parent, cat) {
@@ -739,9 +1037,20 @@ function renderCategory(parent, cat) {
   const available = visible.filter(i => !getKeep(i) && !getKilled(i));
   const killed = visible.filter(i => getKilled(i));
 
+  // Collapsible for categories with 4+ visible items
+  const canCollapse = visible.length >= 4;
+  const isCatCollapsed = canCollapse && !!collapsedCats[cat.id];
+
   // Category header
   const header = document.createElement("div");
-  header.className = "cat-header";
+  header.className = "cat-header" + (canCollapse ? " clickable" : "");
+  if (canCollapse) {
+    header.onclick = () => { collapsedCats[cat.id] = !collapsedCats[cat.id]; render(); };
+    const chev = document.createElement("span");
+    chev.className = "cat-chev" + (isCatCollapsed ? " collapsed" : "");
+    chev.innerHTML = "&#9662;";
+    header.appendChild(chev);
+  }
   const h3 = document.createElement("h3");
   h3.textContent = cat.label;
   const badge = document.createElement("span");
@@ -752,61 +1061,56 @@ function renderCategory(parent, cat) {
   // Container for items
   const container = document.createElement("div");
 
-  // Kept items (above the line)
-  kept.forEach((item, i) => {
-    renderRow(container, item, i + 1, cat, "kept", i >= target);
-  });
+  if (!isCatCollapsed) {
+    // Kept items (above the line)
+    kept.forEach((item, i) => {
+      renderRow(container, item, i + 1, cat, "kept", i >= target);
+    });
 
-  // Drop zone + cut line
-  if (available.length > 0 || killed.length > 0) {
-    const zone = document.createElement("div");
-    zone.className = "drop-zone";
-    zone.textContent = "Drop here to include in ad";
-    zone.addEventListener("dragover", e => {
-      e.preventDefault();
-      if (dragCat !== cat) return;
-      clearDragIndicators();
-      zone.classList.add("drag-hover");
-      // Glow bottom edge of last kept item above the drop zone
-      const keptItems = container.querySelectorAll(".item.kept:not(.dragging)");
-      if (keptItems.length > 0) keptItems[keptItems.length - 1].classList.add("drag-neighbor-bottom");
-      // Excess preview — incoming item would be last in kept
-      if (!getKeep(dragItem) || getKilled(dragItem)) {
-        const tgt = getTarget(cat);
-        const keptCount = cat.items.filter(i =>
-          (i.camp === activeCamp || i.camp === "b") && getKeep(i) && !getKilled(i)
-        ).length;
-        if (keptCount >= tgt) {
-          zone.classList.add("drag-hover-excess");
-          // Red glow on neighbor edge to match the excess insertion
-          if (keptItems.length > 0) keptItems[keptItems.length - 1].style.setProperty('--glow', '#ef5350');
+    // Drop zone + cut line
+    if (available.length > 0 || killed.length > 0) {
+      const zone = document.createElement("div");
+      zone.className = "drop-zone";
+      zone.textContent = "Drop here to include in ad";
+      zone.addEventListener("dragover", e => {
+        e.preventDefault();
+        if (!dragCat || dragCat.type !== cat.type) return;
+        lastDragEl = null; lastDragSide = null; // reset so returning to a row re-triggers
+        dropCat = dropItem = null; // clear row target
+        dropZoneCat = cat;
+        clearDragIndicators();
+        zone.classList.add("drag-hover");
+        const keptItems = container.querySelectorAll(".item.kept:not(.dragging)");
+        if (keptItems.length > 0) keptItems[keptItems.length - 1].classList.add("drag-neighbor-bottom");
+        if (!getKeep(dragItem) || getKilled(dragItem)) {
+          const tgt = getTarget(cat);
+          const keptCount = cat.items.filter(i =>
+            (i.camp === activeCamp || i.camp === "b") && getKeep(i) && !getKilled(i)
+          ).length;
+          if (keptCount >= tgt) {
+            zone.classList.add("drag-hover-excess");
+            if (keptItems.length > 0) keptItems[keptItems.length - 1].style.setProperty('--glow', '#ef5350');
+          }
         }
-      }
-    });
-    zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover", "drag-hover-excess"));
-    zone.addEventListener("drop", e => {
-      e.preventDefault(); zone.classList.remove("drag-hover");
-      if (dragCat !== cat || !dragItem) return;
-      setKeep(dragItem, true);
-      if (getKilled(dragItem)) setKilled(dragItem, false);
-      render();
-    });
-    container.appendChild(zone);
+      });
+      zone.addEventListener("dragleave", () => zone.classList.remove("drag-hover", "drag-hover-excess"));
+      container.appendChild(zone);
 
-    const line = document.createElement("div");
-    line.className = "cut-line";
-    line.innerHTML = `<span class="cut-line-label">${kept.length}/${target} in ad</span><div class="cut-line-bar"></div>`;
-    container.appendChild(line);
+      const line = document.createElement("div");
+      line.className = "cut-line";
+      line.innerHTML = `<span class="cut-line-label">${kept.length}/${target} in ad</span><div class="cut-line-bar"></div>`;
+      container.appendChild(line);
+    }
+
+    // Available items (below the line)
+    available.forEach(item => renderRow(container, item, null, cat, "available", false));
+
+    // Killed items
+    killed.forEach(item => renderKilledRow(container, item, cat));
+
+    // Add your own row
+    renderAddRow(container, cat);
   }
-
-  // Available items (below the line)
-  available.forEach(item => renderRow(container, item, null, cat, "available", false));
-
-  // Killed items
-  killed.forEach(item => renderKilledRow(container, item, cat));
-
-  // Add your own row
-  renderAddRow(container, cat);
 
   const catWrapper = document.createElement("div");
   catWrapper.className = "cat-wrapper";
@@ -819,25 +1123,35 @@ function renderRow(container, item, rank, cat, state, isExcess) {
   row.className = "item " + state + (isExcess ? " excess" : "") + (item.remix ? " remix" : "");
   row.draggable = true;
 
-  // Drag handlers
+  // Drag handlers — track target in dragover, commit in dragend
   row.addEventListener("dragstart", e => {
-    dragCat = cat; dragItem = item;
-    row.classList.add("dragging");
+    dragCat = cat; dragItem = item; dragRow = row;
+    dropCat = dropItem = dropZoneCat = null;
+    startDragGhost(row, e);
     e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", "");
+    requestAnimationFrame(() => row.classList.add("dragging"));
     document.querySelectorAll(".drop-zone").forEach(z => z.classList.add("drag-active"));
   });
   row.addEventListener("dragend", () => {
-    row.classList.remove("dragging");
+    commitDrag();
+    endDragGhost();
     clearDragIndicators();
     document.querySelectorAll(".drop-zone").forEach(z => z.classList.remove("drag-active"));
   });
   row.addEventListener("dragover", e => {
     e.preventDefault();
-    if (dragCat !== cat) return;
-    clearDragIndicators();
+    if (!dragCat || dragCat.type !== cat.type) return;
     const rect = row.getBoundingClientRect();
-    const midY = rect.top + rect.height / 2;
-    const isTop = e.clientY < midY;
+    const isTop = e.clientY < rect.top + rect.height / 2;
+    const side = isTop ? "t" : "b";
+    // Anti-jitter: skip if same target + same side
+    if (lastDragEl === row && lastDragSide === side) return;
+    lastDragEl = row; lastDragSide = side;
+    dropZoneCat = null; // clear zone target when over a row
+    dropCat = cat; dropItem = item;
+    clearDragIndicators();
+    dropAfter = !isTop;
     if (isTop) {
       row.classList.add("drag-over-top");
       const prev = row.previousElementSibling;
@@ -858,36 +1172,14 @@ function renderRow(container, item, rank, cat, state, isExcess) {
         const hoverIdx = keptRows.indexOf(row);
         const insertPos = isTop ? hoverIdx : hoverIdx + 1;
         if (insertPos < tgt) {
-          // New item lands in green zone — last green item gets pushed to excess
           keptRows[tgt - 1].classList.add("drag-will-excess");
         } else {
-          // New item itself would be excess — show red glow on insertion edges
           row.style.setProperty('--glow', '#ef5350');
           const neighbor = isTop ? row.previousElementSibling : row.nextElementSibling;
           if (neighbor && neighbor.classList.contains("item")) neighbor.style.setProperty('--glow', '#ef5350');
         }
       }
     }
-  });
-  row.addEventListener("drop", e => {
-    e.preventDefault(); clearDragIndicators();
-    if (dragCat !== cat || !dragItem) return;
-    if (dragItem === item) return;
-
-    // Remove dragged item from array
-    const fromIdx = cat.items.indexOf(dragItem);
-    cat.items.splice(fromIdx, 1);
-
-    // Insert at new position
-    const toIdx = cat.items.indexOf(item);
-    const insertAfter = e.clientY >= row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
-    cat.items.splice(insertAfter ? toIdx + 1 : toIdx, 0, dragItem);
-
-    // Match the keep state of where it was dropped (for active campaign)
-    setKeep(dragItem, getKeep(item));
-    if (getKilled(dragItem)) setKilled(dragItem, false);
-
-    render();
   });
 
   // Drag handle
@@ -1027,8 +1319,21 @@ function renderRow(container, item, rank, cat, state, isExcess) {
     pinWrap.append(pinBtn, picker);
   }
 
+  // Audience match indicator (kept items only)
+  let audienceEl = null;
+  if (state === "kept" && (cat.type === "h" || cat.type === "d")) {
+    const check = getAudienceMatch(item.t, activeCamp);
+    if (check.match === "mismatch") {
+      audienceEl = document.createElement("span");
+      audienceEl.style.cssText = "font-size:9px;color:#e65100;padding:1px 6px;border-radius:8px;background:#fff3e0;border:1px solid #ffe0b2;flex-shrink:0;white-space:nowrap;cursor:help;";
+      audienceEl.textContent = "\u26A0 " + (activeCamp === "t" ? "admin" : "teacher") + " voice";
+      audienceEl.title = `"${check.signal}" sounds like ${activeCamp === "t" ? "admin" : "teacher"} language — consider moving to the other campaign`;
+    }
+  }
+
   row.append(handle, rk, btns, text);
   if (item.note) row.append(noteEl);
+  if (audienceEl) row.append(audienceEl);
   if (pinWrap) row.append(pinWrap);
   row.append(shareBtn);
   container.appendChild(row);
@@ -1037,10 +1342,50 @@ function renderRow(container, item, rank, cat, state, isExcess) {
 function renderKilledRow(container, item, cat) {
   const row = document.createElement("div");
   row.className = "item killed";
+  row.draggable = true;
 
-  const spacer = document.createElement("span");
-  spacer.style.width = "30px";
-  spacer.style.flexShrink = "0";
+  // Drag handlers — track target in dragover, commit in dragend
+  row.addEventListener("dragstart", e => {
+    dragCat = cat; dragItem = item; dragRow = row;
+    dropCat = dropItem = dropZoneCat = null;
+    startDragGhost(row, e);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", "");
+    requestAnimationFrame(() => row.classList.add("dragging"));
+    document.querySelectorAll(".drop-zone").forEach(z => z.classList.add("drag-active"));
+  });
+  row.addEventListener("dragend", () => {
+    commitDrag();
+    endDragGhost();
+    clearDragIndicators();
+    document.querySelectorAll(".drop-zone").forEach(z => z.classList.remove("drag-active"));
+  });
+  row.addEventListener("dragover", e => {
+    e.preventDefault();
+    if (!dragCat || dragCat.type !== cat.type) return;
+    const rect = row.getBoundingClientRect();
+    const isTop = e.clientY < rect.top + rect.height / 2;
+    const side = isTop ? "t" : "b";
+    if (lastDragEl === row && lastDragSide === side) return;
+    lastDragEl = row; lastDragSide = side;
+    dropZoneCat = null;
+    dropCat = cat; dropItem = item;
+    clearDragIndicators();
+    dropAfter = !isTop;
+    if (isTop) {
+      row.classList.add("drag-over-top");
+      const prev = row.previousElementSibling;
+      if (prev && prev.classList.contains("item")) prev.classList.add("drag-neighbor-bottom");
+    } else {
+      row.classList.add("drag-over-bottom");
+      const next = row.nextElementSibling;
+      if (next && next.classList.contains("item")) next.classList.add("drag-neighbor-top");
+    }
+  });
+
+  const handle = document.createElement("span");
+  handle.className = "drag-handle";
+  handle.textContent = "\u2630";
 
   const rk = document.createElement("span");
   rk.className = "rank-num";
@@ -1064,7 +1409,7 @@ function renderKilledRow(container, item, cat) {
     shareLabel.textContent = "Shared";
   }
 
-  row.append(spacer, rk, btns, text);
+  row.append(handle, rk, btns, text);
   if (item.camp === "b") row.append(shareLabel);
   container.appendChild(row);
 }
@@ -1122,34 +1467,116 @@ function renderAddRow(container, cat) {
 // KEYWORD RENDERING
 // =============================================
 function renderKeywordCategory(parent, cat) {
-  const visible = cat.items.filter(i => i.camp === activeCamp || i.camp === "b");
+  const visible = cat.items; // show all items — categories are already split by campaign
   const active = visible.filter(i => !getKilled(i));
+  const shared = active.filter(i => i.camp === "b");
+  const owned = active.filter(i => i.camp !== "b");
   const killed = visible.filter(i => getKilled(i));
 
+  const canCollapse = visible.length >= 4;
+  const isCatCollapsed = canCollapse && !!collapsedCats[cat.id];
+
   const header = document.createElement("div");
-  header.className = "cat-header";
+  header.className = "cat-header" + (canCollapse ? " clickable" : "");
+  if (canCollapse) {
+    header.onclick = () => { collapsedCats[cat.id] = !collapsedCats[cat.id]; render(); };
+    const chev = document.createElement("span");
+    chev.className = "cat-chev" + (isCatCollapsed ? " collapsed" : "");
+    chev.innerHTML = "&#9662;";
+    header.appendChild(chev);
+  }
   const h3 = document.createElement("h3");
-  h3.textContent = cat.type === "n" ? "Blocked Terms" : "Active Keywords";
+  h3.textContent = cat.label;
   const badge = document.createElement("span");
   badge.className = "cat-badge good";
   badge.textContent = active.length;
   header.append(h3, badge);
-  parent.appendChild(header);
 
   const container = document.createElement("div");
-  active.forEach(item => renderKeywordRow(container, item, cat));
-  killed.forEach(item => renderKeywordKilledRow(container, item, cat));
-  renderKeywordAddRow(container, cat);
-  parent.appendChild(container);
+  if (isCatCollapsed) {
+    // When collapsed, only show the header
+  } else {
+    active.forEach(item => renderKeywordRow(container, item, cat));
+    killed.forEach(item => renderKeywordKilledRow(container, item, cat));
+
+    // Suggested cross-negatives (only for campaign-specific negatives, not shared)
+    if (cat.type === "n" && cat.camps !== "ta") {
+      const suggestions = getSuggestedNegatives(cat.camps);
+      if (suggestions.length > 0) {
+        const sugHeader = document.createElement("div");
+        sugHeader.style.cssText = "font-size:11px;color:#1a73e8;padding:12px 0 4px;font-weight:600;";
+        sugHeader.textContent = "Suggested:";
+        container.appendChild(sugHeader);
+        const sugWrap = document.createElement("div");
+        sugWrap.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;padding:4px 0 8px;";
+        suggestions.forEach(s => {
+          const chip = document.createElement("button");
+          chip.style.cssText = "font-size:10px;padding:2px 8px;border:1px dashed #1a73e8;border-radius:12px;background:#e8f0fe;color:#1a73e8;cursor:pointer;font-family:inherit;transition:all 0.12s;";
+          chip.textContent = "+ " + s;
+          chip.title = `Add "${s}" as negative`;
+          chip.onmouseover = () => { chip.style.background = "#d2e3fc"; };
+          chip.onmouseout = () => { chip.style.background = "#e8f0fe"; };
+          chip.onclick = () => {
+            const newItem = { t: s, camp: cat.camps, keepT: false, keepA: false, killedT: false, killedA: false, remix: false, pinT: null, pinA: null, match: "phrase", id: slug(s) };
+            cat.items.push(newItem);
+            render();
+          };
+          sugWrap.appendChild(chip);
+        });
+        container.appendChild(sugWrap);
+      }
+    }
+
+    renderKeywordAddRow(container, cat);
+  }
+
+  const catWrapper = document.createElement("div");
+  catWrapper.className = "cat-wrapper";
+  catWrapper.append(header, container);
+  parent.appendChild(catWrapper);
 }
 
 function renderKeywordRow(container, item, cat) {
   const row = document.createElement("div");
   row.className = "item kw-item";
+  row.draggable = true;
 
-  const icon = document.createElement("span");
-  icon.className = "kw-icon";
-  icon.textContent = cat.type === "n" ? "\u2212" : "\u2022";
+  // Drag handlers — track target in dragover, commit in dragend
+  row.addEventListener("dragstart", e => {
+    dragCat = cat; dragItem = item; dragRow = row;
+    dropCat = dropItem = dropZoneCat = null;
+    startDragGhost(row, e);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", "");
+    requestAnimationFrame(() => row.classList.add("dragging"));
+  });
+  row.addEventListener("dragend", () => {
+    commitDrag();
+    endDragGhost();
+    clearDragIndicators();
+  });
+  row.addEventListener("dragover", e => {
+    e.preventDefault();
+    if (!dragCat || dragCat.type !== cat.type) return;
+    const rect = row.getBoundingClientRect();
+    const isTop = e.clientY < rect.top + rect.height / 2;
+    const side = isTop ? "t" : "b";
+    if (lastDragEl === row && lastDragSide === side) return;
+    lastDragEl = row; lastDragSide = side;
+    dropZoneCat = null;
+    dropCat = cat; dropItem = item;
+    clearDragIndicators();
+    dropAfter = !isTop;
+    if (isTop) {
+      row.classList.add("drag-over-top");
+      const prev = row.previousElementSibling;
+      if (prev && prev.classList.contains("item")) prev.classList.add("drag-neighbor-bottom");
+    } else {
+      row.classList.add("drag-over-bottom");
+      const next = row.nextElementSibling;
+      if (next && next.classList.contains("item")) next.classList.add("drag-neighbor-top");
+    }
+  });
 
   const btns = document.createElement("div");
   btns.className = "vote-btns";
@@ -1157,19 +1584,32 @@ function renderKeywordRow(container, item, cat) {
   killBtn.className = "vote-btn kill";
   killBtn.textContent = "\u2717";
   killBtn.title = "Remove";
-  killBtn.onclick = e => { e.stopPropagation(); setKilled(item, true); render(); };
+  killBtn.onclick = e => {
+    e.stopPropagation();
+    if (cat.type === "n") { item.killedT = true; item.killedA = true; }
+    else setKilled(item, true);
+    render();
+  };
   btns.append(killBtn);
 
+  // Text — starts non-editable so dragging works; click-release enables editing
   const text = document.createElement("span");
   text.className = "item-text";
-  text.contentEditable = true;
   text.textContent = item.t;
+  text.addEventListener("mouseup", e => {
+    if (text.contentEditable === "true") return;
+    text.contentEditable = true;
+    text.focus();
+    const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+    if (range) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+  });
+  text.addEventListener("blur", () => { text.contentEditable = false; });
   text.addEventListener("input", () => { item.t = text.textContent; item.id = slug(item.t); persistAll(); });
   text.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); text.blur(); }});
 
   const matchPill = document.createElement("button");
-  matchPill.className = "match-pill" + (item.match === "exact" ? " exact" : item.match === "broad" ? " broad" : "");
-  matchPill.textContent = item.match;
+  matchPill.className = "match-pill" + (item.match === "exact" ? " exact" : item.match === "broad" ? " broad" : " default");
+  matchPill.textContent = item.match === "phrase" ? "" : item.match;
   matchPill.title = "Click to change match type";
   matchPill.onclick = e => {
     e.stopPropagation();
@@ -1178,32 +1618,51 @@ function renderKeywordRow(container, item, cat) {
     render();
   };
 
-  const shareBtn = document.createElement("button");
-  shareBtn.className = "share-toggle " + (item.camp === "b" ? "on" : "off");
-  shareBtn.textContent = item.camp === "b" ? "Shared" : "Share";
-  shareBtn.title = item.camp === "b" ? "Remove from other campaign" : "Add to both campaigns";
-  shareBtn.onclick = e => {
-    e.stopPropagation();
-    if (item.camp === "b") {
-      item.camp = activeCamp;
-      if (activeCamp === "t") item.killedA = false;
-      else item.killedT = false;
-    } else {
-      item.camp = "b";
-    }
-    render();
-  };
-
-  row.append(icon, btns, text, matchPill, shareBtn);
+  row.append(btns, text, matchPill);
   container.appendChild(row);
 }
 
 function renderKeywordKilledRow(container, item, cat) {
   const row = document.createElement("div");
   row.className = "item kw-item killed";
+  row.draggable = true;
 
-  const icon = document.createElement("span");
-  icon.className = "kw-icon";
+  // Drag handlers — track target in dragover, commit in dragend
+  row.addEventListener("dragstart", e => {
+    dragCat = cat; dragItem = item; dragRow = row;
+    dropCat = dropItem = dropZoneCat = null;
+    startDragGhost(row, e);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", "");
+    requestAnimationFrame(() => row.classList.add("dragging"));
+  });
+  row.addEventListener("dragend", () => {
+    commitDrag();
+    endDragGhost();
+    clearDragIndicators();
+  });
+  row.addEventListener("dragover", e => {
+    e.preventDefault();
+    if (!dragCat || dragCat.type !== cat.type) return;
+    const rect = row.getBoundingClientRect();
+    const isTop = e.clientY < rect.top + rect.height / 2;
+    const side = isTop ? "t" : "b";
+    if (lastDragEl === row && lastDragSide === side) return;
+    lastDragEl = row; lastDragSide = side;
+    dropZoneCat = null;
+    dropCat = cat; dropItem = item;
+    clearDragIndicators();
+    dropAfter = !isTop;
+    if (isTop) {
+      row.classList.add("drag-over-top");
+      const prev = row.previousElementSibling;
+      if (prev && prev.classList.contains("item")) prev.classList.add("drag-neighbor-bottom");
+    } else {
+      row.classList.add("drag-over-bottom");
+      const next = row.nextElementSibling;
+      if (next && next.classList.contains("item")) next.classList.add("drag-neighbor-top");
+    }
+  });
 
   const btns = document.createElement("div");
   btns.className = "vote-btns";
@@ -1211,23 +1670,23 @@ function renderKeywordKilledRow(container, item, cat) {
   restoreBtn.className = "vote-btn restore";
   restoreBtn.textContent = "\u2713";
   restoreBtn.title = "Bring back";
-  restoreBtn.onclick = () => { setKilled(item, false); render(); };
+  restoreBtn.onclick = () => {
+    if (cat.type === "n") { item.killedT = false; item.killedA = false; }
+    else setKilled(item, false);
+    render();
+  };
   btns.append(restoreBtn);
 
   const text = document.createElement("span");
   text.className = "item-text";
   text.textContent = item.t;
 
-  const matchPill = document.createElement("span");
-  matchPill.className = "match-pill";
-  matchPill.textContent = item.match;
-
-  row.append(icon, btns, text, matchPill);
-  if (item.camp === "b") {
-    const shareLabel = document.createElement("span");
-    shareLabel.className = "shared-badge";
-    shareLabel.textContent = "Shared";
-    row.append(shareLabel);
+  row.append(btns, text);
+  if (item.match !== "phrase") {
+    const matchPill = document.createElement("span");
+    matchPill.className = "match-pill" + (item.match === "exact" ? " exact" : " broad");
+    matchPill.textContent = item.match;
+    row.append(matchPill);
   }
   container.appendChild(row);
 }
@@ -1262,27 +1721,18 @@ function renderKeywordAddRow(container, cat) {
     matchPill.className = "match-pill" + (addMatch === "exact" ? " exact" : addMatch === "broad" ? " broad" : "");
   };
 
-  let addShared = cat.type === "n";
-  const shareBtn = document.createElement("button");
-  shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
-  shareBtn.textContent = addShared ? "Shared" : "Share";
-  shareBtn.onclick = e => {
-    e.stopPropagation();
-    addShared = !addShared;
-    shareBtn.className = "share-toggle " + (addShared ? "on" : "off");
-    shareBtn.textContent = addShared ? "Shared" : "Share";
-  };
+  // New items inherit the category's camp assignment
+  const itemCamp = cat.camps === "ta" ? "b" : cat.camps;
 
   input.addEventListener("keydown", e => {
     if (e.key !== "Enter") return;
     const text = input.value.trim();
     if (!text) return;
-    const camp = addShared ? "b" : activeCamp;
-    cat.items.push({ t: text, camp, match: addMatch, keepT: false, keepA: false, killedT: false, killedA: false, remix: false, id: slug(text) });
+    cat.items.push({ t: text, camp: itemCamp, match: addMatch, keepT: false, keepA: false, killedT: false, killedA: false, remix: false, id: slug(text) });
     render();
   });
 
-  row.append(icon, btns, input, matchPill, shareBtn);
+  row.append(icon, btns, input, matchPill);
   container.appendChild(row);
 }
 
@@ -1319,6 +1769,13 @@ function updateCounters() {
   hEl.className = "counter-pill " + (hKept === H_MAX ? "good" : hKept > H_MAX ? "over" : "warn");
   dEl.className = "counter-pill " + (dKept === D_MAX ? "good" : dKept > D_MAX ? "over" : "warn");
   kwEl.className = "counter-pill good";
+
+  // Shared keywords counter
+  const shared = getOverlapCount();
+  document.getElementById("overlapNum").textContent = shared;
+  const olEl = document.getElementById("overlapPill");
+  olEl.className = "counter-pill good";
+  olEl.style.display = shared > 0 ? "" : "none";
 }
 
 // =============================================
@@ -1435,6 +1892,35 @@ function renderSummary() {
   container.innerHTML = html;
 }
 
+function renderHealth() {
+  const container = document.getElementById("healthContent");
+  const tHealth = getCampaignHealth("t");
+  const aHealth = getCampaignHealth("a");
+
+  const row = (label, tVal, aVal, goodFn) => {
+    const tClass = goodFn(tVal) ? "color:#137333" : "color:#e65100;font-weight:600";
+    const aClass = goodFn(aVal) ? "color:#137333" : "color:#e65100;font-weight:600";
+    return `<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #f0f0f0;">
+      <span style="color:#888;">${label}</span>
+      <span><span style="${tClass}">T:${tVal}</span> &nbsp; <span style="${aClass}">A:${aVal}</span></span>
+    </div>`;
+  };
+
+  let html = "";
+  html += row("Keywords", tHealth.total, aHealth.total, v => v > 0);
+  html += row("Audience mismatches", tHealth.mismatches, aHealth.mismatches, v => v === 0);
+  html += row("Missing cross-negatives", tHealth.suggestedNegatives, aHealth.suggestedNegatives, v => v === 0);
+
+  // Overall grade
+  const totalIssues = tHealth.mismatches + aHealth.mismatches;
+  const grade = totalIssues === 0 ? { label: "Clean separation", color: "#137333", bg: "#e6f4ea" } :
+                totalIssues <= 3 ? { label: "Minor overlap", color: "#e65100", bg: "#fff3e0" } :
+                { label: "Needs work", color: "#c62828", bg: "#fce4ec" };
+  html += `<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:${grade.bg};color:${grade.color};font-size:11px;font-weight:600;text-align:center;">${grade.label}</div>`;
+
+  container.innerHTML = html;
+}
+
 // =============================================
 // KEYWORD HELPERS
 // =============================================
@@ -1455,8 +1941,13 @@ function getKeywordsForCamp(camp, type) {
 // EXPORT — both campaigns
 // =============================================
 function fmtItem(item, i, max) {
-  const pinLabel = item.pin ? ` [PIN P${item.pin}]` : "";
+  const pinLabel = item.pin ? `  [PIN P${item.pin}]` : "";
   return `  ${i+1}. ${item.t} (${item.t.length}/${max})${pinLabel}\n`;
+}
+function fmtKw(kw) {
+  if (kw.match === "exact") return `[${kw.t}]`;
+  if (kw.match === "phrase") return `"${kw.t}"`;
+  return kw.t; // broad
 }
 
 function showExport() {
@@ -1481,11 +1972,11 @@ function showExport() {
   tData.dItems.forEach((item, i) => t += fmtItem(item, i, 90));
   if (tKw.length) {
     t += `\nKeywords (${tKw.length}):\n`;
-    tKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+    tKw.forEach((kw, i) => t += `  ${i+1}. ${fmtKw(kw)}\n`);
   }
   if (tNeg.length) {
     t += `\nNegative Keywords (${tNeg.length}):\n`;
-    tNeg.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+    tNeg.forEach((kw, i) => t += `  ${i+1}. ${fmtKw(kw)}\n`);
   }
 
   // Admins
@@ -1496,11 +1987,11 @@ function showExport() {
   aData.dItems.forEach((item, i) => t += fmtItem(item, i, 90));
   if (aKw.length) {
     t += `\nKeywords (${aKw.length}):\n`;
-    aKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+    aKw.forEach((kw, i) => t += `  ${i+1}. ${fmtKw(kw)}\n`);
   }
   if (aNeg.length) {
     t += `\nNegative Keywords (${aNeg.length}):\n`;
-    aNeg.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
+    aNeg.forEach((kw, i) => t += `  ${i+1}. ${fmtKw(kw)}\n`);
   }
 
   // Shared items
