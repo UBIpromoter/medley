@@ -282,6 +282,7 @@
     <div class="counter-pill" id="overlapPill" title="Keywords shared between both campaigns"><span class="num" id="overlapNum">0</span>&nbsp;shared</div>
   </div>
   <span class="save-status" id="saveStatus">Auto-saved</span>
+  <button class="refresh-btn" onclick="if(confirm('Reset all changes and restore original data? This cannot be undone.')){localStorage.removeItem(STORAGE_KEY);location.reload(true);}">Reset</button>
   <button class="refresh-btn" onclick="location.reload(true)">Refresh</button>
 </div>
 
