@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Medley Insurance — Questions for Jess</title>
+<style>
+  @page {
+    margin: 0.65in 0.75in;
+    size: letter;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: #1a1a1a;
+    line-height: 1.55;
+    font-size: 11.5pt;
+    padding: 40px 60px 60px;
+    max-width: 850px;
+    margin: 0 auto;
+    background: #faf9f6;
+  }
+  @media print {
+    body { padding: 0; background: white; font-size: 11pt; }
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    input[type="text"], textarea { border-color: #ccc !important; }
+    .q-block { break-inside: avoid; }
+  }
+
+  /* Top bar */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(250,249,246,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 10px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    z-index: 99999;
+  }
+  .top-bar button {
+    padding: 7px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.15);
+    transition: all 0.2s;
+  }
+  .btn-print {
+    background: #2d5a27;
+    color: white;
+    border-color: #2d5a27;
+  }
+  .btn-print:hover { background: #3a7332; }
+  .btn-refresh {
+    background: rgba(0,0,0,0.06);
+    color: rgba(0,0,0,0.55);
+  }
+  .btn-refresh:hover { background: rgba(0,0,0,0.12); color: rgba(0,0,0,0.7); }
+
+  /* Progress */
+  .progress-bar {
+    position: fixed;
+    top: 48px; left: 0; right: 0;
+    height: 3px;
+    background: #e8e5de;
+    z-index: 99998;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #2d5a27;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 2.5px solid #1a1a1a;
+    padding-bottom: 14px;
+    margin: 50px 0 24px 0;
+  }
+  .doc-header h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  .doc-header .subtitle {
+    font-size: 11pt;
+    color: #555;
+    font-style: italic;
+  }
+  .doc-header .entity {
+    font-size: 10pt;
+    color: #888;
+    margin-top: 6px;
+  }
+
+  /* Intro */
+  .intro {
+    background: #f0ede4;
+    border-left: 3px solid #b8860b;
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    font-size: 10.5pt;
+    line-height: 1.65;
+    border-radius: 0 6px 6px 0;
+  }
+  .intro strong { color: #1a1a1a; }
+
+  /* Section headings */
+  h2 {
+    font-size: 14pt;
+    font-weight: 700;
+    border-bottom: 1.5px solid #ccc;
+    padding-bottom: 6px;
+    margin: 34px 0 18px 0;
+    color: #1a1a1a;
+  }
+  h2 .form-ref {
+    font-size: 9.5pt;
+    font-weight: 400;
+    color: #999;
+    margin-left: 8px;
+  }
+
+  /* Question blocks */
+  .q-block {
+    margin-bottom: 26px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid #e5e2da;
+    border-radius: 8px;
+    transition: box-shadow 0.2s;
+  }
+  .q-block:focus-within {
+    box-shadow: 0 0 0 2px rgba(45,90,39,0.2);
+    border-color: #9cb89a;
+  }
+  .q-block.answered {
+    border-left: 3px solid #2d5a27;
+  }
+
+  .q-number {
+    font-weight: 700;
+    font-size: 11pt;
+    color: #333;
+    display: inline;
+  }
+  .q-text {
+    font-size: 11pt;
+    display: inline;
+  }
+  .q-context {
+    font-size: 9.5pt;
+    color: #777;
+    margin-top: 6px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* Form elements */
+  input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 11pt;
+    border: 1px solid #d4d0c8;
+    border-radius: 5px;
+    background: #fcfbf9;
+    margin-top: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus {
+    border-color: #9cb89a;
+    background: white;
+  }
+  input[type="text"]::placeholder {
+    color: #bbb;
+    font-style: italic;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 11pt;
+    border: 1px solid #d4d0c8;
+    border-radius: 5px;
+    background: #fcfbf9;
+    margin-top: 10px;
+    outline: none;
+    resize: vertical;
+    min-height: 70px;
+    transition: border-color 0.2s;
+  }
+  textarea:focus {
+    border-color: #9cb89a;
+    background: white;
+  }
+  textarea::placeholder {
+    color: #bbb;
+    font-style: italic;
+  }
+
+  /* Radio / checkbox options */
+  .options {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .option-btn {
+    padding: 7px 16px;
+    font-family: inherit;
+    font-size: 10.5pt;
+    border: 1.5px solid #d4d0c8;
+    border-radius: 20px;
+    background: #fcfbf9;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #555;
+  }
+  .option-btn:hover {
+    border-color: #9cb89a;
+    background: #f0f7ef;
+    color: #333;
+  }
+  .option-btn.selected {
+    border-color: #2d5a27;
+    background: #2d5a27;
+    color: white;
+  }
+
+  /* Tables */
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 0 0;
+    font-size: 10.5pt;
+  }
+  .input-table th, .input-table td {
+    border: 1px solid #ddd;
+    padding: 0;
+    text-align: left;
+  }
+  .input-table th {
+    background: #f0ede4;
+    font-weight: 600;
+    font-size: 10pt;
+    padding: 8px 10px;
+  }
+  .input-table td {
+    padding: 2px;
+  }
+  .input-table td:first-child {
+    padding: 8px 10px;
+    background: #faf9f6;
+    font-size: 10.5pt;
+  }
+  .input-table input[type="text"] {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    padding: 8px 10px;
+  }
+  .input-table input[type="text"]:focus {
+    background: #f0f7ef;
+  }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    margin: 12px 0;
+  }
+  .checklist li {
+    padding: 10px 12px 10px 40px;
+    position: relative;
+    font-size: 10.5pt;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 4px;
+  }
+  .checklist li:hover { background: #f7f5f0; }
+  .checklist li .cb {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #bbb;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-size: 13px;
+    color: transparent;
+  }
+  .checklist li.checked .cb {
+    background: #2d5a27;
+    border-color: #2d5a27;
+    color: white;
+  }
+  .checklist li.checked {
+    color: #888;
+    text-decoration: line-through;
+  }
+  .checklist .note {
+    color: #aaa;
+    font-size: 9pt;
+    font-style: italic;
+  }
+
+  /* Divider */
+  hr.divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 28px 0;
+  }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 14px;
+    border-top: 1.5px solid #ccc;
+    font-size: 9.5pt;
+    color: #aaa;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar no-print">
+  <button class="btn-refresh" onclick="location.reload()">&#x21bb; Refresh</button>
+  <button class="btn-print" onclick="window.print()">&#x1F4E4; Save as PDF</button>
+</div>
+<div class="progress-bar no-print"><div class="progress-fill" id="progress"></div></div>
+
+<!-- Header -->
+<div class="doc-header">
+  <h1>Insurance Questions for Jess</h1>
+  <div class="subtitle">Open items that need your input before we can submit</div>
+  <div class="entity">The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion</div>
+</div>
+
+<div class="intro">
+  <strong>Hi Jess</strong> — We drafted answers for everything we could on both insurance applications (Comprehensive + Abuse &amp; Molestation). These are the items only you can answer. Click the options or type in the fields. When you're done, hit <strong>"Save as PDF"</strong> at the top to save a copy, or just leave this open and tell Philip what to fill in.
+</div>
+
+<!-- ============================================ -->
+<h2>Participant &amp; Student Numbers <span class="form-ref">Both applications</span></h2>
+
+<div class="q-block" data-q="1">
+  <span class="q-number">1.</span>
+  <span class="q-text">How many clients/students/members do you serve in each age range?</span>
+  <div class="q-context">Annual estimate is fine. This appears on both applications. The Comprehensive form wants finer age buckets.</div>
+
+  <table class="input-table">
+    <tr><th>Age Range</th><th>Who</th><th>Approx. Number</th></tr>
+    <tr><td>6 – 14</td><td>Adaptive music students</td><td><input type="text" placeholder="e.g. 15" data-track></td></tr>
+    <tr><td>15 – 18</td><td>Adaptive music students</td><td><input type="text" placeholder="e.g. 8" data-track></td></tr>
+    <tr><td><strong>0 – 18 total</strong></td><td>All minors served</td><td><input type="text" placeholder="total" data-track></td></tr>
+    <tr><td>19 – 62</td><td>PD teacher participants</td><td><input type="text" placeholder="e.g. 200" data-track></td></tr>
+  </table>
+</div>
+
+<!-- ============================================ -->
+<h2>Revenue &amp; Finances <span class="form-ref">Comprehensive — Section B</span></h2>
+
+<div class="q-block answered" data-q="2" style="border-left:3px solid #2d5a27">
+  <span class="q-number">2.</span>
+  <span class="q-text">Projected revenue sources — pre-filled from your budget spreadsheet:</span>
+  <div class="q-context">No revenue yet. These are projections for the first year. Let us know if anything needs adjusting.</div>
+
+  <table class="input-table">
+    <tr><th>Revenue Source</th><th>Projected Amount</th></tr>
+    <tr><td>Solo Teaching (adaptive music)</td><td><input type="text" value="$42,075" data-track></td></tr>
+    <tr><td>Joint Teaching (2 instructors)</td><td><input type="text" value="$19,800" data-track></td></tr>
+    <tr><td>Solo Presenting (PD workshops)</td><td><input type="text" value="$9,000" data-track></td></tr>
+    <tr><td>Joint Presenting (2-presenter PD)</td><td><input type="text" value="$25,200" data-track></td></tr>
+    <tr><td><strong>Total projected revenue</strong></td><td><input type="text" value="$96,075" data-track style="font-weight:600"></td></tr>
+  </table>
+</div>
+
+<div class="q-block answered" data-q="3" style="border-left:3px solid #2d5a27">
+  <span class="q-number">3.</span>
+  <span class="q-text">Total projected expenses — pre-filled from your budget:</span>
+  <div class="q-context">Payroll ~$69K (wages + taxes/leave/fees) + fixed expenses ~$11K. Adjust if needed.</div>
+  <input type="text" value="$80,500" data-track>
+</div>
+
+<!-- ============================================ -->
+<h2>Background Checks &amp; Screening <span class="form-ref">Both applications</span></h2>
+
+<div class="q-block" data-q="4">
+  <span class="q-number">4.</span>
+  <span class="q-text">Does Medley routinely conduct sex offender screening on all employees and contractors?</span>
+  <div class="q-context">Abuse form Q9. This is separate from CORI/fingerprint checks — specifically the sex offender registry.</div>
+  <div class="options">
+    <button class="option-btn" onclick="pick(this)">Yes</button>
+    <button class="option-btn" onclick="pick(this)">No</button>
+  </div>
+</div>
+
+<div class="q-block" data-q="4a">
+  <span class="q-number">4a.</span>
+  <span class="q-text">If yes — do you collect signed acknowledgements that the individual may be rejected/terminated on a match?</span>
+  <div class="options">
+    <button class="option-btn" onclick="pick(this)">Yes</button>
+    <button class="option-btn" onclick="pick(this)">No</button>
+    <button class="option-btn" onclick="pick(this)">N/A</button>
+  </div>
+</div>
+
+<div class="q-block" data-q="5">
+  <span class="q-number">5.</span>
+  <span class="q-text">How often does Medley re-screen employees through a criminal database?</span>
+  <div class="q-context">Abuse form Q11. Check all that apply — click to toggle.</div>
+  <div class="options">
+    <button class="option-btn" onclick="toggle(this)">Prior to hire</button>
+    <button class="option-btn" onclick="toggle(this)">Annually</button>
+    <button class="option-btn" onclick="toggle(this)">Biannually</button>
+    <button class="option-btn" onclick="toggle(this)">Other</button>
+  </div>
+  <input type="text" placeholder="If 'Other' — describe" data-track style="margin-top:8px">
+</div>
+
+<div class="q-block" data-q="6">
+  <span class="q-number">6.</span>
+  <span class="q-text">The Comprehensive form asks about these additional screening items. Yes or No for employees?</span>
+  <div class="q-context">Comprehensive Section F, items 4f–4g and 5b–5g.</div>
+
+  <table class="input-table">
+    <tr><th style="width:70%">Screening Item</th><th>Answer</th></tr>
+    <tr><td>Education of professionals verified</td><td><input type="text" placeholder="Yes / No" data-track></td></tr>
+    <tr><td>Licensing/certification of professionals verified</td><td><input type="text" placeholder="Yes / No" data-track></td></tr>
+    <tr><td>Name check — local level</td><td><input type="text" placeholder="Yes / No" data-track></td></tr>
+    <tr><td>FBI fingerprint — regardless of time in state</td><td><input type="text" placeholder="Yes / No" data-track></td></tr>
+    <tr><td>FBI fingerprint — if in state less than 5 years</td><td><input type="text" placeholder="Yes / No" data-track></td></tr>
+  </table>
+</div>
+
+<!-- ============================================ -->
+<h2>School Contracts &amp; A&amp;M Coverage <span class="form-ref">Abuse — Q20</span></h2>
+
+<div class="q-block" data-q="7">
+  <span class="q-number">7.</span>
+  <span class="q-text">Are you contractually obligated to carry abuse &amp; molestation coverage?</span>
+  <div class="q-context">We assumed yes since the first school engagement starts Feb 24.</div>
+  <div class="options">
+    <button class="option-btn" onclick="pick(this)">Yes</button>
+    <button class="option-btn" onclick="pick(this)">No</button>
+    <button class="option-btn" onclick="pick(this)">Not sure yet</button>
+  </div>
+</div>
+
+<div class="q-block" data-q="7a">
+  <span class="q-number">7a.</span>
+  <span class="q-text">If yes — what coverage limits does the contract require?</span>
+  <input type="text" placeholder="e.g. $1M per occurrence / $2M aggregate" data-track>
+</div>
+
+<div class="q-block" data-q="7b">
+  <span class="q-number">7b.</span>
+  <span class="q-text">Can you provide a copy of the school contract? The insurer asks for it.</span>
+  <div class="options">
+    <button class="option-btn" onclick="pick(this)">Yes — I'll send it</button>
+    <button class="option-btn" onclick="pick(this)">Not yet available</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<h2>Policy Decisions <span class="form-ref">Both applications</span></h2>
+
+<div class="q-block" data-q="8">
+  <span class="q-number">8.</span>
+  <span class="q-text">Should we add exit interviews to the staff policy now, or wait?</span>
+  <div class="q-context">Abuse form Q13. We answered "No" for now. The insurer may view "Yes" more favorably — it's a one-paragraph addition to the handbook.</div>
+  <div class="options">
+    <button class="option-btn" onclick="pick(this)">Add it now</button>
+    <button class="option-btn" onclick="pick(this)">Wait until we grow</button>
+  </div>
+</div>
+
+<div class="q-block" data-q="9">
+  <span class="q-number">9.</span>
+  <span class="q-text">Do you use a contractor for legal review of marketing materials?</span>
+  <div class="q-context">Comprehensive E4. We said "No — created internally." Just confirming.</div>
+  <div class="options">
+    <button class="option-btn" onclick="pick(this)">No — leave as-is</button>
+    <button class="option-btn" onclick="pick(this)">Yes — want to add a note</button>
+  </div>
+  <input type="text" placeholder="If yes, add details here" data-track style="margin-top:8px">
+</div>
+
+<div class="q-block" data-q="10">
+  <span class="q-number">10.</span>
+  <span class="q-text">Does Medley host or co-sponsor any fundraisers or special events?</span>
+  <div class="q-context">Comprehensive Section J. If yes, we need to fill out the full Special Events section. If no, we mark it N/A.</div>
+  <div class="options">
+    <button class="option-btn" onclick="pick(this)">No — mark N/A</button>
+    <button class="option-btn" onclick="pick(this)">Yes — let's discuss</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h2>Attachments Checklist</h2>
+<p style="font-size:10.5pt; color:#777; margin-bottom:8px;">Click to check off. Three are already done.</p>
+
+<ul class="checklist" id="checklist">
+  <li class="checked" onclick="this.classList.toggle('checked');updateProgress()"><span class="cb">&#10003;</span>Staff Policy Handbook <span class="note">— done</span></li>
+  <li class="checked" onclick="this.classList.toggle('checked');updateProgress()"><span class="cb">&#10003;</span>Policy Acknowledgment Form <span class="note">— done</span></li>
+  <li class="checked" onclick="this.classList.toggle('checked');updateProgress()"><span class="cb">&#10003;</span>Photo &amp; Media Release Form <span class="note">— done</span></li>
+  <li onclick="this.classList.toggle('checked');updateProgress()"><span class="cb">&#10003;</span>Resume — Jessica Corwin</li>
+  <li onclick="this.classList.toggle('checked');updateProgress()"><span class="cb">&#10003;</span>Resume — Jen Kass</li>
+  <li onclick="this.classList.toggle('checked');updateProgress()"><span class="cb">&#10003;</span>Resume — Jon Burgos</li>
+  <li onclick="this.classList.toggle('checked');updateProgress()"><span class="cb">&#10003;</span>School contract <span class="note">— if available, for A&amp;M Q20</span></li>
+</ul>
+
+<hr class="divider">
+
+<div class="q-block" data-q="11">
+  <span class="q-number">11.</span>
+  <span class="q-text">Anything else you'd like to add about Medley's abuse prevention approach?</span>
+  <div class="q-context">Abuse form Q21 — optional open-ended field. A chance to highlight strengths (always in schools with their own supervision, mandated reporter training, etc.). We can draft something if you'd prefer.</div>
+  <textarea placeholder="Optional — type anything you'd like to highlight, or leave blank and we can draft something" data-track></textarea>
+</div>
+
+<div class="doc-footer">
+  Prepared February 2026 &middot; The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion
+</div>
+
+<script>
+  // Single-select: click one, deselect siblings
+  function pick(btn) {
+    btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    markAnswered(btn);
+    updateProgress();
+  }
+
+  // Multi-select: toggle
+  function toggle(btn) {
+    btn.classList.toggle('selected');
+    markAnswered(btn);
+    updateProgress();
+  }
+
+  // Mark parent q-block as answered
+  function markAnswered(el) {
+    const block = el.closest('.q-block');
+    if (!block) return;
+    const hasSelection = block.querySelector('.option-btn.selected');
+    const hasText = Array.from(block.querySelectorAll('input[type="text"], textarea')).some(i => i.value.trim());
+    if (hasSelection || hasText) {
+      block.classList.add('answered');
+    } else {
+      block.classList.remove('answered');
+    }
+  }
+
+  // Track text inputs
+  document.querySelectorAll('[data-track]').forEach(input => {
+    input.addEventListener('input', function() {
+      markAnswered(this);
+      updateProgress();
+    });
+  });
+
+  // Progress bar
+  function updateProgress() {
+    const blocks = document.querySelectorAll('.q-block');
+    const total = blocks.length;
+    let answered = 0;
+    blocks.forEach(block => {
+      if (block.classList.contains('answered')) answered++;
+    });
+    const pct = Math.round((answered / total) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+  }
+
+  // Init
+  updateProgress();
+
+  // Persist to localStorage
+  const STORAGE_KEY = 'medley-insurance-jess-v1';
+
+  function saveState() {
+    const state = {};
+    document.querySelectorAll('.q-block').forEach(block => {
+      const q = block.dataset.q;
+      if (!q) return;
+      const selections = [];
+      block.querySelectorAll('.option-btn.selected').forEach(b => selections.push(b.textContent));
+      const inputs = [];
+      block.querySelectorAll('input[type="text"], textarea').forEach(i => inputs.push(i.value));
+      state[q] = { selections, inputs };
+    });
+    // Checklist
+    const checks = [];
+    document.querySelectorAll('#checklist li').forEach((li, i) => {
+      checks.push(li.classList.contains('checked'));
+    });
+    state._checks = checks;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function loadState() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const state = JSON.parse(raw);
+      document.querySelectorAll('.q-block').forEach(block => {
+        const q = block.dataset.q;
+        if (!q || !state[q]) return;
+        const { selections, inputs } = state[q];
+        if (selections && selections.length) {
+          block.querySelectorAll('.option-btn').forEach(b => {
+            if (selections.includes(b.textContent)) b.classList.add('selected');
+          });
+        }
+        if (inputs && inputs.length) {
+          const fields = block.querySelectorAll('input[type="text"], textarea');
+          inputs.forEach((val, i) => { if (fields[i]) fields[i].value = val; });
+        }
+        markAnswered(block.querySelector('.option-btn, input, textarea'));
+      });
+      // Checklist
+      if (state._checks) {
+        document.querySelectorAll('#checklist li').forEach((li, i) => {
+          if (state._checks[i]) li.classList.add('checked');
+          else li.classList.remove('checked');
+        });
+      }
+      updateProgress();
+    } catch(e) {}
+  }
+
+  loadState();
+
+  // Auto-save on any interaction
+  document.addEventListener('click', () => setTimeout(saveState, 100));
+  document.addEventListener('input', () => setTimeout(saveState, 100));
+</script>
+
+</body>
+</html>

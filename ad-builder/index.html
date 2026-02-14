@@ -193,6 +193,20 @@
   .match-pill.exact { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
   .match-pill.broad { background: #fff8e1; border-color: #f57f17; color: #f57f17; }
 
+  /* Pin control */
+  .pin-wrap { position: relative; flex-shrink: 0; display: flex; align-items: center; flex-direction: row-reverse; }
+  .pin-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; cursor: pointer; border: 1px solid #dadce0; background: #f8f9fa; color: #bbb; white-space: nowrap; flex-shrink: 0; transition: all 0.12s; font-family: inherit; }
+  .pin-pill:hover { border-color: #ccc; color: #999; background: #f0f0f0; }
+  .pin-pill.pinned { background: #fef3cd; border-color: #e8a735; color: #b57d1a; }
+  .pin-pill.pinned:hover { background: #fde9a0; }
+  .pin-picker { display: flex; gap: 2px; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 0.2s ease, opacity 0.15s ease, margin 0.2s ease; margin-right: 0; }
+  .pin-picker.open { max-width: 150px; opacity: 1; margin-right: 4px; }
+  .pin-opt { width: 28px; height: 24px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafafa; font-size: 10px; font-weight: 600; color: #888; cursor: pointer; font-family: inherit; transition: all 0.12s; display: flex; align-items: center; justify-content: center; }
+  .pin-opt:hover { border-color: #e8a735; color: #b57d1a; background: #fef8e8; }
+  .pin-opt.active { background: #fef3cd; border-color: #e8a735; color: #b57d1a; }
+  .pin-opt.unpin { color: #999; font-size: 11px; }
+  .pin-opt.unpin:hover { background: #f0f0f0; border-color: #bbb; color: #666; }
+
   /* Keyword items */
   .item.kw-item { padding-left: 16px; }
   .item.kw-item .kw-icon { font-size: 14px; color: #ccc; flex-shrink: 0; width: 18px; text-align: center; }
@@ -336,6 +350,11 @@ function setKilled(item, val) {
   else item.killedA = val;
 }
 function getTarget(cat) { return activeCamp === "t" ? cat.targetT : cat.targetA; }
+function getPin(item) { return activeCamp === "t" ? item.pinT : item.pinA; }
+function setPin(item, val) {
+  if (activeCamp === "t") item.pinT = val;
+  else item.pinA = val;
+}
 
 // =============================================
 // DATA — two campaigns with shared items
@@ -496,6 +515,8 @@ cats.forEach(cat => cat.items.forEach(item => {
   if (item.killedA === undefined) item.killedA = false;
   if (item.remix === undefined) item.remix = false;
   if (item.match === undefined) item.match = "phrase";
+  if (item.pinT === undefined) item.pinT = null;
+  if (item.pinA === undefined) item.pinA = null;
 }));
 
 // =============================================
@@ -518,6 +539,8 @@ function applyStore() {
         if (s.killedT !== undefined) item.killedT = s.killedT;
         if (s.killedA !== undefined) item.killedA = s.killedA;
         if (s.remix !== undefined) item.remix = s.remix;
+        if (s.pinT !== undefined) item.pinT = s.pinT;
+        if (s.pinA !== undefined) item.pinA = s.pinA;
         if (s.match) item.match = s.match;
         if (s.camp) item.camp = s.camp;
         if (s.t) item.t = s.t;
@@ -526,7 +549,7 @@ function applyStore() {
       Object.keys(saved.items).forEach(id => {
         if (!cat.items.find(i => i.id === id)) {
           const s = saved.items[id];
-          cat.items.push({ t:s.t, keepT:s.keepT||false, keepA:s.keepA||false, camp:s.camp||activeCamp, killedT:s.killedT||false, killedA:s.killedA||false, remix:s.remix||false, match:s.match||"phrase", id });
+          cat.items.push({ t:s.t, keepT:s.keepT||false, keepA:s.keepA||false, camp:s.camp||activeCamp, killedT:s.killedT||false, killedA:s.killedA||false, remix:s.remix||false, pinT:s.pinT||null, pinA:s.pinA||null, match:s.match||"phrase", id });
         }
       });
     }
@@ -545,7 +568,7 @@ function persistAll() {
       items: {}
     };
     cat.items.forEach(item => {
-      store[cat.id].items[item.id] = { keepT:item.keepT, keepA:item.keepA, camp:item.camp, killedT:item.killedT, killedA:item.killedA, remix:item.remix, match:item.match, t:item.t };
+      store[cat.id].items[item.id] = { keepT:item.keepT, keepA:item.keepA, camp:item.camp, killedT:item.killedT, killedA:item.killedA, remix:item.remix, pinT:item.pinT, pinA:item.pinA, match:item.match, t:item.t };
     });
   });
   saveStore(store);
@@ -883,7 +906,7 @@ function renderRow(container, item, rank, cat, state, isExcess) {
   killBtn.className = "vote-btn kill";
   killBtn.textContent = "\u2717";
   killBtn.title = "Remove";
-  killBtn.onclick = e => { e.stopPropagation(); setKilled(item, true); setKeep(item, false); item.remix = false; render(); };
+  killBtn.onclick = e => { e.stopPropagation(); setKilled(item, true); setKeep(item, false); setPin(item, null); item.remix = false; render(); };
 
   const remixBtn = document.createElement("button");
   remixBtn.className = "vote-btn" + (item.remix ? " remix-on" : "");
@@ -937,8 +960,74 @@ function renderRow(container, item, rank, cat, state, isExcess) {
     noteEl.title = item.note;
   }
 
+  // Pin control (kept headlines & descriptions only)
+  let pinWrap = null;
+  if (state === "kept" && (cat.type === "h" || cat.type === "d")) {
+    const pin = getPin(item);
+    const maxPos = cat.type === "h" ? 3 : 2;
+
+    // Find which positions are taken by OTHER items
+    const taken = new Set();
+    cats.filter(c => c.type === cat.type && c.camps.includes(activeCamp)).forEach(c => {
+      c.items.forEach(other => {
+        if (other !== item) { const p = getPin(other); if (p) taken.add(p); }
+      });
+    });
+
+    pinWrap = document.createElement("div");
+    pinWrap.className = "pin-wrap";
+
+    const pinBtn = document.createElement("button");
+    pinBtn.className = "pin-pill" + (pin ? " pinned" : "");
+    pinBtn.innerHTML = pin ? `<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px;margin-right:2px"><path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5H8.5v5.5a.5.5 0 0 1-1 0V10H3.5a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.18 4 .5a.5.5 0 0 1 .146-.354"/></svg>${pin}` : '<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px"><path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5H8.5v5.5a.5.5 0 0 1-1 0V10H3.5a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.18 4 .5a.5.5 0 0 1 .146-.354"/></svg>';
+    pinBtn.title = pin ? `Pinned to position ${pin} — click to change` : "Pin to a position";
+
+    const picker = document.createElement("div");
+    picker.className = "pin-picker";
+
+    for (let p = 1; p <= maxPos; p++) {
+      const opt = document.createElement("button");
+      const isTaken = taken.has(p);
+      const isActive = pin === p;
+      opt.className = "pin-opt" + (isActive ? " active" : "");
+      opt.textContent = "P" + p;
+      if (isTaken && !isActive) {
+        opt.title = `Another item is also at P${p} — Google rotates between them (never appear together)`;
+        opt.style.borderStyle = "dashed";
+      } else {
+        opt.title = isActive ? `Currently pinned to P${p} — click to unpin` : `Pin to position ${p}`;
+      }
+      opt.onclick = e => {
+        e.stopPropagation();
+        setPin(item, isActive ? null : p);
+        render();
+      };
+      picker.appendChild(opt);
+    }
+
+    // Unpin option (only show if currently pinned)
+    if (pin) {
+      const unpin = document.createElement("button");
+      unpin.className = "pin-opt unpin";
+      unpin.textContent = "\u2717";
+      unpin.title = "Remove pin";
+      unpin.onclick = e => { e.stopPropagation(); setPin(item, null); render(); };
+      picker.appendChild(unpin);
+    }
+
+    pinBtn.onclick = e => {
+      e.stopPropagation();
+      // Close any other open pickers
+      document.querySelectorAll(".pin-picker.open").forEach(pk => { if (pk !== picker) pk.classList.remove("open"); });
+      picker.classList.toggle("open");
+    };
+
+    pinWrap.append(pinBtn, picker);
+  }
+
   row.append(handle, rk, btns, text);
   if (item.note) row.append(noteEl);
+  if (pinWrap) row.append(pinWrap);
   row.append(shareBtn);
   container.appendChild(row);
 }
@@ -1248,35 +1337,98 @@ function getKeptForCamp(camp) {
   return { hKept, dKept };
 }
 
+function getKeptItemsForCamp(camp) {
+  const hItems = [], dItems = [];
+  cats.forEach(c => {
+    if (!c.camps.includes(camp)) return;
+    c.items.forEach(item => {
+      const killed = camp === "t" ? item.killedT : item.killedA;
+      if ((item.camp !== camp && item.camp !== "b") || killed) return;
+      const keep = camp === "t" ? item.keepT : item.keepA;
+      if (!keep) return;
+      const pin = camp === "t" ? item.pinT : item.pinA;
+      (c.type === "h" ? hItems : dItems).push({ t: item.t, pin });
+    });
+  });
+  return { hItems, dItems };
+}
+
+function pickWithPins(items, n) {
+  const slots = new Array(n).fill(null);
+  const used = new Set();
+  // For each position, randomly pick one of the items pinned there
+  for (let pos = 0; pos < n; pos++) {
+    const pinned = items.filter(i => i.pin === pos + 1);
+    if (pinned.length > 0) {
+      const chosen = pinned[Math.floor(Math.random() * pinned.length)];
+      slots[pos] = chosen.t;
+      used.add(chosen.t);
+    }
+  }
+  // Fill remaining slots randomly from unpinned (or pinned-elsewhere-but-not-used) items
+  const available = items.filter(i => !used.has(i.t) && !i.pin);
+  const shuffled = [...available]; for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
+  let si = 0;
+  for (let pos = 0; pos < n; pos++) {
+    if (!slots[pos] && si < shuffled.length) {
+      slots[pos] = shuffled[si++].t;
+    }
+  }
+  return slots.filter(Boolean);
+}
+
 function renderPreviews() {
   const container = document.getElementById("previews");
   container.innerHTML = "";
-  const { hKept, dKept } = getKeptForCamp(activeCamp);
+  const { hItems, dItems } = getKeptItemsForCamp(activeCamp);
 
-  if (hKept.length < 3 || dKept.length < 2) {
+  if (hItems.length < 3 || dItems.length < 2) {
     container.innerHTML = '<div style="font-size:12px;color:#999;font-style:italic;padding:8px 0;">Need at least 3 headlines and 2 descriptions above the line for previews.</div>';
     return;
   }
 
+  const hasPins = hItems.some(i => i.pin) || dItems.some(i => i.pin);
+
   for (let i = 0; i < 4; i++) {
-    const h = pick(hKept, 3), d = pick(dKept, 2);
+    const h = pickWithPins(hItems, 3), d = pickWithPins(dItems, 2);
     const card = document.createElement("div");
     card.className = "preview-card";
-    card.innerHTML = `<div class="pv-label">Combo ${i+1}</div><div class="pv-h">${esc(h[0])} | ${esc(h[1])} | ${esc(h[2])}</div><div class="pv-u"><span class="badge">Ad</span> www.music-access.com</div><div class="pv-d">${esc(d[0])} ${esc(d[1])}</div>`;
+    let hHtml = h.map((t, idx) => {
+      const pinned = hItems.find(item => item.t === t && item.pin === idx + 1);
+      return pinned ? `<span style="border-bottom:2px solid #e8a735" title="Pinned to position ${idx+1}">${esc(t)}</span>` : esc(t);
+    }).join(" | ");
+    let dHtml = d.map((t, idx) => {
+      const pinned = dItems.find(item => item.t === t && item.pin === idx + 1);
+      return pinned ? `<span style="border-bottom:2px solid #e8a735" title="Pinned to position ${idx+1}">${esc(t)}</span>` : esc(t);
+    }).join(" ");
+    card.innerHTML = `<div class="pv-label">Combo ${i+1}</div><div class="pv-h">${hHtml}</div><div class="pv-u"><span class="badge">Ad</span> www.music-access.com</div><div class="pv-d">${dHtml}</div>`;
     container.appendChild(card);
+  }
+
+  if (hasPins) {
+    const note = document.createElement("div");
+    note.style.cssText = "font-size:10px;color:#b57d1a;margin-top:6px;font-style:italic;";
+    note.innerHTML = '<span style="border-bottom:2px solid #e8a735">Underlined</span> = pinned to that position';
+    container.appendChild(note);
   }
 }
 
 function renderSummary() {
   const container = document.getElementById("summary");
-  const { hKept, dKept } = getKeptForCamp(activeCamp);
+  const { hItems, dItems } = getKeptItemsForCamp(activeCamp);
   const campName = activeCamp === "t" ? "Teachers" : "Admins";
 
-  let html = `<h4>${campName}: ${hKept.length} headlines, ${dKept.length} descriptions</h4>`;
-  hKept.forEach((t, i) => html += `<div class="summary-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
-  if (dKept.length) {
+  let html = `<h4>${campName}: ${hItems.length} headlines, ${dItems.length} descriptions</h4>`;
+  hItems.forEach((item, i) => {
+    const pinBadge = item.pin ? ` <span style="font-size:9px;color:#b57d1a;font-weight:700;">P${item.pin}</span>` : "";
+    html += `<div class="summary-item"><span class="rn">${i+1}.</span> ${esc(item.t)}${pinBadge}</div>`;
+  });
+  if (dItems.length) {
     html += '<div style="margin-top:8px;"></div>';
-    dKept.forEach((t, i) => html += `<div class="summary-item"><span class="rn">${i+1}.</span> ${esc(t)}</div>`);
+    dItems.forEach((item, i) => {
+      const pinBadge = item.pin ? ` <span style="font-size:9px;color:#b57d1a;font-weight:700;">P${item.pin}</span>` : "";
+      html += `<div class="summary-item"><span class="rn">${i+1}.</span> ${esc(item.t)}${pinBadge}</div>`;
+    });
   }
   container.innerHTML = html;
 }
@@ -1300,9 +1452,14 @@ function getKeywordsForCamp(camp, type) {
 // =============================================
 // EXPORT — both campaigns
 // =============================================
+function fmtItem(item, i, max) {
+  const pinLabel = item.pin ? ` [PIN P${item.pin}]` : "";
+  return `  ${i+1}. ${item.t} (${item.t.length}/${max})${pinLabel}\n`;
+}
+
 function showExport() {
-  const tData = getKeptForCamp("t");
-  const aData = getKeptForCamp("a");
+  const tData = getKeptItemsForCamp("t");
+  const aData = getKeptItemsForCamp("a");
   const tKw = getKeywordsForCamp("t", "k");
   const aKw = getKeywordsForCamp("a", "k");
   const tNeg = getKeywordsForCamp("t", "n");
@@ -1316,10 +1473,10 @@ function showExport() {
 
   // Teachers
   t += `\n\nTEACHERS CAMPAIGN\n${"-".repeat(30)}\n`;
-  t += `\nHeadlines (${tData.hKept.length}/${H_MAX}):\n`;
-  tData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
-  t += `\nDescriptions (${tData.dKept.length}/${D_MAX}):\n`;
-  tData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+  t += `\nHeadlines (${tData.hItems.length}/${H_MAX}):\n`;
+  tData.hItems.forEach((item, i) => t += fmtItem(item, i, 30));
+  t += `\nDescriptions (${tData.dItems.length}/${D_MAX}):\n`;
+  tData.dItems.forEach((item, i) => t += fmtItem(item, i, 90));
   if (tKw.length) {
     t += `\nKeywords (${tKw.length}):\n`;
     tKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
@@ -1331,10 +1488,10 @@ function showExport() {
 
   // Admins
   t += `\n\nADMINS CAMPAIGN\n${"-".repeat(30)}\n`;
-  t += `\nHeadlines (${aData.hKept.length}/${H_MAX}):\n`;
-  aData.hKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/30)\n`);
-  t += `\nDescriptions (${aData.dKept.length}/${D_MAX}):\n`;
-  aData.dKept.forEach((text, i) => t += `  ${i+1}. ${text} (${text.length}/90)\n`);
+  t += `\nHeadlines (${aData.hItems.length}/${H_MAX}):\n`;
+  aData.hItems.forEach((item, i) => t += fmtItem(item, i, 30));
+  t += `\nDescriptions (${aData.dItems.length}/${D_MAX}):\n`;
+  aData.dItems.forEach((item, i) => t += fmtItem(item, i, 90));
   if (aKw.length) {
     t += `\nKeywords (${aKw.length}):\n`;
     aKw.forEach((kw, i) => t += `  ${i+1}. ${kw.t} (${kw.match})\n`);
@@ -1345,8 +1502,12 @@ function showExport() {
   }
 
   // Shared items
-  const sharedH = tData.hKept.filter(h => aData.hKept.includes(h));
-  const sharedD = tData.dKept.filter(d => aData.dKept.includes(d));
+  const tTexts = tData.hItems.map(i => i.t);
+  const aTexts = aData.hItems.map(i => i.t);
+  const sharedH = tTexts.filter(h => aTexts.includes(h));
+  const tDTexts = tData.dItems.map(i => i.t);
+  const aDTexts = aData.dItems.map(i => i.t);
+  const sharedD = tDTexts.filter(d => aDTexts.includes(d));
   if (sharedH.length || sharedD.length) {
     t += `\n\nSHARED ACROSS BOTH\n${"-".repeat(30)}\n`;
     if (sharedH.length) {
@@ -1364,14 +1525,14 @@ function showExport() {
     remixItems.forEach((r, i) => t += `  ${i+1}. [${r.cat}] ${r.t}\n`);
   }
 
-  // Sample combos per campaign
-  if (tData.hKept.length >= 3 && tData.dKept.length >= 2) {
+  // Sample combos per campaign (respecting pins)
+  if (tData.hItems.length >= 3 && tData.dItems.length >= 2) {
     t += "\n\nSAMPLE COMBOS \u2014 TEACHERS:\n";
-    for (let i = 0; i < 3; i++) t += `\n  ${pick(tData.hKept, 3).join(" | ")}\n  ${pick(tData.dKept, 2).join(" ")}\n`;
+    for (let i = 0; i < 3; i++) t += `\n  ${pickWithPins(tData.hItems, 3).join(" | ")}\n  ${pickWithPins(tData.dItems, 2).join(" ")}\n`;
   }
-  if (aData.hKept.length >= 3 && aData.dKept.length >= 2) {
+  if (aData.hItems.length >= 3 && aData.dItems.length >= 2) {
     t += "\n\nSAMPLE COMBOS \u2014 ADMINS:\n";
-    for (let i = 0; i < 3; i++) t += `\n  ${pick(aData.hKept, 3).join(" | ")}\n  ${pick(aData.dKept, 2).join(" ")}\n`;
+    for (let i = 0; i < 3; i++) t += `\n  ${pickWithPins(aData.hItems, 3).join(" | ")}\n  ${pickWithPins(aData.dItems, 2).join(" ")}\n`;
   }
 
   document.getElementById("exportPre").textContent = t;
@@ -1591,6 +1752,13 @@ function addAiMsg(role, text) {
 // Init
 render();
 loadFromCloud();
+
+// Close pin pickers on click outside
+document.addEventListener("click", e => {
+  if (!e.target.closest(".pin-wrap")) {
+    document.querySelectorAll(".pin-picker.open").forEach(p => p.classList.remove("open"));
+  }
+});
 </script>
 </body>
 </html>

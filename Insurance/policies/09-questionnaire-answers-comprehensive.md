@@ -19,7 +19,7 @@ Items marked **[JESS]** need Jess's input. Items marked **[PHILIP]** need Philip
 - 86+: **0**
 
 **A2. Provide all applicable information:**
-- Payroll: **$25,000 - $50,000** (estimated, 3 PT W-2 employees)
+- Payroll: **~$58,000** (projected wages for 3 PT W-2 employees; ~$69,000 loaded with taxes/leave/fees)
 - Number of employees: **3** (Jen Kass, Jon Burgos, Isaiah Eddington — all part-time W-2)
 - Number of volunteers: **0**
 - Number of client workers: **0**
@@ -85,11 +85,15 @@ Jessica Corwin — Kodaly Certification (Hartt School of Music), Graduate Certif
 
 ## Section B — Organizations in Business Less Than 3 Years — APPLIES
 
-**B1. Sources of funding/revenue:**
-- **[JESS/PHILIP]** — List revenue sources and amounts (PD workshop fees, adaptive instruction fees, book sales, etc.)
+**B1. Sources of funding/revenue (projected — business has not yet generated revenue):**
+- Solo Teaching (adaptive music instruction): **$42,075**
+- Joint Teaching (2-instructor sessions): **$19,800**
+- Solo Presenting (PD workshops): **$9,000**
+- Joint Presenting (2-presenter PD): **$25,200**
+- **Total projected revenue: $96,075**
 
 **B2. Total projected expenses for current fiscal year:**
-- **$75,000 - $150,000**
+- **$80,500** (payroll $69,348 + fixed expenses $11,152)
 
 **B3. Executive staff resumes:**
 - Attach resumes for Jessica Corwin, Jen Kass, Jon Burgos
