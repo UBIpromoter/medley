@@ -1,0 +1,3 @@
+Campaign	Campaign Status	Campaign Type	Networks	Budget	Budget type	Bid Strategy Type	Maximum CPC bid limit	Languages
+Teachers	Paused	Search	Google search	10.00	Daily	Maximize clicks	3.00	en
+Admins	Paused	Search	Google search	10.00	Daily	Maximize clicks	3.00	en

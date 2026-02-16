@@ -1,0 +1,40 @@
+Campaign	Ad Group	Keyword	Criterion Type
+Teachers	Teachers - General	inclusive music education	Phrase
+Teachers	Teachers - General	adaptive music education	Phrase
+Teachers	Teachers - General	accessible music education	Phrase
+Teachers	Teachers - General	inclusive music workshop	Phrase
+Teachers	Teachers - General	music education workshop	Phrase
+Teachers	Teachers - General	inclusive music teaching	Phrase
+Teachers	Teachers - General	adaptive music PD	Phrase
+Teachers	Teachers - General	adaptive music ed	Phrase
+Teachers	Teachers - General	disability inclusive music education	Phrase
+Teachers	Teachers - General	music teacher PD	Phrase
+Teachers	Teachers - General	music education PD	Phrase
+Teachers	Teachers - General	PD for music teachers	Phrase
+Teachers	Teachers - General	music teacher workshop	Phrase
+Teachers	Teachers - General	inclusive music PD	Phrase
+Teachers	Teachers - General	inclusive music professional development	Phrase
+Teachers	Teachers - General	music inclusion workshop	Phrase
+Teachers	Teachers - General	adaptive music teacher workshop	Phrase
+Teachers	Teachers - General	teaching music to disabled students	Phrase
+Teachers	Teachers - General	special education music PD	Phrase
+Teachers	Teachers - General	special education music workshop	Phrase
+Teachers	Teachers - General	neurodivergent music ed	Phrase
+Teachers	Teachers - General	music IEP training	Phrase
+Teachers	Teachers - General	autistic students music class	Phrase
+Admins	Admins - General	inclusive music education	Phrase
+Admins	Admins - General	adaptive music education	Phrase
+Admins	Admins - General	accessible music education	Phrase
+Admins	Admins - General	inclusive music workshop	Phrase
+Admins	Admins - General	music education workshop	Phrase
+Admins	Admins - General	inclusive music teaching	Phrase
+Admins	Admins - General	adaptive music PD	Phrase
+Admins	Admins - General	adaptive music ed	Phrase
+Admins	Admins - General	disability inclusive music education	Phrase
+Admins	Admins - General	music teacher professional development	Phrase
+Admins	Admins - General	music education professional development	Phrase
+Admins	Admins - General	music department training	Phrase
+Admins	Admins - General	music pd for schools	Phrase
+Admins	Admins - General	music inclusion training	Phrase
+Admins	Admins - General	music for special education classroom	Phrase
+Admins	Admins - General	district music PD	Exact

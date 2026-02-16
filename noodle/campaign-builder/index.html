@@ -174,13 +174,26 @@
   /* Export overlay */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: center; justify-content: center; }
   .overlay.open { display: flex; }
-  .overlay-box { background: #fff; border-radius: 12px; max-width: 700px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; }
-  .overlay-header { padding: 16px 24px 10px; border-bottom: 1px solid #e5e5e5; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 12px; }
+  .overlay-box { background: #fff; border-radius: 12px; max-width: 800px; width: 92%; max-height: 85vh; display: flex; flex-direction: column; }
+  .overlay-header { padding: 16px 24px 0; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 12px; }
   .overlay-header h3 { font-size: 16px; flex: 1; }
   .overlay-header button { background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
   .overlay-header button.close-btn { background: #666; }
+  .overlay-tabs { display: flex; gap: 0; padding: 12px 24px 0; border-bottom: 1px solid #e5e5e5; }
+  .overlay-tab { background: none; border: none; border-bottom: 2px solid transparent; padding: 8px 16px; font-size: 13px; font-weight: 500; color: #666; cursor: pointer; transition: all 0.15s; }
+  .overlay-tab:hover { color: #333; }
+  .overlay-tab.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: 600; }
   .overlay-body { padding: 16px 24px 24px; overflow-y: auto; flex: 1; }
   .overlay-body pre { background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 13px; white-space: pre-wrap; line-height: 1.6; }
+  .editor-section { margin-bottom: 20px; }
+  .editor-section h4 { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .editor-section .hint { font-size: 11px; color: #888; font-weight: 400; margin-bottom: 8px; }
+  .editor-section pre { font-size: 11px; line-height: 1.5; background: #f4f6f8; padding: 12px; border-radius: 6px; overflow-x: auto; white-space: pre; border: 1px solid #e5e5e5; }
+  .copy-section-btn { font-size: 11px; padding: 3px 10px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+  .copy-section-btn:hover { background: #1557b0; }
+  .copy-section-btn.copied { background: #137333; }
+  .editor-step { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; font-size: 12px; color: #555; line-height: 1.5; }
+  .editor-step .step-num { background: #1a73e8; color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
 
   /* Collapsible sections */
   .section-header { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; padding: 6px 4px; border-radius: 6px; transition: background 0.12s; }
@@ -282,7 +295,7 @@
     <div class="counter-pill" id="overlapPill" title="Keywords shared between both campaigns"><span class="num" id="overlapNum">0</span>&nbsp;shared</div>
   </div>
   <span class="save-status" id="saveStatus">Auto-saved</span>
-  <button class="refresh-btn" onclick="if(confirm('Reset all changes and restore original data? This cannot be undone.')){localStorage.removeItem(STORAGE_KEY);location.reload(true);}">Reset</button>
+  <button class="refresh-btn" onclick="if(confirm('Reset all changes and restore original data? This cannot be undone.')){localStorage.removeItem(STORAGE_KEY);if(db)db.from('ad_state').delete().eq('id',STORAGE_KEY);location.reload(true);}">Reset</button>
   <button class="refresh-btn" onclick="location.reload(true)">Refresh</button>
 </div>
 
@@ -310,7 +323,7 @@
     <div id="healthContent"></div>
   </div>
 
-  <button class="export-btn" onclick="showExport()">Export Both Campaigns</button>
+  <button class="export-btn" onclick="showExport()">Export Campaigns</button>
 </div>
 </div>
 
@@ -320,11 +333,22 @@
 <div class="overlay" id="overlay">
   <div class="overlay-box">
     <div class="overlay-header">
-      <h3>Your Ad Copy — Both Campaigns</h3>
-      <button onclick="copyExport()" id="copyBtn">Copy to Clipboard</button>
+      <h3>Export Campaigns</h3>
       <button class="close-btn" onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
     </div>
-    <div class="overlay-body"><pre id="exportPre"></pre></div>
+    <div class="overlay-tabs">
+      <button class="overlay-tab active" onclick="switchExportTab('summary')">Summary</button>
+      <button class="overlay-tab" onclick="switchExportTab('editor')">Google Ads Editor</button>
+    </div>
+    <div class="overlay-body">
+      <div id="exportSummary">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+          <button onclick="copyExport()" id="copyBtn" class="copy-section-btn">Copy All</button>
+        </div>
+        <pre id="exportPre"></pre>
+      </div>
+      <div id="exportEditor" style="display:none;"></div>
+    </div>
   </div>
 </div>
 
@@ -341,7 +365,7 @@
   throw new Error('auth');
 })();
 
-const STORAGE_KEY = "medley-campaign-v1";
+const STORAGE_KEY = "medley-campaign-v2";
 const H_MAX = 15, D_MAX = 4;
 let collapsed = { h: false, d: false, k: false, n: false };
 let collapsedCats = {}; // per-category collapse state, keyed by cat.id
@@ -365,14 +389,14 @@ const CAMP_INTENT = {
     name: "Teachers",
     who: "The teacher themselves",
     intent: "I need skills for my classroom",
-    signals: ["my students", "my classroom", "classroom", "strategies", "teach", "trained", "skills", "learn", "I need", "hands-on"],
-    negSignals: ["district", "staff training", "department", "team PD", "school-wide", "administrator", "principal", "hire", "budget"],
+    signals: ["my students", "my classroom", "I need", "I wasn't", "my practice", "feel empowered"],
+    negSignals: ["district", "staff training", "department training", "team PD", "school-wide", "administrator", "principal", "hire", "budget"],
   },
   a: {
     name: "Admins",
     who: "Principal, director, or coordinator",
     intent: "My staff needs training",
-    signals: ["district", "department", "staff", "team", "school-wide", "equip", "train your", "PD for teachers", "build your"],
+    signals: ["district", "department", "staff", "school-wide", "equip your", "train your", "build your", "your team"],
     negSignals: ["my students", "my classroom", "I wasn't trained", "feel empowered", "teach the kids"],
   }
 };
@@ -441,8 +465,12 @@ function getSuggestedNegatives(camp) {
       }
     });
   });
-  // Suggest negatives from the camp's negSignals that aren't already added
-  return intent.negSignals.filter(s => !existing.has(s.toLowerCase()));
+  // Suggest negatives from the camp's negSignals that aren't already covered
+  const existArr = [...existing];
+  return intent.negSignals.filter(s => {
+    const sl = s.toLowerCase();
+    return !existArr.some(e => e.includes(sl) || sl.includes(e));
+  });
 }
 
 // Get campaign health score
@@ -480,55 +508,70 @@ function setPin(item, val) {
 // keepT/keepA: above cut line per campaign
 // =============================================
 const cats = [
-  // --- HEADLINES ---
+  // --- HEADLINES (optimized Feb 15) ---
   { id:"gap", type:"h", label:"The Gap", camps:"ta", targetT:3, targetA:3, max:30, items:[
-    { t:"Your Degree Didn't Cover This", camp:"t", keepT:true, keepA:false },
+    // Both campaigns
     { t:"Not Trained for This?", camp:"b", keepT:true, keepA:true },
+    // Teachers
+    { t:"Your Degree Didn't Cover This", camp:"t", keepT:true, keepA:false },
     { t:"When Inclusion Feels Hard", camp:"b", keepT:true, keepA:false },
+    // Admins
     { t:"Bridge the Training Gap", camp:"a", keepT:false, keepA:true },
-    { t:"What Your Degree Missed", camp:"t", keepT:false, keepA:false },
     { t:"The PD You Actually Need", camp:"b", keepT:false, keepA:true },
+    // Bench
+    { t:"What Your Degree Missed", camp:"t", keepT:false, keepA:false },
     { t:"Teach Disabled Students", camp:"t", keepT:false, keepA:false },
     { t:"Support Neurodivergent Kids", camp:"t", keepT:false, keepA:false },
   ]},
   { id:"promise", type:"h", label:"The Promise", camps:"ta", targetT:5, targetA:3, max:30, items:[
-    { t:"Tools for Monday Morning", camp:"t", keepT:true, keepA:false },
+    // Both campaigns
     { t:"Strategies That Actually Work", camp:"b", keepT:true, keepA:true },
+    { t:"Hands-On Music PD", camp:"b", keepT:true, keepA:true },
+    // Teachers
+    { t:"Tools for Monday Morning", camp:"t", keepT:true, keepA:false },
     { t:"Teach the Kids You Have", camp:"t", keepT:true, keepA:false },
     { t:"Feel Empowered to Teach", camp:"t", keepT:true, keepA:false },
-    { t:"Hands-On Music PD", camp:"b", keepT:true, keepA:true },
-    { t:"Music for ALL Learners", camp:"b", keepT:false, keepA:true },
+    // Admins — "Build an Inclusive Program" replaces "Music for ALL Learners" (more admin-oriented action)
+    { t:"Build an Inclusive Program", camp:"a", keepT:false, keepA:true },
+    // Bench
+    { t:"Music for ALL Learners", camp:"b", keepT:false, keepA:false },
     { t:"Ready for Next Monday", camp:"t", keepT:false, keepA:false },
-    { t:"Build an Inclusive Program", camp:"a", keepT:false, keepA:false },
-    { t:"Joyful Inclusion Tools", camp:"t", keepT:false, keepA:false },
     { t:"Build Staff Inclusion Skills", camp:"a", keepT:false, keepA:false },
     { t:"Strengthen Your Music Team", camp:"a", keepT:false, keepA:false },
+    { t:"Joyful Inclusion Tools", camp:"t", keepT:false, keepA:false },
   ]},
   { id:"cred", type:"h", label:"Credibility", camps:"ta", targetT:4, targetA:6, max:30, items:[
+    // Both campaigns
     { t:"By Music Teachers", camp:"b", keepT:true, keepA:true },
     { t:"Real Teachers Not Consultants", camp:"b", keepT:true, keepA:true },
-    { t:"Humans, Not Curriculum", camp:"b", keepT:true, keepA:true, note:"Jess's philosophy" },
+    // Teachers — "Humans, Not Curriculum" stays for teachers, pulled from admins cold search
+    { t:"Humans, Not Curriculum", camp:"b", keepT:true, keepA:false, note:"Jess's philosophy — save for admin retargeting" },
     { t:"For Music Teachers", camp:"t", keepT:true, keepA:false },
+    // Admins — "PD Teachers Actually Request" replaces "Humans, Not Curriculum" (addresses admin buy-in)
     { t:"Equip Your Music Teachers", camp:"a", keepT:false, keepA:true },
     { t:"Schools & Districts", camp:"a", keepT:false, keepA:true },
     { t:"Train Your Music Department", camp:"a", keepT:false, keepA:true },
+    { t:"PD Teachers Actually Request", camp:"a", keepT:false, keepA:true },
+    // Bench — retargeting / backup
     { t:"Watch the Children", camp:"b", keepT:false, keepA:false, note:"Jess's mantra — save for retargeting" },
     { t:"We See Kids, Not Labels", camp:"b", keepT:false, keepA:false, note:"Save for retargeting" },
     { t:"Made by Music Teachers", camp:"b", keepT:false, keepA:false },
-    { t:"PD Teachers Actually Request", camp:"a", keepT:false, keepA:false },
   ]},
   { id:"cta", type:"h", label:"Format", camps:"ta", targetT:3, targetA:3, max:30, items:[
+    // Both campaigns — no changes, these are correct
     { t:"Inclusive Music PD", camp:"b", keepT:true, keepA:true },
     { t:"Adaptive Music Ed", camp:"b", keepT:true, keepA:true },
     { t:"Virtual & In-Person", camp:"b", keepT:true, keepA:true },
+    // Bench
     { t:"Music Inclusion Workshop", camp:"t", keepT:false, keepA:false },
     { t:"Monday-Ready Music PD", camp:"t", keepT:false, keepA:false },
     { t:"District-Wide Music PD", camp:"a", keepT:false, keepA:false },
     { t:"Book Music PD for Staff", camp:"a", keepT:false, keepA:false },
   ]},
 
-  // --- DESCRIPTIONS ---
+  // --- DESCRIPTIONS (optimized Feb 15) ---
   { id:"dt", type:"d", label:"For Teachers", camps:"t", targetT:2, targetA:0, max:90, items:[
+    // No changes — top 2 are sharp and direct
     { t:"We teach what your degree didn't. By music teachers.", camp:"t", keepT:true, keepA:false },
     { t:"You learned music. Not disability. We fix that.", camp:"t", keepT:true, keepA:false },
     { t:"Not theory. Hands-on skills your program skipped. Use them Monday.", camp:"t", keepT:false, keepA:false },
@@ -539,43 +582,61 @@ const cats = [
     { t:"Practical inclusion for real classrooms. By teachers.", camp:"t", keepT:false, keepA:false },
   ]},
   { id:"da", type:"d", label:"For Admins", camps:"a", targetT:0, targetA:2, max:90, items:[
+    // "Your music teachers weren't trained..." replaces "Every child in your district..."
+    // (names the problem directly vs moral appeal)
     { t:"Close the training gap in your music dept.", camp:"a", keepT:false, keepA:true },
-    { t:"Every child in your district deserves music. Equip your team.", camp:"a", keepT:false, keepA:true },
+    { t:"Your music teachers weren't trained for inclusion. We can help.", camp:"a", keepT:false, keepA:true },
     { t:"PD teachers actually request. By music teachers, not outsiders.", camp:"a", keepT:false, keepA:false },
-    { t:"Your music teachers weren't trained for inclusion. We can help.", camp:"a", keepT:false, keepA:false, note:"Original — longer version" },
+    { t:"Every child in your district deserves music. Equip your team.", camp:"a", keepT:false, keepA:false },
     { t:"PD music teachers love. Boost retention & inclusion.", camp:"a", keepT:false, keepA:false },
     { t:"District-ready inclusion training. Virtual or on-site.", camp:"a", keepT:false, keepA:false },
   ]},
   { id:"du", type:"d", label:"Universal", camps:"ta", targetT:2, targetA:2, max:90, items:[
+    // Shared — works for both audiences
     { t:"Inclusion PD by music teachers. Practical. Hands-on.", camp:"b", keepT:true, keepA:true },
-    { t:"Strategies you didn't learn in school. Virtual & in-person.", camp:"b", keepT:true, keepA:true },
-    { t:"The training music teachers actually need. Inclusive, adaptive, hands-on.", camp:"b", keepT:false, keepA:false },
+    // Teachers only — "you didn't learn" is teacher-directed language
+    { t:"Strategies you didn't learn in school. Virtual & in-person.", camp:"b", keepT:true, keepA:false },
+    // Admins only — talks about staff needs, admin perspective
+    { t:"The training music teachers actually need. Inclusive, adaptive, hands-on.", camp:"b", keepT:false, keepA:true },
   ]},
 
   // --- KEYWORDS ---
+  // --- KEYWORDS (reordered Feb 15 — strongest/highest-volume first) ---
   { id:"kw-shared", type:"k", label:"Shared Keywords", camps:"ta", max:0, items:[
-    { t:"inclusive music education", camp:"b", match:"phrase" },
-    { t:"inclusive music workshop", camp:"b", match:"phrase" },
-    { t:"adaptive music PD", camp:"b", match:"phrase" },
-    { t:"adaptive music ed", camp:"b", match:"phrase" },
-    { t:"online music course", camp:"b", match:"exact" },
-    { t:"disability inclusive music education", camp:"b", match:"phrase" },
+    { t:"inclusive music education", camp:"b", match:"phrase" },       // broadest inclusion term
+    { t:"adaptive music education", camp:"b", match:"phrase" },       // NEW — broader than "adaptive music PD"
+    { t:"accessible music education", camp:"b", match:"phrase" },     // NEW — Jess's own framing
+    { t:"inclusive music workshop", camp:"b", match:"phrase" },        // specific format
+    { t:"music education workshop", camp:"b", match:"phrase" },       // NEW — broader format
+    { t:"inclusive music teaching", camp:"b", match:"phrase" },        // NEW — active verb form
+    { t:"adaptive music PD", camp:"b", match:"phrase" },              // precise but low volume
+    { t:"adaptive music ed", camp:"b", match:"phrase" },              // abbreviation variant
+    { t:"disability inclusive music education", camp:"b", match:"phrase" }, // long tail
   ]},
   { id:"kw-teachers", type:"k", label:"Teachers Keywords", camps:"t", max:0, items:[
-    { t:"inclusive music PD", camp:"t", match:"phrase" },
-    { t:"neurodivergent music ed", camp:"t", match:"phrase" },
-    { t:"music teacher PD", camp:"t", match:"phrase" },
-    { t:"music IEP training", camp:"t", match:"phrase" },
-    { t:"inclusive music professional development", camp:"t", match:"phrase" },
-    { t:"music inclusion workshop", camp:"t", match:"phrase" },
-    { t:"autistic students music class", camp:"t", match:"phrase" },
-    { t:"adaptive music teacher workshop", camp:"t", match:"phrase" },
+    { t:"music teacher PD", camp:"t", match:"phrase" },               // ANCHOR — 21% CTR, proven
+    { t:"music education PD", camp:"t", match:"phrase" },             // NEW — variant of anchor
+    { t:"PD for music teachers", camp:"t", match:"phrase" },          // NEW — inverted word order
+    { t:"music teacher workshop", camp:"t", match:"phrase" },         // NEW — workshop variant
+    { t:"inclusive music PD", camp:"t", match:"phrase" },              // inclusion-specific
+    { t:"inclusive music professional development", camp:"t", match:"phrase" }, // long form
+    { t:"music inclusion workshop", camp:"t", match:"phrase" },        // specific
+    { t:"adaptive music teacher workshop", camp:"t", match:"phrase" }, // specific
+    { t:"teaching music to disabled students", camp:"t", match:"phrase" }, // NEW — natural search query
+    { t:"special education music PD", camp:"t", match:"phrase" },     // NEW — SPED teachers seeking PD
+    { t:"special education music workshop", camp:"t", match:"phrase" }, // NEW — SPED workshop
+    { t:"neurodivergent music ed", camp:"t", match:"phrase" },        // precise, low volume
+    { t:"music IEP training", camp:"t", match:"phrase" },             // precise, low volume
+    { t:"autistic students music class", camp:"t", match:"phrase" },  // long tail
   ]},
   { id:"kw-admins", type:"k", label:"Admins Keywords", camps:"a", max:0, items:[
-    { t:"music department training", camp:"a", match:"phrase" },
-    { t:"music teacher professional development", camp:"a", match:"phrase" },
-    { t:"music pd for schools", camp:"a", match:"phrase" },
-    { t:"district music PD", camp:"a", match:"exact" },
+    { t:"music teacher professional development", camp:"a", match:"phrase" }, // formal admin language
+    { t:"music education professional development", camp:"a", match:"phrase" }, // NEW — broader
+    { t:"music department training", camp:"a", match:"phrase" },       // direct admin need
+    { t:"music pd for schools", camp:"a", match:"phrase" },            // institutional
+    { t:"music inclusion training", camp:"a", match:"phrase" },        // NEW — inclusion focus
+    { t:"music for special education classroom", camp:"a", match:"phrase" }, // NEW — SPED program
+    { t:"district music PD", camp:"a", match:"exact" },               // narrow, exact match
   ]},
 
   // --- NEGATIVE KEYWORDS ---
@@ -623,6 +684,7 @@ const cats = [
     { t:"summer music camp", camp:"b", match:"phrase" },
     { t:"music lesson plans free", camp:"b", match:"phrase" },
     { t:"adaptive music lessons", camp:"b", match:"phrase" },
+    { t:"online music course", camp:"b", match:"phrase" },
   ]},
   // Teachers campaign: block admin-intent searches
   { id:"nk-teachers", type:"n", label:"Teachers Negatives", camps:"t", max:0, items:[
@@ -637,6 +699,7 @@ const cats = [
     { t:"equip your", camp:"t", match:"phrase" },
     { t:"budget", camp:"t", match:"phrase" },
     { t:"PD for teachers", camp:"t", match:"phrase" },
+    { t:"team PD", camp:"t", match:"phrase" },
     { t:"hire", camp:"t", match:"phrase" },
   ]},
   // Admins campaign: block teacher-intent searches
@@ -2030,6 +2093,7 @@ function showExport() {
   }
 
   document.getElementById("exportPre").textContent = t;
+  switchExportTab("summary");
   document.getElementById("overlay").classList.add("open");
 }
 
@@ -2037,7 +2101,118 @@ function copyExport() {
   navigator.clipboard.writeText(document.getElementById("exportPre").textContent).then(() => {
     const btn = document.getElementById("copyBtn");
     btn.textContent = "Copied!";
-    setTimeout(() => btn.textContent = "Copy to Clipboard", 1500);
+    setTimeout(() => btn.textContent = "Copy All", 1500);
+  });
+}
+
+// =============================================
+// EXPORT TABS + GOOGLE ADS EDITOR FORMAT
+// =============================================
+
+const FINAL_URL = "https://www.music-access.com/professional-development";
+const CAMP_NAMES = { t: "Teachers", a: "Admins" };
+const AG_NAMES = { t: "Teachers - General", a: "Admins - General" };
+
+function switchExportTab(tab) {
+  document.querySelectorAll(".overlay-tab").forEach(t => t.classList.remove("active"));
+  document.querySelector(`.overlay-tab[onclick*="${tab}"]`).classList.add("active");
+  document.getElementById("exportSummary").style.display = tab === "summary" ? "" : "none";
+  document.getElementById("exportEditor").style.display = tab === "editor" ? "" : "none";
+  if (tab === "editor") buildEditorExport();
+}
+
+function buildEditorExport() {
+  const container = document.getElementById("exportEditor");
+  const tData = getKeptItemsForCamp("t");
+  const aData = getKeptItemsForCamp("a");
+  const tKw = getKeywordsForCamp("t", "k");
+  const aKw = getKeywordsForCamp("a", "k");
+  const tNeg = getKeywordsForCamp("t", "n");
+  const aNeg = getKeywordsForCamp("a", "n");
+
+  // --- RSA block ---
+  function rsaRow(camp, data) {
+    const cn = CAMP_NAMES[camp], ag = AG_NAMES[camp];
+    const h = []; for (let i = 0; i < 15; i++) h.push(data.hItems[i] ? data.hItems[i].t : "");
+    const d = []; for (let i = 0; i < 4; i++) d.push(data.dItems[i] ? data.dItems[i].t : "");
+    return [cn, ag, ...h, ...d, FINAL_URL, "PD", ""].join("\t");
+  }
+  const rsaHeader = ["Campaign", "Ad group", ...Array.from({length:15},(_,i)=>`Headline ${i+1}`), ...Array.from({length:4},(_,i)=>`Description ${i+1}`), "Final URL", "Path 1", "Path 2"].join("\t");
+  const rsaText = rsaHeader + "\n" + rsaRow("t", tData) + "\n" + rsaRow("a", aData);
+
+  // --- Keywords block ---
+  function matchLabel(m) { return m === "exact" ? "Exact" : m === "phrase" ? "Phrase" : "Broad"; }
+  const kwHeader = "Campaign\tAd group\tKeyword\tMatch type";
+  let kwRows = "";
+  tKw.forEach(kw => kwRows += `\n${CAMP_NAMES.t}\t${AG_NAMES.t}\t${kw.t}\t${matchLabel(kw.match)}`);
+  aKw.forEach(kw => kwRows += `\n${CAMP_NAMES.a}\t${AG_NAMES.a}\t${kw.t}\t${matchLabel(kw.match)}`);
+  const kwText = kwHeader + kwRows;
+
+  // --- Negative Keywords block (campaign level) ---
+  const negHeader = "Campaign\tKeyword\tMatch type";
+  let negRows = "";
+  // Shared negatives go into both campaigns
+  const sharedNegs = [];
+  cats.forEach(c => {
+    if (c.type !== "n" || c.camps !== "ta") return;
+    c.items.forEach(item => {
+      if (!item.killedT && !item.killedA) sharedNegs.push({ t: item.t, match: item.match });
+    });
+  });
+  sharedNegs.forEach(kw => {
+    negRows += `\n${CAMP_NAMES.t}\t${kw.t}\t${matchLabel(kw.match)}`;
+    negRows += `\n${CAMP_NAMES.a}\t${kw.t}\t${matchLabel(kw.match)}`;
+  });
+  tNeg.filter(kw => !sharedNegs.find(s => s.t === kw.t)).forEach(kw => {
+    negRows += `\n${CAMP_NAMES.t}\t${kw.t}\t${matchLabel(kw.match)}`;
+  });
+  aNeg.filter(kw => !sharedNegs.find(s => s.t === kw.t)).forEach(kw => {
+    negRows += `\n${CAMP_NAMES.a}\t${kw.t}\t${matchLabel(kw.match)}`;
+  });
+  const negText = negHeader + negRows;
+
+  // --- Build UI ---
+  container.innerHTML = `
+    <div style="margin-bottom:16px;padding:12px;background:#e8f0fe;border-radius:8px;">
+      <div style="font-size:13px;font-weight:600;color:#1a73e8;margin-bottom:8px;">How to use with Google Ads Editor</div>
+      <div class="editor-step"><span class="step-num">1</span><span>Open Google Ads Editor → download your account</span></div>
+      <div class="editor-step"><span class="step-num">2</span><span>For each section below: click <b>Copy</b>, then in Editor choose <b>Account → Import → Paste text</b></span></div>
+      <div class="editor-step"><span class="step-num">3</span><span>Editor will create campaigns, ad groups, ads, keywords, and negatives automatically</span></div>
+      <div class="editor-step"><span class="step-num">4</span><span>Review changes, then <b>Post</b> to push live</span></div>
+    </div>
+
+    <div class="editor-section">
+      <h4>Responsive Search Ads <button class="copy-section-btn" onclick="copySectionText(this, 'editorRsa')">Copy</button></h4>
+      <div class="hint">Creates one RSA per campaign with all headlines, descriptions, and final URL</div>
+      <pre id="editorRsa">${escHtml(rsaText)}</pre>
+    </div>
+
+    <div class="editor-section">
+      <h4>Keywords <button class="copy-section-btn" onclick="copySectionText(this, 'editorKw')">Copy</button>
+        <span style="font-size:11px;font-weight:400;color:#888;">${tKw.length + aKw.length} total</span>
+      </h4>
+      <div class="hint">Paste into Editor → Keywords section. Creates keywords with correct match types.</div>
+      <pre id="editorKw">${escHtml(kwText)}</pre>
+    </div>
+
+    <div class="editor-section">
+      <h4>Negative Keywords <button class="copy-section-btn" onclick="copySectionText(this, 'editorNeg')">Copy</button>
+        <span style="font-size:11px;font-weight:400;color:#888;">${(sharedNegs.length * 2 + tNeg.filter(kw => !sharedNegs.find(s => s.t === kw.t)).length + aNeg.filter(kw => !sharedNegs.find(s => s.t === kw.t)).length)} total</span>
+      </h4>
+      <div class="hint">Paste into Editor → Negative keywords (campaign level). Shared negatives are duplicated into both campaigns.</div>
+      <pre id="editorNeg">${escHtml(negText)}</pre>
+    </div>
+  `;
+}
+
+function escHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function copySectionText(btn, preId) {
+  const text = document.getElementById(preId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 1500);
   });
 }
 

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Ads Import Helper</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 24px; max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+  .subtitle { color: #888; font-size: 14px; margin-bottom: 32px; }
+  .step { margin-bottom: 28px; border: 1px solid #333; border-radius: 12px; overflow: hidden; }
+  .step.done { opacity: 0.4; }
+  .step-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #222244; cursor: pointer; }
+  .step-header:hover { background: #2a2a55; }
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #444; color: #fff; font-weight: 700; font-size: 14px; margin-right: 12px; flex-shrink: 0; }
+  .step.done .step-num { background: #2d7a3a; }
+  .step-title { font-weight: 600; font-size: 15px; flex: 1; }
+  .step-meta { font-size: 12px; color: #888; margin-left: 12px; }
+  .step-where { font-size: 13px; color: #7a9ec2; padding: 10px 18px; background: #1e1e3a; border-top: 1px solid #333; }
+  .step-where code { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  .step-body { padding: 0; display: none; }
+  .step.open .step-body { display: block; }
+  .step-actions { display: flex; gap: 8px; padding: 10px 18px; background: #1e1e3a; border-top: 1px solid #333; }
+  .btn { padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.15s; }
+  .btn-copy { background: #3366cc; color: #fff; }
+  .btn-copy:hover { background: #4477dd; }
+  .btn-copy.copied { background: #2d7a3a; }
+  .btn-done { background: #333; color: #aaa; }
+  .btn-done:hover { background: #444; color: #fff; }
+  .preview { max-height: 180px; overflow: auto; padding: 12px 18px; background: #111; font-family: 'SF Mono', Monaco, monospace; font-size: 11px; line-height: 1.6; color: #999; white-space: pre; border-top: 1px solid #333; }
+  .instructions { padding: 14px 18px; background: #1a1a30; border-top: 1px solid #333; font-size: 13px; line-height: 1.6; }
+  .instructions ol { padding-left: 20px; }
+  .instructions li { margin-bottom: 4px; }
+  .instructions strong { color: #fff; }
+  .warning { background: #3a2a1a; border: 1px solid #664; border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; font-size: 13px; line-height: 1.5; }
+  .warning strong { color: #ffcc66; }
+  .totals { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .total-card { background: #222; border-radius: 8px; padding: 12px 16px; flex: 1; min-width: 120px; }
+  .total-card .num { font-size: 24px; font-weight: 700; color: #fff; }
+  .total-card .label { font-size: 12px; color: #888; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<button onclick="location.reload()" style="position:fixed;top:12px;right:12px;z-index:99999;padding:8px 18px;font-size:15px;font-weight:600;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);border-radius:8px;cursor:pointer;backdrop-filter:blur(12px);transition:all 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.22)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.7)'">↻ Refresh</button>
+
+<h1>Google Ads Import Helper</h1>
+<p class="subtitle">5 paste operations → Google Ads Editor → Post → Done</p>
+
+<div class="totals">
+  <div class="total-card"><div class="num">2</div><div class="label">Campaigns</div></div>
+  <div class="total-card"><div class="num">2</div><div class="label">Ad Groups</div></div>
+  <div class="total-card"><div class="num">2</div><div class="label">RSAs</div></div>
+  <div class="total-card"><div class="num">39</div><div class="label">Keywords</div></div>
+  <div class="total-card"><div class="num">109</div><div class="label">Negatives</div></div>
+</div>
+
+<div class="warning">
+  <strong>Before you start:</strong> In Google Ads Editor, delete the two partially-posted campaigns (Teachers & Admins). Right-click each → Remove. Then Post that removal. Start fresh.
+</div>
+
+<div class="step open" id="step1">
+  <div class="step-header" onclick="toggle(1)">
+    <span class="step-num">1</span>
+    <span class="step-title">Campaigns</span>
+    <span class="step-meta">2 rows</span>
+  </div>
+  <div class="step-where">
+    Navigate to: <code>Campaigns</code> in left panel (under "All campaigns")
+  </div>
+  <div class="step-body">
+    <div class="instructions">
+      <ol>
+        <li>Click <strong>Make multiple changes</strong> (top toolbar, or Edit menu)</li>
+        <li>Select <strong>"Use selected destinations"</strong> or <strong>"My data includes columns for campaigns and/or ad groups"</strong></li>
+        <li>Click <strong>Copy</strong> below, then <strong>Paste from clipboard</strong> in the dialog</li>
+        <li>Click <strong>Process</strong> → review → <strong>Finish and review changes</strong></li>
+      </ol>
+    </div>
+    <div class="preview" id="preview1"></div>
+    <div class="step-actions">
+      <button class="btn btn-copy" onclick="copyData(1)">Copy to Clipboard</button>
+      <button class="btn btn-done" onclick="markDone(1)">Mark Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="step" id="step2">
+  <div class="step-header" onclick="toggle(2)">
+    <span class="step-num">2</span>
+    <span class="step-title">Ad Groups</span>
+    <span class="step-meta">2 rows</span>
+  </div>
+  <div class="step-where">
+    Navigate to: <code>Ad groups</code> in left panel (under the campaign tree)
+  </div>
+  <div class="step-body">
+    <div class="instructions">
+      <ol>
+        <li>Click <strong>Make multiple changes</strong></li>
+        <li>Check <strong>"My data includes columns for campaigns and/or ad groups"</strong></li>
+        <li>Click <strong>Copy</strong> below, then <strong>Paste from clipboard</strong></li>
+        <li>Click <strong>Process</strong> → review → <strong>Finish and review changes</strong></li>
+      </ol>
+    </div>
+    <div class="preview" id="preview2"></div>
+    <div class="step-actions">
+      <button class="btn btn-copy" onclick="copyData(2)">Copy to Clipboard</button>
+      <button class="btn btn-done" onclick="markDone(2)">Mark Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="step" id="step3">
+  <div class="step-header" onclick="toggle(3)">
+    <span class="step-num">3</span>
+    <span class="step-title">Keywords</span>
+    <span class="step-meta">39 rows</span>
+  </div>
+  <div class="step-where">
+    Navigate to: <code>Keywords and targeting</code> → <code>Keywords</code> in left panel
+  </div>
+  <div class="step-body">
+    <div class="instructions">
+      <ol>
+        <li>Click <strong>Make multiple changes</strong></li>
+        <li>Check <strong>"My data includes columns for campaigns and/or ad groups"</strong></li>
+        <li>Click <strong>Copy</strong> below, then <strong>Paste from clipboard</strong></li>
+        <li>Click <strong>Process</strong> → review → <strong>Finish and review changes</strong></li>
+      </ol>
+    </div>
+    <div class="preview" id="preview3"></div>
+    <div class="step-actions">
+      <button class="btn btn-copy" onclick="copyData(3)">Copy to Clipboard</button>
+      <button class="btn btn-done" onclick="markDone(3)">Mark Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="step" id="step4">
+  <div class="step-header" onclick="toggle(4)">
+    <span class="step-num">4</span>
+    <span class="step-title">Responsive Search Ads</span>
+    <span class="step-meta">2 rows</span>
+  </div>
+  <div class="step-where">
+    Navigate to: <code>Ads</code> → <code>Responsive search ads</code> in left panel
+  </div>
+  <div class="step-body">
+    <div class="instructions">
+      <ol>
+        <li>Click <strong>Make multiple changes</strong></li>
+        <li>Check <strong>"My data includes columns for campaigns and/or ad groups"</strong></li>
+        <li>Click <strong>Copy</strong> below, then <strong>Paste from clipboard</strong></li>
+        <li>Click <strong>Process</strong> → review → <strong>Finish and review changes</strong></li>
+      </ol>
+    </div>
+    <div class="preview" id="preview4"></div>
+    <div class="step-actions">
+      <button class="btn btn-copy" onclick="copyData(4)">Copy to Clipboard</button>
+      <button class="btn btn-done" onclick="markDone(4)">Mark Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="step" id="step5">
+  <div class="step-header" onclick="toggle(5)">
+    <span class="step-num">5</span>
+    <span class="step-title">Negative Keywords</span>
+    <span class="step-meta">109 rows</span>
+  </div>
+  <div class="step-where">
+    Navigate to: <code>Keywords and targeting</code> → <code>Keywords, Negative</code> in left panel
+  </div>
+  <div class="step-body">
+    <div class="instructions">
+      <ol>
+        <li>Click <strong>Make multiple changes</strong></li>
+        <li>Check <strong>"My data includes columns for campaigns and/or ad groups"</strong></li>
+        <li>Click <strong>Copy</strong> below, then <strong>Paste from clipboard</strong></li>
+        <li>Click <strong>Process</strong> → review → <strong>Finish and review changes</strong></li>
+      </ol>
+    </div>
+    <div class="preview" id="preview5"></div>
+    <div class="step-actions">
+      <button class="btn btn-copy" onclick="copyData(5)">Copy to Clipboard</button>
+      <button class="btn btn-done" onclick="markDone(5)">Mark Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="warning" style="margin-top: 24px; background: #1a2e1a; border-color: #464;">
+  <strong>After all 5 are pasted:</strong> Click <strong>Post</strong> (top toolbar) → <strong>All campaigns</strong> → <strong>Post</strong>. Everything goes up in one shot. Campaigns start Paused — enable them when you're ready to spend.
+</div>
+
+<script>
+const T = '\t';
+const N = '\n';
+
+const data = {
+  1: [
+    ['Campaign','Campaign Status','Campaign Type','Networks','Budget','Budget type','Bid Strategy Type','Maximum CPC bid limit','Languages'],
+    ['Teachers','Paused','Search','Google search','10.00','Daily','Maximize clicks','3.00','en'],
+    ['Admins','Paused','Search','Google search','10.00','Daily','Maximize clicks','3.00','en']
+  ],
+  2: [
+    ['Campaign','Ad Group','Ad Group Type','Ad Group Status','Max CPC'],
+    ['Teachers','Teachers - General','Standard','Enabled','3.00'],
+    ['Admins','Admins - General','Standard','Enabled','3.00']
+  ],
+  3: [
+    ['Campaign','Ad Group','Keyword','Criterion Type'],
+    ['Teachers','Teachers - General','inclusive music education','Phrase'],
+    ['Teachers','Teachers - General','adaptive music education','Phrase'],
+    ['Teachers','Teachers - General','accessible music education','Phrase'],
+    ['Teachers','Teachers - General','inclusive music workshop','Phrase'],
+    ['Teachers','Teachers - General','music education workshop','Phrase'],
+    ['Teachers','Teachers - General','inclusive music teaching','Phrase'],
+    ['Teachers','Teachers - General','adaptive music PD','Phrase'],
+    ['Teachers','Teachers - General','adaptive music ed','Phrase'],
+    ['Teachers','Teachers - General','disability inclusive music education','Phrase'],
+    ['Teachers','Teachers - General','music teacher PD','Phrase'],
+    ['Teachers','Teachers - General','music education PD','Phrase'],
+    ['Teachers','Teachers - General','PD for music teachers','Phrase'],
+    ['Teachers','Teachers - General','music teacher workshop','Phrase'],
+    ['Teachers','Teachers - General','inclusive music PD','Phrase'],
+    ['Teachers','Teachers - General','inclusive music professional development','Phrase'],
+    ['Teachers','Teachers - General','music inclusion workshop','Phrase'],
+    ['Teachers','Teachers - General','adaptive music teacher workshop','Phrase'],
+    ['Teachers','Teachers - General','teaching music to disabled students','Phrase'],
+    ['Teachers','Teachers - General','special education music PD','Phrase'],
+    ['Teachers','Teachers - General','special education music workshop','Phrase'],
+    ['Teachers','Teachers - General','neurodivergent music ed','Phrase'],
+    ['Teachers','Teachers - General','music IEP training','Phrase'],
+    ['Teachers','Teachers - General','autistic students music class','Phrase'],
+    ['Admins','Admins - General','inclusive music education','Phrase'],
+    ['Admins','Admins - General','adaptive music education','Phrase'],
+    ['Admins','Admins - General','accessible music education','Phrase'],
+    ['Admins','Admins - General','inclusive music workshop','Phrase'],
+    ['Admins','Admins - General','music education workshop','Phrase'],
+    ['Admins','Admins - General','inclusive music teaching','Phrase'],
+    ['Admins','Admins - General','adaptive music PD','Phrase'],
+    ['Admins','Admins - General','adaptive music ed','Phrase'],
+    ['Admins','Admins - General','disability inclusive music education','Phrase'],
+    ['Admins','Admins - General','music teacher professional development','Phrase'],
+    ['Admins','Admins - General','music education professional development','Phrase'],
+    ['Admins','Admins - General','music department training','Phrase'],
+    ['Admins','Admins - General','music pd for schools','Phrase'],
+    ['Admins','Admins - General','music inclusion training','Phrase'],
+    ['Admins','Admins - General','music for special education classroom','Phrase'],
+    ['Admins','Admins - General','district music PD','Exact']
+  ],
+  4: [
+    ['Campaign','Ad Group','Ad type','Headline 1','Headline 2','Headline 3','Headline 4','Headline 5','Headline 6','Headline 7','Headline 8','Headline 9','Headline 10','Headline 11','Headline 12','Headline 13','Headline 14','Headline 15','Description 1','Description 2','Description 3','Description 4','Final URL','Path 1','Path 2'],
+    ['Teachers','Teachers - General','Responsive search ad','Not Trained for This?','Your Degree Didn\'t Cover This','When Inclusion Feels Hard','Strategies That Actually Work','Hands-On Music PD','Tools for Monday Morning','Teach the Kids You Have','Feel Empowered to Teach','By Music Teachers','Real Teachers Not Consultants','Humans, Not Curriculum','For Music Teachers','Inclusive Music PD','Adaptive Music Ed','Virtual & In-Person','We teach what your degree didn\'t. By music teachers.','You learned music. Not disability. We fix that.','Inclusion PD by music teachers. Practical. Hands-on.','Strategies you didn\'t learn in school. Virtual & in-person.','https://www.music-access.com/professional-development','PD',''],
+    ['Admins','Admins - General','Responsive search ad','Not Trained for This?','Bridge the Training Gap','The PD You Actually Need','Strategies That Actually Work','Hands-On Music PD','Build an Inclusive Program','By Music Teachers','Real Teachers Not Consultants','Equip Your Music Teachers','Schools & Districts','Train Your Music Department','PD Teachers Actually Request','Inclusive Music PD','Adaptive Music Ed','Virtual & In-Person','Close the training gap in your music dept.','Your music teachers weren\'t trained for inclusion. We can help.','Inclusion PD by music teachers. Practical. Hands-on.','The training music teachers actually need. Inclusive, adaptive, hands-on.','https://www.music-access.com/professional-development','PD','']
+  ],
+  5: [
+    ['Campaign','Keyword','Criterion Type'],
+    ['Teachers','hiring','Negative Phrase'],
+    ['Teachers','jobs','Negative Phrase'],
+    ['Teachers','careers','Negative Phrase'],
+    ['Teachers','salary','Negative Phrase'],
+    ['Teachers','internship','Negative Phrase'],
+    ['Teachers','remote music teacher jobs','Negative Phrase'],
+    ['Teachers','guitar teacher','Negative Phrase'],
+    ['Teachers','piano teacher','Negative Phrase'],
+    ['Teachers','private piano teacher','Negative Phrase'],
+    ['Teachers','private lessons','Negative Phrase'],
+    ['Teachers','violin lessons','Negative Phrase'],
+    ['Teachers','voice lessons','Negative Phrase'],
+    ['Teachers','tutor','Negative Phrase'],
+    ['Teachers','clinical music therapy','Negative Phrase'],
+    ['Teachers','hospital music therapy','Negative Phrase'],
+    ['Teachers','music therapy for kids','Negative Phrase'],
+    ['Teachers','music therapy certification','Negative Phrase'],
+    ['Teachers','music teacher certification','Negative Phrase'],
+    ['Teachers','how to become a music teacher','Negative Phrase'],
+    ['Teachers','music education degree','Negative Phrase'],
+    ['Teachers','MTEL music prep','Negative Phrase'],
+    ['Teachers','degree','Negative Phrase'],
+    ['Teachers','masters program','Negative Phrase'],
+    ['Teachers','college course','Negative Phrase'],
+    ['Teachers','certification program','Negative Phrase'],
+    ['Teachers','special education law','Negative Phrase'],
+    ['Teachers','IEP goals','Negative Phrase'],
+    ['Teachers','IEP accommodations','Negative Phrase'],
+    ['Teachers','how to write an IEP','Negative Phrase'],
+    ['Teachers','cheap','Negative Phrase'],
+    ['Teachers','free','Negative Phrase'],
+    ['Teachers','DIY','Negative Phrase'],
+    ['Teachers','lesson plans','Negative Phrase'],
+    ['Teachers','worksheets','Negative Phrase'],
+    ['Teachers','curriculum','Negative Phrase'],
+    ['Teachers','printable','Negative Phrase'],
+    ['Teachers','YouTube','Negative Phrase'],
+    ['Teachers','homeschool','Negative Phrase'],
+    ['Teachers','kids music classes','Negative Phrase'],
+    ['Teachers','summer music camp','Negative Phrase'],
+    ['Teachers','music lesson plans free','Negative Phrase'],
+    ['Teachers','adaptive music lessons','Negative Phrase'],
+    ['Teachers','online music course','Negative Phrase'],
+    ['Teachers','district','Negative Phrase'],
+    ['Teachers','staff training','Negative Phrase'],
+    ['Teachers','department training','Negative Phrase'],
+    ['Teachers','school-wide','Negative Phrase'],
+    ['Teachers','administrator','Negative Phrase'],
+    ['Teachers','principal','Negative Phrase'],
+    ['Teachers','for my team','Negative Phrase'],
+    ['Teachers','train your','Negative Phrase'],
+    ['Teachers','equip your','Negative Phrase'],
+    ['Teachers','budget','Negative Phrase'],
+    ['Teachers','PD for teachers','Negative Phrase'],
+    ['Teachers','team PD','Negative Phrase'],
+    ['Teachers','hire','Negative Phrase'],
+    ['Admins','hiring','Negative Phrase'],
+    ['Admins','jobs','Negative Phrase'],
+    ['Admins','careers','Negative Phrase'],
+    ['Admins','salary','Negative Phrase'],
+    ['Admins','internship','Negative Phrase'],
+    ['Admins','remote music teacher jobs','Negative Phrase'],
+    ['Admins','guitar teacher','Negative Phrase'],
+    ['Admins','piano teacher','Negative Phrase'],
+    ['Admins','private piano teacher','Negative Phrase'],
+    ['Admins','private lessons','Negative Phrase'],
+    ['Admins','violin lessons','Negative Phrase'],
+    ['Admins','voice lessons','Negative Phrase'],
+    ['Admins','tutor','Negative Phrase'],
+    ['Admins','clinical music therapy','Negative Phrase'],
+    ['Admins','hospital music therapy','Negative Phrase'],
+    ['Admins','music therapy for kids','Negative Phrase'],
+    ['Admins','music therapy certification','Negative Phrase'],
+    ['Admins','music teacher certification','Negative Phrase'],
+    ['Admins','how to become a music teacher','Negative Phrase'],
+    ['Admins','music education degree','Negative Phrase'],
+    ['Admins','MTEL music prep','Negative Phrase'],
+    ['Admins','degree','Negative Phrase'],
+    ['Admins','masters program','Negative Phrase'],
+    ['Admins','college course','Negative Phrase'],
+    ['Admins','certification program','Negative Phrase'],
+    ['Admins','special education law','Negative Phrase'],
+    ['Admins','IEP goals','Negative Phrase'],
+    ['Admins','IEP accommodations','Negative Phrase'],
+    ['Admins','how to write an IEP','Negative Phrase'],
+    ['Admins','cheap','Negative Phrase'],
+    ['Admins','free','Negative Phrase'],
+    ['Admins','DIY','Negative Phrase'],
+    ['Admins','lesson plans','Negative Phrase'],
+    ['Admins','worksheets','Negative Phrase'],
+    ['Admins','curriculum','Negative Phrase'],
+    ['Admins','printable','Negative Phrase'],
+    ['Admins','YouTube','Negative Phrase'],
+    ['Admins','homeschool','Negative Phrase'],
+    ['Admins','kids music classes','Negative Phrase'],
+    ['Admins','summer music camp','Negative Phrase'],
+    ['Admins','music lesson plans free','Negative Phrase'],
+    ['Admins','adaptive music lessons','Negative Phrase'],
+    ['Admins','online music course','Negative Phrase'],
+    ['Admins','my students','Negative Phrase'],
+    ['Admins','my classroom','Negative Phrase'],
+    ['Admins','classroom strategies','Negative Phrase'],
+    ['Admins','I wasn\'t trained','Negative Phrase'],
+    ['Admins','feel empowered','Negative Phrase'],
+    ['Admins','teach the kids','Negative Phrase'],
+    ['Admins','not trained for this','Negative Phrase'],
+    ['Admins','hands-on skills','Negative Phrase'],
+    ['Admins','Monday morning','Negative Phrase']
+  ]
+};
+
+function toTSV(rows) {
+  return rows.map(r => r.join(T)).join(N);
+}
+
+// Populate previews
+for (let i = 1; i <= 5; i++) {
+  const el = document.getElementById('preview' + i);
+  if (el) {
+    const tsv = toTSV(data[i]);
+    // Show header + first few data rows
+    const lines = tsv.split(N);
+    const show = lines.slice(0, Math.min(8, lines.length));
+    if (lines.length > 8) show.push('... (' + (lines.length - 1) + ' total rows)');
+    el.textContent = show.join(N);
+  }
+}
+
+function copyData(step) {
+  const tsv = toTSV(data[step]);
+  navigator.clipboard.writeText(tsv).then(() => {
+    const btn = document.querySelector('#step' + step + ' .btn-copy');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy to Clipboard';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function markDone(step) {
+  const el = document.getElementById('step' + step);
+  el.classList.add('done');
+  el.classList.remove('open');
+  // Open next step
+  const next = document.getElementById('step' + (step + 1));
+  if (next && !next.classList.contains('done')) {
+    next.classList.add('open');
+  }
+}
+
+function toggle(step) {
+  const el = document.getElementById('step' + step);
+  if (el.classList.contains('done')) return;
+  el.classList.toggle('open');
+}
+</script>
+</body>
+</html>

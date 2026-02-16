@@ -1,0 +1,109 @@
+Campaign	Keyword	Criterion Type
+Teachers	hiring	Negative Phrase
+Teachers	jobs	Negative Phrase
+Teachers	careers	Negative Phrase
+Teachers	salary	Negative Phrase
+Teachers	internship	Negative Phrase
+Teachers	remote music teacher jobs	Negative Phrase
+Teachers	guitar teacher	Negative Phrase
+Teachers	piano teacher	Negative Phrase
+Teachers	private piano teacher	Negative Phrase
+Teachers	private lessons	Negative Phrase
+Teachers	violin lessons	Negative Phrase
+Teachers	voice lessons	Negative Phrase
+Teachers	tutor	Negative Phrase
+Teachers	clinical music therapy	Negative Phrase
+Teachers	hospital music therapy	Negative Phrase
+Teachers	music therapy for kids	Negative Phrase
+Teachers	music therapy certification	Negative Phrase
+Teachers	music teacher certification	Negative Phrase
+Teachers	how to become a music teacher	Negative Phrase
+Teachers	music education degree	Negative Phrase
+Teachers	MTEL music prep	Negative Phrase
+Teachers	degree	Negative Phrase
+Teachers	masters program	Negative Phrase
+Teachers	college course	Negative Phrase
+Teachers	certification program	Negative Phrase
+Teachers	special education law	Negative Phrase
+Teachers	IEP goals	Negative Phrase
+Teachers	IEP accommodations	Negative Phrase
+Teachers	how to write an IEP	Negative Phrase
+Teachers	cheap	Negative Phrase
+Teachers	free	Negative Phrase
+Teachers	DIY	Negative Phrase
+Teachers	lesson plans	Negative Phrase
+Teachers	worksheets	Negative Phrase
+Teachers	curriculum	Negative Phrase
+Teachers	printable	Negative Phrase
+Teachers	YouTube	Negative Phrase
+Teachers	homeschool	Negative Phrase
+Teachers	kids music classes	Negative Phrase
+Teachers	summer music camp	Negative Phrase
+Teachers	music lesson plans free	Negative Phrase
+Teachers	adaptive music lessons	Negative Phrase
+Teachers	online music course	Negative Phrase
+Teachers	district	Negative Phrase
+Teachers	staff training	Negative Phrase
+Teachers	department training	Negative Phrase
+Teachers	school-wide	Negative Phrase
+Teachers	administrator	Negative Phrase
+Teachers	principal	Negative Phrase
+Teachers	for my team	Negative Phrase
+Teachers	train your	Negative Phrase
+Teachers	equip your	Negative Phrase
+Teachers	budget	Negative Phrase
+Teachers	PD for teachers	Negative Phrase
+Teachers	team PD	Negative Phrase
+Teachers	hire	Negative Phrase
+Admins	hiring	Negative Phrase
+Admins	jobs	Negative Phrase
+Admins	careers	Negative Phrase
+Admins	salary	Negative Phrase
+Admins	internship	Negative Phrase
+Admins	remote music teacher jobs	Negative Phrase
+Admins	guitar teacher	Negative Phrase
+Admins	piano teacher	Negative Phrase
+Admins	private piano teacher	Negative Phrase
+Admins	private lessons	Negative Phrase
+Admins	violin lessons	Negative Phrase
+Admins	voice lessons	Negative Phrase
+Admins	tutor	Negative Phrase
+Admins	clinical music therapy	Negative Phrase
+Admins	hospital music therapy	Negative Phrase
+Admins	music therapy for kids	Negative Phrase
+Admins	music therapy certification	Negative Phrase
+Admins	music teacher certification	Negative Phrase
+Admins	how to become a music teacher	Negative Phrase
+Admins	music education degree	Negative Phrase
+Admins	MTEL music prep	Negative Phrase
+Admins	degree	Negative Phrase
+Admins	masters program	Negative Phrase
+Admins	college course	Negative Phrase
+Admins	certification program	Negative Phrase
+Admins	special education law	Negative Phrase
+Admins	IEP goals	Negative Phrase
+Admins	IEP accommodations	Negative Phrase
+Admins	how to write an IEP	Negative Phrase
+Admins	cheap	Negative Phrase
+Admins	free	Negative Phrase
+Admins	DIY	Negative Phrase
+Admins	lesson plans	Negative Phrase
+Admins	worksheets	Negative Phrase
+Admins	curriculum	Negative Phrase
+Admins	printable	Negative Phrase
+Admins	YouTube	Negative Phrase
+Admins	homeschool	Negative Phrase
+Admins	kids music classes	Negative Phrase
+Admins	summer music camp	Negative Phrase
+Admins	music lesson plans free	Negative Phrase
+Admins	adaptive music lessons	Negative Phrase
+Admins	online music course	Negative Phrase
+Admins	my students	Negative Phrase
+Admins	my classroom	Negative Phrase
+Admins	classroom strategies	Negative Phrase
+Admins	I wasn't trained	Negative Phrase
+Admins	feel empowered	Negative Phrase
+Admins	teach the kids	Negative Phrase
+Admins	not trained for this	Negative Phrase
+Admins	hands-on skills	Negative Phrase
+Admins	Monday morning	Negative Phrase

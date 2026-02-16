@@ -1,0 +1,86 @@
+{
+  "_note": "Medley Ad Copy — default data snapshot, two-campaign structure",
+  "_date": "2026-02-12",
+  "_storageKey": "medley-ad-v2",
+  "categories": [
+    {
+      "id": "gap", "type": "h", "label": "The Gap", "camps": "ta", "targetT": 3, "targetA": 3, "max": 30,
+      "items": [
+        { "t": "Your Degree Didn't Cover This", "camp": "t", "keepT": true, "keepA": false },
+        { "t": "Not Trained for This?", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "When Inclusion Feels Hard", "camp": "b", "keepT": true, "keepA": false },
+        { "t": "Bridge the Training Gap", "camp": "a", "keepT": false, "keepA": true },
+        { "t": "What Your Degree Missed", "camp": "t", "keepT": false, "keepA": false },
+        { "t": "The PD You Actually Need", "camp": "b", "keepT": false, "keepA": true }
+      ]
+    },
+    {
+      "id": "promise", "type": "h", "label": "The Promise", "camps": "ta", "targetT": 5, "targetA": 3, "max": 30,
+      "items": [
+        { "t": "Tools for Monday Morning", "camp": "t", "keepT": true, "keepA": false },
+        { "t": "Strategies That Actually Work", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "Teach the Kids You Have", "camp": "t", "keepT": true, "keepA": false },
+        { "t": "Feel Empowered to Teach", "camp": "t", "keepT": true, "keepA": false },
+        { "t": "Hands-On Music PD", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "Music for ALL Learners", "camp": "b", "keepT": false, "keepA": true },
+        { "t": "Ready for Next Monday", "camp": "t", "keepT": false, "keepA": false },
+        { "t": "Build an Inclusive Program", "camp": "a", "keepT": false, "keepA": false }
+      ]
+    },
+    {
+      "id": "cred", "type": "h", "label": "Credibility", "camps": "ta", "targetT": 3, "targetA": 3, "max": 30,
+      "items": [
+        { "t": "By Music Teachers", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "Real Teachers Not Consultants", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "Humans, Not Curriculum", "camp": "b", "keepT": true, "keepA": true, "note": "Jess's philosophy" },
+        { "t": "Watch the Children", "camp": "b", "keepT": false, "keepA": false, "note": "Jess's mantra" },
+        { "t": "We See Kids, Not Labels", "camp": "b", "keepT": false, "keepA": false },
+        { "t": "Made by Music Teachers", "camp": "b", "keepT": false, "keepA": false }
+      ]
+    },
+    {
+      "id": "aud", "type": "h", "label": "Audience", "camps": "ta", "targetT": 1, "targetA": 3, "max": 30,
+      "items": [
+        { "t": "For Music Teachers", "camp": "t", "keepT": true, "keepA": false },
+        { "t": "Equip Your Music Teachers", "camp": "a", "keepT": false, "keepA": true },
+        { "t": "Schools & Districts", "camp": "a", "keepT": false, "keepA": true },
+        { "t": "Train Your Music Department", "camp": "a", "keepT": false, "keepA": true }
+      ]
+    },
+    {
+      "id": "cta", "type": "h", "label": "Format", "camps": "ta", "targetT": 3, "targetA": 3, "max": 30,
+      "items": [
+        { "t": "Inclusive Music PD", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "Adaptive Music Ed", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "Virtual & In-Person", "camp": "b", "keepT": true, "keepA": true }
+      ]
+    },
+    {
+      "id": "dt", "type": "d", "label": "For Teachers", "camps": "t", "targetT": 2, "targetA": 0, "max": 90,
+      "items": [
+        { "t": "We teach what your degree didn't. By music teachers.", "camp": "t", "keepT": true, "keepA": false },
+        { "t": "You were trained for music, not disability. We bridge that gap.", "camp": "t", "keepT": true, "keepA": false },
+        { "t": "Not theory. Hands-on skills your program skipped. Use them Monday.", "camp": "t", "keepT": false, "keepA": false },
+        { "t": "Weren't trained for this? We'll get you there. Practical inclusion PD.", "camp": "t", "keepT": false, "keepA": false },
+        { "t": "Fill the gap your degree left. Real strategies for inclusive classrooms.", "camp": "t", "keepT": false, "keepA": false },
+        { "t": "Feel empowered to include every student. Monday will look different.", "camp": "t", "keepT": false, "keepA": false }
+      ]
+    },
+    {
+      "id": "da", "type": "d", "label": "For Admins", "camps": "a", "targetT": 0, "targetA": 2, "max": 90,
+      "items": [
+        { "t": "Your music teachers weren't trained for inclusion. We can help.", "camp": "a", "keepT": false, "keepA": true },
+        { "t": "Every child in your district deserves music. Equip your team.", "camp": "a", "keepT": false, "keepA": true },
+        { "t": "PD teachers actually request. By music teachers, not outsiders.", "camp": "a", "keepT": false, "keepA": false }
+      ]
+    },
+    {
+      "id": "du", "type": "d", "label": "Universal", "camps": "ta", "targetT": 2, "targetA": 2, "max": 90,
+      "items": [
+        { "t": "Inclusion PD by music teachers. Practical. Hands-on.", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "Strategies you didn't learn in school. Virtual & in-person.", "camp": "b", "keepT": true, "keepA": true },
+        { "t": "The training music teachers actually need. Inclusive, adaptive, hands-on.", "camp": "b", "keepT": false, "keepA": false }
+      ]
+    }
+  ]
+}

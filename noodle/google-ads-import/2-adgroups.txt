@@ -1,0 +1,3 @@
+Campaign	Ad Group	Ad Group Type	Ad Group Status	Max CPC
+Teachers	Teachers - General	Standard	Enabled	3.00
+Admins	Admins - General	Standard	Enabled	3.00
