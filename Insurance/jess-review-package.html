@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Medley Insurance Package — Review</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Georgia, serif; color: #1a1a1a; line-height: 1.6; background: #faf9f6; }
+
+  /* Top nav */
+  .top-bar {
+    position: sticky; top: 0; z-index: 999;
+    background: rgba(250,249,246,0.97); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 10px 20px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .top-bar a {
+    padding: 7px 14px; font-size: 12px; font-weight: 600; border-radius: 7px;
+    text-decoration: none; color: #555; border: 1px solid rgba(0,0,0,0.12);
+    transition: all 0.2s; cursor: pointer; white-space: nowrap;
+  }
+  .top-bar a:hover { background: rgba(0,0,0,0.06); color: #1a1a1a; }
+  .top-bar a.active { background: #2d5a27; color: white; border-color: #2d5a27; }
+  .top-bar .spacer { flex: 1; }
+  .top-bar button {
+    padding: 7px 18px; font-size: 12px; font-weight: 600;
+    border-radius: 7px; cursor: pointer; border: 1px solid rgba(0,0,0,0.12);
+    background: rgba(0,0,0,0.04); color: rgba(0,0,0,0.5); transition: all 0.2s;
+  }
+  .top-bar button:hover { background: rgba(0,0,0,0.1); color: rgba(0,0,0,0.7); }
+
+  /* Content */
+  .doc { max-width: 820px; margin: 0 auto; padding: 40px 48px 100px; display: none; }
+  .doc.active { display: block; }
+  h1 { font-size: 20pt; border-bottom: 2.5px solid #1a1a1a; padding-bottom: 10px; margin-bottom: 20px; }
+  h2 { font-size: 14pt; border-bottom: 1.5px solid #ccc; padding-bottom: 6px; margin: 30px 0 14px; color: #1a1a1a; }
+  h3 { font-size: 12pt; margin: 20px 0 8px; }
+  h4 { font-size: 11pt; margin: 16px 0 6px; font-style: italic; }
+  p, li { font-size: 10.5pt; margin-bottom: 8px; }
+  ul, ol { margin-left: 24px; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ddd; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #f0ede4; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
+
+  /* Callouts */
+  .note {
+    background: #f5f3ec; border-left: 3px solid #b8860b; padding: 12px 16px;
+    margin: 16px 0; font-size: 10pt; border-radius: 0 6px 6px 0;
+  }
+  .sig-line { border-bottom: 1px solid #999; display: inline-block; width: 260px; margin: 4px 8px; }
+  .sig-block { margin: 20px 0; line-height: 2.2; }
+
+  /* Summary page */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .summary-card {
+    background: white; border: 1px solid #e0ddd4; border-radius: 8px; padding: 16px 20px;
+  }
+  .summary-card h3 { margin: 0 0 8px; font-size: 11pt; }
+  .summary-card p { font-size: 10pt; color: #555; margin: 0; }
+  @media print {
+    .top-bar { display: none; }
+    .doc { display: block !important; page-break-before: always; padding: 0; }
+    .doc:first-of-type { page-break-before: auto; }
+    body { background: white; }
+  }
+  @media (max-width: 700px) {
+    .doc { padding: 20px 16px 60px; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .top-bar { padding: 8px 12px; gap: 6px; }
+    .top-bar a { padding: 6px 10px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="#" onclick="show('summary')" class="active" id="tab-summary">Summary</a>
+  <a href="#" onclick="show('handbook')" id="tab-handbook">Handbook</a>
+  <a href="#" onclick="show('ack')" id="tab-ack">Ack Form</a>
+  <a href="#" onclick="show('media')" id="tab-media">Media Release</a>
+  <a href="#" onclick="show('abuse')" id="tab-abuse">A&amp;M Questionnaire</a>
+  <a href="#" onclick="show('comp')" id="tab-comp">Comprehensive Q</a>
+  <a href="#" onclick="show('email')" id="tab-email">Broker Email</a>
+  <span class="spacer"></span>
+  <button onclick="location.reload()">↻</button>
+</div>
+
+<!-- ==================== SUMMARY ==================== -->
+<div class="doc active" id="doc-summary">
+<h1>Insurance Package — Review Summary</h1>
+<p>Jess — this is everything going to Meesh at Dowd. Six documents total. Read through and flag anything that doesn't match reality or doesn't feel right. The handbook is the big one — that's what you and the team will actually live with.</p>
+
+<h2>What's in the package</h2>
+<div class="summary-grid">
+  <div class="summary-card">
+    <h3>1. Staff Policy Handbook</h3>
+    <p>The big one. Abuse prevention, code of conduct, physical contact policy, background checks, incident reporting, media policy. <strong>This is what you and the team will actually live with.</strong></p>
+  </div>
+  <div class="summary-card">
+    <h3>2. Acknowledgment Form</h3>
+    <p>Sign-off form — confirms staff read the handbook and consents to background checks.</p>
+  </div>
+  <div class="summary-card">
+    <h3>3. Media Release Form</h3>
+    <p>Photo/video permission form for students and participants.</p>
+  </div>
+  <div class="summary-card">
+    <h3>4. A&amp;M Questionnaire</h3>
+    <p>Abuse &amp; Molestation questionnaire — 21 questions about screening, policies, training. Make sure the claims about your work are accurate.</p>
+  </div>
+  <div class="summary-card">
+    <h3>5. Comprehensive Questionnaire</h3>
+    <p>General operations — facilities, finances, media, abuse-sensitive clients. Most sections N/A (no facility, no vehicles, etc.).</p>
+  </div>
+  <div class="summary-card">
+    <h3>6. Broker Email</h3>
+    <p>Philip's cover letter to Meesh explaining context, what's attached, and the background check transition.</p>
+  </div>
+</div>
+
+
+</div>
+
+<!-- ==================== HANDBOOK ==================== -->
+<div class="doc" id="doc-handbook">
+<h1>Staff Policy Handbook</h1>
+<p><strong>The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion</strong><br>
+<strong>Effective Date: ____________</strong></p>
+<hr>
+
+<h2>About This Handbook</h2>
+<p>This handbook contains the policies and procedures that apply to all employees, contractors, and volunteers of Medley Music Access &amp; Inclusion. Read it in full and sign the Policy Acknowledgment Form before beginning any work with Medley.</p>
+<p>Medley provides professional development for music educators and adaptive music instruction for students, including minors and individuals with disabilities. These policies exist to protect the people we serve and to maintain the professional standards our work requires.</p>
+
+<hr>
+<h1>Part 1: Abuse Prevention</h1>
+
+<h2>1.1 Zero-Tolerance Statement</h2>
+<p>Medley maintains a zero-tolerance policy toward any form of abuse, neglect, molestation, or exploitation of any client, student, or program participant. Any staff member who engages in, conceals, or fails to report such conduct will be subject to immediate termination and referral to law enforcement.</p>
+
+<h2>1.2 Definitions</h2>
+<p><strong>Abuse</strong> includes but is not limited to:</p>
+<ul>
+  <li><strong>Physical abuse:</strong> Any non-accidental physical injury or act that creates a substantial risk of physical injury</li>
+  <li><strong>Sexual abuse:</strong> Any sexual contact or interaction with a minor or vulnerable individual, including but not limited to inappropriate touching, exposure, exploitation, or solicitation</li>
+  <li><strong>Emotional abuse:</strong> A pattern of behavior that impairs a person's emotional development or sense of self-worth, including constant criticism, threats, intimidation, or rejection</li>
+  <li><strong>Neglect:</strong> Failure to provide adequate supervision, safety, or care when responsible for a minor or vulnerable individual</li>
+</ul>
+
+<h2>1.3 Appropriate Behaviors</h2>
+<ul>
+  <li>Maintaining professional boundaries at all times</li>
+  <li>Using positive, respectful language with all students and participants</li>
+  <li>Providing instruction in observable, accessible settings</li>
+  <li>Communicating with families through official channels</li>
+  <li>Redirecting behavior using positive, non-physical techniques</li>
+  <li>Using professional judgment around physical contact to support student participation (see Section 2.3)</li>
+</ul>
+
+<h2>1.4 Prohibited Behaviors</h2>
+<ul>
+  <li>Being alone with a minor in a closed, unobservable space</li>
+  <li>Any form of physical discipline or punishment</li>
+  <li>Any sexual, romantic, or intimate contact or communication with a minor or vulnerable individual</li>
+  <li>Sharing personal contact information (personal phone, social media) with minor students</li>
+  <li>Transporting a minor alone without written parental/guardian consent</li>
+  <li>Giving personal gifts to individual students</li>
+  <li>Photographing or recording students without written consent from parent/guardian</li>
+  <li>Using alcohol, tobacco, or controlled substances in the presence of students</li>
+  <li>Making demeaning, degrading, or sexually suggestive comments</li>
+  <li>Grooming behaviors, including: building secretive relationships with students, excessive personal attention or favoritism, sharing personal problems with students, testing boundaries incrementally, or any attempt to isolate a student from peers or other adults</li>
+</ul>
+
+<h2>1.5 Supervision Requirements</h2>
+<div>
+<ul>
+  <li>When providing direct instruction to minors, at least one other adult (Medley staff or host-site staff) must be present or the instruction must take place in an observable setting.</li>
+  <li><strong>"Observable setting"</strong> means a space where the instructor and students are visible and accessible to other adults who can reasonably monitor the session or enter the space if needed — for example, an open door to an occupied hallway, a windowed room facing a staffed area, or a shared classroom with other adults present.</li>
+  <li>No employee or volunteer may be alone in a closed, unobservable space with a minor.</li>
+  <li>When Medley operates within a host school or facility, Medley staff will comply with the host site's supervision policies in addition to this policy. Where the host site's policies are stricter, the stricter policy applies.</li>
+  <li>If a suitable observable space is not available at a host site, the staff member must request a different location or arrange for another adult to be present before beginning a session.</li>
+</ul>
+</div>
+
+<h2>1.6 Transportation</h2>
+<p>Staff may not transport students in personal vehicles under any circumstances. All Medley services occur at host school facilities. Students remain under school custody before and after Medley instruction.</p>
+
+<h2>1.7 Investigation and Law Enforcement Cooperation</h2>
+<p>Medley will promptly investigate all reports of suspected abuse. If at any point during an investigation there is reason to believe abuse has occurred, Medley will:</p>
+<ol>
+  <li>Immediately report to the Massachusetts Department of Children and Families (DCF) via 51A filing</li>
+  <li>Cooperate fully with law enforcement and DCF investigations</li>
+  <li>Not interfere with, obstruct, or attempt to influence any external investigation</li>
+</ol>
+
+<hr>
+<h1>Part 2: Code of Conduct</h1>
+
+<h2>2.1 Professional Boundaries</h2>
+<p>All staff will:</p>
+<div>
+<ul>
+  <li>Treat every student, participant, and colleague with dignity and respect</li>
+  <li>Maintain clear professional boundaries in all interactions</li>
+  <li>Use respectful language when discussing disability, following identity-first conventions (e.g., "disabled students," "autistic students," "nonspeaking students") <strong>unless an individual or family expresses a different preference</strong></li>
+  <li>Recognize that our role is to serve learners, not to fix them</li>
+  <li>Defer to families and caregivers on matters of personal care, medical needs, and behavioral support outside the scope of music instruction</li>
+</ul>
+</div>
+
+<h2>2.2 Communication</h2>
+<ul>
+  <li>All communication with families of minor students must go through official Medley channels (organizational email, official phone number)</li>
+  <li>Staff may not exchange personal phone numbers, social media handles, or private messaging info with minor students</li>
+  <li>Staff may not communicate with minor students through any private or personal channel</li>
+  <li>Communication with adult PD participants may use standard professional channels</li>
+</ul>
+
+<h2>2.3 Physical Contact and Professional Support</h2>
+<p>Medley provides adaptive music instruction to students with physical, sensory, and developmental disabilities. In this context, instructional and therapeutic physical contact is a necessary and professionally recognized component of effective instruction.</p>
+<p>All physical contact is provided by credentialed professionals — including a board-certified music therapist (MT-BC) and music educators with specialized training in autism and inclusive practice — and is goal-directed, task-specific, and guided by established standards of professional practice.</p>
+
+<h3>Permitted Contact</h3>
+<p>Physical contact is limited to actions that directly support a student's participation, learning, or safety:</p>
+<ul>
+  <li><strong>Instrumental assistance:</strong> Hand-over-hand or hand-under-hand guidance to facilitate instrument playing</li>
+  <li><strong>Postural and positioning support:</strong> Physical assistance to help a student sit, hold an instrument, or maintain a stable position</li>
+  <li><strong>Motor prompting:</strong> Brief, targeted physical prompts to guide a student's movement during a structured music activity</li>
+  <li><strong>Safety stabilization:</strong> Momentary support to prevent injury during active movement or transitions</li>
+</ul>
+<p>All staff-initiated contact is directly related to an instructional objective, limited to the duration necessary for the task, and consistent with the practitioner's training and scope of practice.</p>
+
+<h3>Student-Initiated Contact</h3>
+<div>
+<p>Students with developmental, sensory, and physical disabilities frequently initiate physical contact with trusted adults. This is a well-documented characteristic of this population and an expected part of the therapeutic and educational relationship. Students may seek physical closeness, lean against an instructor, reach for or grasp an instructor's hands or body, <strong>climb into an instructor's lap</strong>, or sit in close physical proximity during instruction.</p>
+<p>When a student initiates contact, staff respond with professional clinical judgment:</p>
+<ul>
+  <li>Staff do not abruptly reject or forcibly remove a student who seeks physical closeness, as this can cause distress and harm the student's sense of safety and trust. Instead, staff use their clinical and educational training to determine the appropriate response — which may include allowing the contact briefly, gently redirecting the student to a more appropriate position, or using the moment as an instructional opportunity.</li>
+  <li><strong>When student-initiated contact goes beyond what is typical for the instructional task</strong> (e.g., a student climbing into an instructor's lap or seeking prolonged physical closeness), <strong>staff redirect when clinically appropriate and document the behavior in session notes.</strong></li>
+  <li><strong>Staff may always disengage from any contact at their own discretion, without fear of reprisal.</strong> Staff safety and comfort are also protected.</li>
+  <li>Expected student-initiated behaviors, including physical contact patterns, are discussed with parents/guardians and the school team <strong>before the first session</strong> as part of intake planning, and revisited as part of ongoing collaboration about the student's needs.</li>
+  <li>All sessions take place in observable environments with other adults present (see Section 1.5). <strong>In practice, Medley instructors work within active classrooms alongside school support staff — paraprofessionals, aides, and classroom teachers — who are present throughout the session.</strong></li>
+</ul>
+</div>
+
+<h3>Safeguards</h3>
+<div>
+<ul>
+  <li>Staff narrate their actions during physical contact ("I'm going to help guide your hand to the drum") and monitor for the student's verbal and non-verbal responses throughout</li>
+  <li>Staff immediately cease contact upon any sign of discomfort, distress, or refusal</li>
+  <li>Physical support strategies are discussed with parents/guardians and the student's school team <strong>before the first session</strong> and aligned with the student's existing educational or therapeutic plans (IEP, 504, etc.)</li>
+  <li>All instruction involving physical contact takes place in observable environments (open doors, windowed rooms, or other adults present)</li>
+</ul>
+</div>
+
+<h3>Scope Limitations</h3>
+<p>Medley staff provide music instruction only. Staff do not perform:</p>
+<ul>
+  <li>Personal care or activities of daily living (restroom assistance, feeding, hygiene, clothing adjustment)</li>
+  <li>Medical or nursing interventions</li>
+  <li>Physical interventions beyond the scope of music instruction</li>
+</ul>
+<p>These are the responsibility of school personnel or the student's designated support team.</p>
+
+<h3>Prohibited</h3>
+<ul>
+  <li>Physical discipline or punitive contact of any kind</li>
+  <li>Physical restraint (staff defer to designated school or crisis intervention personnel)</li>
+  <li>Any sexual, romantic, or exploitative contact</li>
+  <li>Contact unrelated to an instructional or safety purpose</li>
+  <li>Continuation of contact when a student communicates refusal or distress through any means</li>
+</ul>
+
+<h2>2.4 Digital and Social Media</h2>
+<ul>
+  <li>Staff may not follow, friend, or connect with minor students on personal social media accounts</li>
+  <li>Staff may not privately message minor students on any platform</li>
+  <li>Photographs or video of students may only be taken with prior written consent from the parent/guardian and must be used only for authorized Medley purposes</li>
+  <li>Staff may not post images of students to personal social media accounts</li>
+</ul>
+
+<h2>2.5 Gifts and Favoritism</h2>
+<ul>
+  <li>Staff may not give personal gifts to individual students</li>
+  <li>Organizational items (e.g., certificates, group treats for a class) are permitted</li>
+  <li>Staff must avoid any appearance of favoritism toward individual students</li>
+</ul>
+
+<h2>2.6 Substance Use</h2>
+<ul>
+  <li>Use of alcohol, tobacco, cannabis, or any controlled substance is prohibited during any Medley activity or while supervising students</li>
+  <li>Staff may not be under the influence of any intoxicating substance during Medley activities</li>
+</ul>
+
+<h2>2.7 Consequences</h2>
+<p>Violations of this Code of Conduct will be addressed based on severity and may include:</p>
+<ul>
+  <li>Verbal or written warning</li>
+  <li>Suspension from Medley activities pending investigation</li>
+  <li>Immediate termination</li>
+  <li>Referral to law enforcement</li>
+</ul>
+<p>Any conduct involving suspected abuse of a minor will result in immediate suspension pending investigation and mandatory reporting to DCF.</p>
+
+<h2>2.8 Emergency Procedures</h2>
+<div>
+<p>Medley operates within host schools and facilities that maintain their own emergency protocols. All staff must:</p>
+<ul>
+  <li>Complete any host-site emergency orientation or training required of contractors</li>
+  <li>Follow host-site protocols for medical emergencies, student elopement, building evacuation, and lockdown</li>
+  <li>Not administer medication or provide medical interventions — defer to school personnel or the student's designated support team</li>
+  <li>Notify the Director of any emergency or near-miss as soon as the situation is stabilized, and document it per the Incident Reporting Procedure (Part 5)</li>
+</ul>
+</div>
+<h2>2.9 Host School Compliance</h2>
+<p>When working at host schools or facilities, Medley staff must:</p>
+<ul>
+  <li>Comply with all host site safety, security, and conduct policies</li>
+  <li>Follow the host school's visitor and contractor procedures (sign-in, badge requirements, etc.)</li>
+  <li>Coordinate with host site staff on supervision and emergency procedures</li>
+  <li>Report any incidents to both the host site administration and the Medley Director</li>
+</ul>
+
+<hr>
+<h1>Part 3: Training</h1>
+
+<h2>3.1 Initial Training</h2>
+<p>All new staff must complete the following before any contact with students:</p>
+<ul>
+  <li>Full review of this Staff Policy Handbook</li>
+  <li>Mandated reporter training (available free through Massachusetts DCF)</li>
+  <li>Abuse prevention training covering: recognizing signs of abuse, grooming behaviors, appropriate boundaries, and reporting procedures</li>
+  <li>Orientation to Medley's mission, values, and approach to inclusive music education</li>
+</ul>
+<p>Training must be completed and documented before the staff member's first session with students. There are no exceptions.</p>
+
+<h2>3.2 Annual Refresher Training</h2>
+<p>All active staff must complete an annual refresher covering:</p>
+<ul>
+  <li>Review of this handbook (including any updates)</li>
+  <li>Mandated reporter obligations</li>
+  <li>Abuse prevention and boundary awareness</li>
+  <li>Any new policies or procedures</li>
+</ul>
+
+<h2>3.3 Documentation</h2>
+<p>All training is documented with:</p>
+<ul>
+  <li>Date and topics covered</li>
+  <li>Staff member's signature confirming completion</li>
+  <li>Retained in the staff member's personnel file for the duration of association plus 7 years</li>
+</ul>
+
+<hr>
+<h1>Part 4: Background Check Policy</h1>
+
+<h2>4.1 Required Checks</h2>
+<p>Prior to beginning any work that involves contact with minors or vulnerable individuals, the following checks must be completed:</p>
+<table>
+  <tr><th>Check</th><th>Required</th></tr>
+  <tr><td>CORI (Criminal Offender Record Information) — Massachusetts</td><td>Yes</td></tr>
+  <tr><td>SORI (Sex Offender Registry Information) — Massachusetts</td><td>Yes</td></tr>
+  <tr><td>National criminal background check (name-based)</td><td>Yes</td></tr>
+  <tr><td>National Sex Offender Public Website (NSOPW) search</td><td>Yes</td></tr>
+  <tr><td>Fingerprint-based national criminal history check (FBI/CHSB)</td><td>Yes, for all staff with direct student or participant contact</td></tr>
+  <tr><td>Verification of identity (government-issued photo ID)</td><td>Yes</td></tr>
+  <tr><td>Professional license/certification verification (where applicable)</td><td>Yes</td></tr>
+</table>
+<p>If an individual has resided outside Massachusetts in the past 5 years, an out-of-state criminal records check is also required.</p>
+
+<div>
+<p>Staff who hold a current, valid fingerprint-based clearance through a Massachusetts public school district or licensed educational employer may begin work upon <strong>written verification of that clearance from the issuing employer</strong>, provided Medley's own CORI and SORI checks have been initiated. <strong>All Medley-required checks must be completed within 30 days of the staff member's start date.</strong> Documentation of outside clearances does not replace Medley's independent screening — it permits work to begin while Medley's own checks are processed.</p>
+</div>
+<p>The Green Wall Group LLC is registered as a CORI requester with the Massachusetts Criminal History Systems Board (CHSB).</p>
+
+<h2>4.2 Timing</h2>
+<div>
+<ul>
+  <li>All required checks must be completed and reviewed <strong>before</strong> the individual has any contact with minors or vulnerable individuals</li>
+  <li>No individual may begin working with students until background check results have been received and reviewed by the Director</li>
+  <li>The sole exception is the transition provision in Section 4.1: staff with verified current clearances from a Massachusetts public school or licensed educational employer may begin work while Medley's independent checks are completed, provided those checks have been initiated and will be completed within 30 days</li>
+</ul>
+</div>
+
+<h2>4.3 Renewal</h2>
+<ul>
+  <li>Background checks (CORI and SORI at minimum) will be renewed <strong>every 3 years</strong> for all active employees, contractors, and regular volunteers</li>
+  <li>If Medley becomes aware of a new criminal charge or conviction for any active staff member, an updated check will be conducted immediately</li>
+</ul>
+
+<h2>4.4 Review and Disqualification</h2>
+<p>The following result in automatic disqualification:</p>
+<ul>
+  <li>Any conviction for a crime against a child or vulnerable person</li>
+  <li>Any conviction for a sexual offense</li>
+  <li>Registration on any sex offender registry</li>
+  <li>Any pending charges for the above</li>
+</ul>
+<p>Other criminal history will be reviewed on a case-by-case basis, considering the nature and gravity of the offense, time elapsed, and the nature of the position.</p>
+
+<h2>4.5 Applicant Rights</h2>
+<ul>
+  <li>All applicants will be informed in writing that a background check is required</li>
+  <li>Applicants will provide written consent for all checks</li>
+  <li>If an adverse decision is made based on results, the applicant will be notified in writing and given an opportunity to dispute the accuracy, consistent with Massachusetts CORI law</li>
+</ul>
+
+<h2>4.6 Confidentiality</h2>
+<ul>
+  <li>Background check results are confidential, stored securely and separately from general personnel files</li>
+  <li>Access is limited to the Director</li>
+  <li>Results are retained for the duration of association plus 7 years after separation</li>
+</ul>
+
+<h2>4.7 Owner Status</h2>
+<div>
+<p>Philip Silva (Owner/Business Manager) and Jessica Corwin (Owner/Director) are excluded from workers' compensation and payroll as LLC owners. <strong>Both are subject to background screening and all policies in this handbook.</strong></p>
+<ul>
+  <li><strong>Jessica Corwin</strong> provides direct adaptive music instruction to minors and is fully covered under all liability and abuse &amp; molestation insurance. She is subject to all screening and conduct policies and maintains current CORI/fingerprint clearance through her position as a Massachusetts public school teacher, in addition to Medley's own checks.</li>
+  <li><strong>Philip Silva</strong> serves as Business Manager with no direct student contact. He is subject to <strong>CORI and SORI screening</strong>, the Code of Conduct, and all reporting obligations in this handbook.</li>
+</ul>
+</div>
+
+<hr>
+<h1>Part 5: Incident Reporting Procedure</h1>
+
+<h2>5.1 Mandated Reporter Designation</h2>
+<div>
+<p>Massachusetts law designates teachers, counselors, and certain other professionals as <strong>mandated reporters</strong> who are legally required to report suspected child abuse or neglect (M.G.L. c. 119, Section 51A). Staff who hold these professional roles are mandated reporters under state law. As a matter of organizational policy, Medley requires <strong>all</strong> staff — regardless of statutory status — to follow the same reporting procedures described in this section. Failure by any staff member to report as required by this policy is grounds for immediate termination.</p>
+</div>
+
+<h2>5.2 What Must Be Reported</h2>
+<h3>Suspected Abuse or Neglect of a Minor (51A)</h3>
+<p>Any staff member who has <strong>reasonable cause to believe</strong> that a child under 18 is suffering from abuse or neglect must report. This includes:</p>
+<ul>
+  <li>Physical injury not consistent with an accident</li>
+  <li>Sexual abuse or exploitation</li>
+  <li>Emotional abuse or chronic neglect</li>
+  <li>Disclosure by a child that they are being abused or neglected</li>
+  <li>Observations of unexplained injuries, fear of a caregiver, or other warning signs</li>
+</ul>
+<p><strong>You do not need to be certain.</strong> Reasonable suspicion is sufficient and required.</p>
+
+<h3>Other Reportable Incidents</h3>
+<ul>
+  <li>Any injury to a student or participant during a Medley activity</li>
+  <li>Any allegation of inappropriate conduct by a staff member</li>
+  <li>Any safety hazard or near-miss during a Medley activity</li>
+  <li>Any violation of this handbook</li>
+</ul>
+
+<h2>5.3 Reporting Suspected Abuse of a Minor (51A)</h2>
+<p><strong>Step 1: Immediately call DCF</strong></p>
+<p>Massachusetts Department of Children and Families Child Abuse Hotline:<br>
+<strong>1-800-792-5200</strong> (24 hours, 7 days)</p>
+<p>Do not wait. Do not investigate on your own first.</p>
+<p><strong>Step 2: Notify the Director</strong></p>
+<p>Immediately after contacting DCF, notify the Director (Jessica Corwin) by phone or in person. If the allegation involves the Director, notify the Business Manager (Philip Silva) instead.</p>
+<p><strong>Step 3: Written report within 48 hours</strong></p>
+<p>File a written 51A report with DCF. The Director will assist with this process.</p>
+<p><strong>Step 4: Cooperate with investigation</strong></p>
+<p>Cooperate fully with DCF and law enforcement. Do not contact the alleged perpetrator or the child's family to discuss the report.</p>
+
+<h2>5.4 Reporting Other Incidents</h2>
+<ol>
+  <li>Address any immediate safety concerns</li>
+  <li>Notify the Director verbally as soon as possible, and in writing within 24 hours</li>
+  <li>Document: date, time, location, individuals involved, witnesses, description, actions taken, follow-up needed</li>
+</ol>
+
+<h2>5.5 Response to Allegations Against Staff</h2>
+<ol>
+  <li>The staff member is <strong>immediately suspended</strong> from all student contact pending investigation</li>
+  <li>If a minor is involved, a 51A report is filed with DCF</li>
+  <li>The Director conducts an internal review</li>
+  <li>Actions may include reinstatement, additional training, termination, or referral to law enforcement</li>
+  <li>No student contact is permitted until the investigation is complete</li>
+</ol>
+
+<h2>5.6 Protections</h2>
+<ul>
+  <li><strong>Good faith reporters are protected.</strong> Massachusetts law shields mandated reporters from liability for reports made in good faith</li>
+  <li><strong>Retaliation is prohibited.</strong> Medley will not retaliate against any individual who makes a good-faith report</li>
+  <li><strong>Failure to report is a crime.</strong> Under Massachusetts law, mandated reporters who fail to report suspected abuse may face criminal penalties</li>
+</ul>
+
+<h2>5.7 Record Retention</h2>
+<p>All incident reports, 51A filings, and related documentation are retained <strong>permanently</strong> in a secure, confidential file. Access is limited to the Director and, when necessary, legal counsel or law enforcement.</p>
+
+<hr>
+<h1>Part 6: Photo and Media Policy</h1>
+
+<h2>6.1 Consent Requirements</h2>
+<p><strong>Adults (18+):</strong> Written consent required. May revoke at any time in writing.</p>
+<p><strong>Minors (under 18):</strong> Written consent from parent or legal guardian. If the minor is old enough to understand (generally age 12+), their assent should also be obtained.</p>
+<p><strong>Individuals under guardianship:</strong> Consent from the legal guardian.</p>
+
+<h2>6.2 Standards</h2>
+<ul>
+  <li>Medley will use respectful, identity-first language and framing in all media featuring disabled individuals</li>
+  <li>Images and descriptions will center the individual's participation and musicianship, never their disability as a subject of inspiration or pity</li>
+  <li>No image or recording will be used in a way that is demeaning, exploitative, or misrepresentative</li>
+  <li>No image or recording will be sold to third parties</li>
+</ul>
+
+<h2>6.3 Staff Responsibilities</h2>
+<ul>
+  <li>Staff may not photograph or record students on personal devices</li>
+  <li>All photographs and recordings must be taken on Medley-authorized devices or by an authorized photographer</li>
+  <li>Staff may not post images of students to personal social media accounts</li>
+  <li>Staff must confirm that a signed release is on file before submitting photos for any Medley use</li>
+</ul>
+
+<hr>
+<p><strong>This handbook will be reviewed annually and updated as needed.</strong></p>
+<p><strong>All staff must sign a Policy Acknowledgment Form confirming they have read and understood this handbook.</strong></p>
+</div>
+
+<!-- ==================== ACKNOWLEDGMENT FORM ==================== -->
+<div class="doc" id="doc-ack">
+<h1>Policy Acknowledgment and Background Check Consent</h1>
+<p><strong>The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion</strong></p>
+<hr>
+
+<h2>Staff Information</h2>
+<table>
+  <tr><td style="width:40%">Full Name</td><td><span class="sig-line"></span></td></tr>
+  <tr><td>Position/Role</td><td><span class="sig-line"></span></td></tr>
+  <tr><td>Start Date</td><td><span class="sig-line"></span></td></tr>
+  <tr><td>Government-Issued Photo ID Verified</td><td>☐ Yes — ID Type: <span class="sig-line" style="width:140px"></span></td></tr>
+</table>
+
+<h2>Policy Acknowledgment</h2>
+<p>By signing below, I confirm that I have received, read, and understand the Medley Music Access &amp; Inclusion <strong>Staff Policy Handbook</strong>, which includes:</p>
+<ul>
+  <li>Part 1: Abuse Prevention</li>
+  <li>Part 2: Code of Conduct</li>
+  <li>Part 3: Training Requirements</li>
+  <li>Part 4: Background Check Policy</li>
+  <li>Part 5: Incident Reporting Procedure</li>
+  <li>Part 6: Photo and Media Policy</li>
+</ul>
+<p>I agree to comply with all policies in the handbook. I understand that:</p>
+<ol>
+  <li><strong>Violation of any policy may result in disciplinary action, up to and including termination and referral to law enforcement.</strong></li>
+  <li><strong>I am obligated to report</strong> any suspected abuse, neglect, or policy violation immediately, as described in the Incident Reporting Procedure.</li>
+  <li><strong>I am a mandated reporter</strong> under Medley policy. Failure to report suspected child abuse or neglect is a crime under Massachusetts law (M.G.L. c. 119, Section 51A).</li>
+  <li>These policies may be <strong>updated from time to time.</strong> I will be notified of changes and may be asked to sign a new acknowledgment.</li>
+  <li>I have had the opportunity to ask questions about these policies and have received satisfactory answers.</li>
+</ol>
+
+<h2>Background Check Consent</h2>
+<p>Medley Music Access &amp; Inclusion works with minors and individuals with disabilities. As a condition of my engagement with Medley, I authorize The Green Wall Group LLC to conduct the following background checks:</p>
+<ul>
+  <li>Massachusetts CORI (Criminal Offender Record Information) check</li>
+  <li>Massachusetts SORI (Sex Offender Registry Information) check</li>
+  <li>National criminal background check</li>
+  <li>National Sex Offender Public Website (NSOPW) search</li>
+  <li>Fingerprint-based national criminal history check (FBI/CHSB), if required for host school access</li>
+</ul>
+<p>I understand that:</p>
+<ul>
+  <li>A criminal record does not automatically disqualify me; results will be reviewed in accordance with Medley's Background Check Policy and Massachusetts law</li>
+  <li>If an adverse decision is made based on results, I will be notified in writing and given an opportunity to dispute the accuracy</li>
+  <li>Background check results are confidential and will be stored securely</li>
+  <li>Checks will be renewed every 3 years during my association with Medley</li>
+</ul>
+
+<div class="sig-block">
+Signature: <span class="sig-line"></span> Date: <span class="sig-line" style="width:120px"></span><br>
+Printed Name: <span class="sig-line"></span><br>
+Director Signature: <span class="sig-line"></span> Date: <span class="sig-line" style="width:120px"></span>
+</div>
+<p><em>This signed form will be retained in the individual's personnel file for the duration of their association with Medley and for 7 years after separation.</em></p>
+</div>
+
+<!-- ==================== MEDIA RELEASE ==================== -->
+<div class="doc" id="doc-media">
+<h1>Photo / Media Release Form</h1>
+<p><strong>The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion</strong></p>
+<hr>
+<p><strong>I, <span class="sig-line"></span> (print name), hereby grant Medley Music Access &amp; Inclusion (The Green Wall Group LLC) permission to use my / my child's likeness, image, voice, and/or written statements in the following:</strong></p>
+<ul>
+  <li>☐ Website (www.music-access.com)</li>
+  <li>☐ Social media (Instagram, Facebook, etc.)</li>
+  <li>☐ Print materials (brochures, flyers, presentations)</li>
+  <li>☐ Other: <span class="sig-line" style="width:200px"></span></li>
+</ul>
+<p><strong>Name of individual being photographed/recorded:</strong> <span class="sig-line"></span></p>
+<p><strong>If a minor, name and relationship of consenting parent/guardian:</strong> <span class="sig-line"></span></p>
+
+<p>I understand that:</p>
+<div>
+<ul>
+  <li>These materials may be used for promotional and educational purposes</li>
+  <li><strong>This permission is granted indefinitely unless revoked in writing</strong></li>
+  <li>I will not receive compensation for this use</li>
+  <li>I may revoke this consent at any time by written notice to Medley</li>
+  <li>Medley will make reasonable efforts to remove content upon revocation, but cannot guarantee removal from all platforms or materials already in circulation</li>
+  <li><strong>Medley may crop, edit, or resize images for formatting purposes</strong></li>
+  <li>Images and descriptions will center the individual's participation and musicianship, using respectful, identity-first language</li>
+  <li>No image or recording will be used in a way that is demeaning, exploitative, or misrepresentative</li>
+  <li>No image or recording will be sold to third parties</li>
+</ul>
+<p><strong>I release and hold harmless The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion, its owners, employees, and agents from any claims arising from the authorized use of these materials as described above.</strong></p>
+</div>
+
+<div class="sig-block">
+Signature: <span class="sig-line"></span> Date: <span class="sig-line" style="width:120px"></span><br>
+Printed Name: <span class="sig-line"></span><br>
+(If minor) Parent/Guardian Signature: <span class="sig-line"></span> Date: <span class="sig-line" style="width:120px"></span><br>
+Parent/Guardian Printed Name: <span class="sig-line"></span>
+</div>
+</div>
+
+<!-- ==================== A&M QUESTIONNAIRE ==================== -->
+<div class="doc" id="doc-abuse">
+<h1>Abuse &amp; Molestation Questionnaire — Completed</h1>
+<p><strong>Applicant:</strong> The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion<br>
+<strong>FEIN:</strong> 27-3988260 · <strong>Website:</strong> www.music-access.com</p>
+<div class="note"><strong>Note:</strong> Green Wall Group LLC's other business activities (affordable housing, financial services) are entirely separate. This application covers <strong>only Medley's activities.</strong></div>
+
+<table>
+  <tr><th>Field</th><th>Answer</th></tr>
+  <tr><td>Years in business</td><td>LLC: 15 years (~2011). Medley DBA: 1 year (2025).</td></tr>
+  <tr><td>Years under current management</td><td>15</td></tr>
+</table>
+
+<h2>Questions</h2>
+
+<p><strong>Q1. Clients by age range:</strong></p>
+<table>
+  <tr><td>0–18</td><td><strong>60</strong> (50 preschool, 10 ages 6–14)</td></tr>
+  <tr><td>19–61</td><td><strong>75</strong> (PD teacher participants)</td></tr>
+  <tr><td>62+</td><td><strong>0</strong></td></tr>
+</table>
+
+<p><strong>Q2. Written abuse policies?</strong> → <strong>YES</strong></p>
+<ul>
+  <li>a. Zero-tolerance → YES</li>
+  <li>b. Define appropriate/inappropriate behaviors → YES</li>
+  <li>c. Will investigate and cooperate with law enforcement → YES</li>
+</ul>
+
+<p><strong>Q3. Employees sign abuse policies?</strong> → <strong>YES</strong></p>
+<p><strong>Q4. Enforce the 3-person rule?</strong> → <strong>YES</strong> — at least one other adult present or observable setting. Medley operates within public school classrooms with school staff present.</p>
+<p><strong>Q5. Monitor client areas?</strong> → <strong>N/A</strong> — no facility. Works within host schools.</p>
+
+<p><strong>Q6. Screening controls:</strong></p>
+<div>
+<div class="note">Both owners are subject to background screening. Jessica Corwin: full screening. Philip Silva (no student contact): CORI/SORI. Full screening for all staff with student contact (Jess, Jen, Jon).</div>
+</div>
+<table>
+  <tr><th></th><th>Employees</th><th>Volunteers</th></tr>
+  <tr><td>a. Photo ID required</td><td>YES (I-9 process)</td><td>No volunteers</td></tr>
+  <tr><td>b. Personal interviews</td><td>YES</td><td>No volunteers</td></tr>
+  <tr><td>c. Personal references</td><td>YES</td><td>No volunteers</td></tr>
+  <tr><td>d. 5-year employment history</td><td>YES</td><td>No volunteers</td></tr>
+</table>
+
+<p><strong>Q7. Background checks:</strong></p>
+<div>
+<div class="note">All staff hold current clearances through existing school employers. Medley's own checks initiated, due within 30 days of start.</div>
+<table>
+  <tr><th></th><th>Employees</th></tr>
+  <tr><td>a. Name — state</td><td><strong>YES</strong> — initiated; staff hold current clearances</td></tr>
+  <tr><td>b. Name — national</td><td><strong>YES</strong> — initiated; staff hold current clearances</td></tr>
+  <tr><td>c. Fingerprint — state</td><td><strong>YES</strong> — initiated; staff hold current clearances</td></tr>
+  <tr><td>d. FBI fingerprint</td><td><strong>YES</strong> — initiated; staff hold current clearances</td></tr>
+</table>
+</div>
+
+<p><strong>Q8.</strong> Applications disclose background check? → <strong>YES</strong><br>
+<strong>Q9.</strong> Sex offender screening? → <strong>YES</strong><br>
+<strong>Q10.</strong> Controls completed prior to hiring/contact? → <strong>YES</strong><br>
+<strong>Q11.</strong> Re-screening frequency → <strong>Prior to hire</strong><br>
+<strong>Q12.</strong> Retain records permanently? → <strong>YES</strong><br>
+<strong>Q13.</strong> Any abuse allegations? → <strong>NO</strong><br>
+<strong>Q14.</strong> Retain abuse reports permanently? → <strong>YES</strong></p>
+
+<p><strong>Q15. Procedure for allegation against employee?</strong> → <strong>YES</strong> — Immediate suspension, 51A if minor involved, internal review.</p>
+<p><strong>Q16. Procedure for allegation involving child/client?</strong> → <strong>YES</strong> — Ensure safety, separate parties, 51A, notify parent/guardian.</p>
+
+<p><strong>Q17. Abuse prevention training:</strong></p>
+<table>
+  <tr><th></th><th>Orientation</th><th>Annual</th><th>Documented?</th></tr>
+  <tr><td>Employees</td><td>YES — full policy + mandated reporter training</td><td>YES — annual refresher</td><td>YES</td></tr>
+</table>
+
+<p><strong>Q18.</strong> Mandated reporter? → <strong>YES</strong><br>
+<strong>Q19.</strong> Work with Praesidium? → <strong>NO</strong></p>
+
+<p><strong>Q20.</strong> Contractually required to carry A&amp;M? → <strong>Not yet confirmed</strong> — Assumed $1M/$2M.</p>
+
+<p><strong>Q21. Additional detail:</strong></p>
+<div>
+<p>Medley operates exclusively within public school classrooms. Medley instructors work alongside school support staff — paraprofessionals, aides, and classroom teachers — who are present throughout every session. No transport. No unsupervised access. No overnight programs. All staff hold current clearances through existing employers. Medley's own checks initiated, due within 30 days.</p>
+</div>
+
+<p><strong>Completed by:</strong> Jessica Corwin, Director / Managing Member</p>
+</div>
+
+<!-- ==================== COMPREHENSIVE QUESTIONNAIRE ==================== -->
+<div class="doc" id="doc-comp">
+<h1>Comprehensive Questionnaire — Completed</h1>
+<p><strong>Applicant:</strong> The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion<br>
+<strong>FEIN:</strong> 27-3988260 · <strong>Website:</strong> www.music-access.com</p>
+<div class="note"><strong>Context:</strong> Medley is in early startup. The Medley DBA was established in 2025; the LLC since ~2011. Jess runs the Adaptive Music Program at Springfield Community Music School (~5 years, 600+ students). She transitions to Medley full-time end of June 2026. First school contract begins Feb 24. All figures are first-year projections. Pre-revenue as of Feb 2026.</div>
+
+<h2>Section A — Facilities and Operations</h2>
+<p><strong>A1. Clients by age:</strong></p>
+<table>
+  <tr><td>0–5</td><td><strong>50</strong> (preschool adaptive music)</td></tr>
+  <tr><td>6–14</td><td><strong>10</strong></td></tr>
+  <tr><td>15–18</td><td>0</td></tr>
+  <tr><td>19–62</td><td><strong>75</strong> (PD teachers)</td></tr>
+  <tr><td>62+</td><td>0</td></tr>
+</table>
+
+<p><strong>A2. Employees/payroll:</strong></p>
+<div>
+<table>
+  <tr><td>Payroll</td><td>~$58K projected (~$69K loaded)</td></tr>
+  <tr><td>Employees</td><td>3 PT W-2 (Jen Kass, Jon Burgos, Isaiah Eddington)</td></tr>
+  <tr><td>Volunteers</td><td>0</td></tr>
+</table>
+<div class="note">Both owners screened. Jess: full screening. Philip: CORI/SORI. Isaiah: graphic artist, no student contact.</div>
+</div>
+
+<p><strong>A3.</strong> Years under management: 15 (LLC), 1 (Medley)<br>
+<strong>A4.</strong> Accreditations: Jess — Kodály Cert (Hartt), Grad Cert Music Ed &amp; Autism (Berklee). Jen — MT-BC.<br>
+<strong>A5.</strong> Non-profit? NO<br>
+<strong>A6.</strong> Licensed? NO<br>
+<strong>A7.</strong> All NO (no adoption, no detox, no restraints, no medical, etc.)<br>
+<strong>A8–A11.</strong> All NO<br>
+<strong>A12.</strong> Security: N/A — no facility<br>
+<strong>A13–A19.</strong> All NO or N/A</p>
+
+<h2>Section B — New Organization (&lt;3 years)</h2>
+<p><strong>B1. Projected revenue:</strong></p>
+<table>
+  <tr><td>Adaptive music instruction</td><td>$61,875</td></tr>
+  <tr><td>Professional development</td><td>$34,200</td></tr>
+  <tr><td>Songbook</td><td>TBD</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>~$96,075</strong></td></tr>
+</table>
+<p><strong>B2.</strong> Projected expenses: <strong>$80,500</strong><br>
+<strong>B3.</strong> Résumés attached: Jess, Jen, Jon</p>
+
+<h2>Sections C–D: N/A</h2>
+<p>No playgrounds, no facility rental.</p>
+
+<h2>Section E — Media Exposures</h2>
+<p><strong>E1.</strong> Written waivers for likeness? → YES<br>
+<strong>E2.</strong> Broadcast? → N/A<br>
+<strong>E3.</strong> Media: website, social, email, blog, photos, songbook<br>
+<strong>E4.</strong> Contractor for legal review? → NO<br>
+<strong>E5.</strong> Media liability insurance? → NO</p>
+
+<h2>Section F — Abuse Sensitive Clients</h2>
+<p><strong>F1.</strong> Claims/allegations? → NO<br>
+<strong>F2.</strong> Written abuse reporting? → YES<br>
+<strong>F3.</strong> Two adults with clients? → YES</p>
+
+<p><strong>F4. Screening controls:</strong></p>
+<table>
+  <tr><th></th><th>Employees</th></tr>
+  <tr><td>Written applications</td><td>I-9/W-4 completed; formal app to be implemented</td></tr>
+  <tr><td>Photo ID</td><td>YES (I-9)</td></tr>
+  <tr><td>Interviews</td><td>YES</td></tr>
+  <tr><td>References</td><td>YES</td></tr>
+  <tr><td>5-year employment history</td><td>YES</td></tr>
+  <tr><td>Education verified</td><td>YES</td></tr>
+  <tr><td>Licensing verified</td><td>YES</td></tr>
+</table>
+
+<p><strong>F5. Background checks:</strong></p>
+<div>
+<div class="note">Same as A&amp;M questionnaire. All checks initiated. Staff hold current clearances. 30-day completion window.</div>
+<table>
+  <tr><th></th><th>Employees</th></tr>
+  <tr><td>Name — local/state/national</td><td><strong>YES</strong> — initiated; current clearances</td></tr>
+  <tr><td>Fingerprint — state</td><td><strong>YES</strong> — initiated; current clearances</td></tr>
+  <tr><td>FBI fingerprint</td><td><strong>YES</strong> — initiated; current clearances</td></tr>
+  <tr><td>Other criteria / other methods</td><td><strong>N/A</strong> — all standard checks above utilized</td></tr>
+</table>
+</div>
+
+<p><strong>F6.</strong> Controls completed prior to hiring/contact? → YES<br>
+<strong>F7.</strong> Applications disclose background check? → YES<br>
+<strong>F8.</strong> Records retained: duration + 7 years; background checks permanently</p>
+
+<h2>Sections G–X: All N/A</h2>
+<p>No auto, no food/merchandise, no liquor, no special events, no animals, no church, no performance arts, no camps, no childcare, no schools, no vocational, no clubs, no athletics, no residential housing, no professional liability (Medley provides music education, not clinical/therapeutic services).</p>
+
+<h2>Description of Operations</h2>
+<div>
+<ol>
+  <li><strong>Adaptive music instruction</strong> — in public school classrooms <strong>alongside school support staff (paraprofessionals, aides, classroom teachers) who are present throughout every session.</strong> Also occasionally at libraries. No transport. No unsupervised access.</li>
+  <li><strong>Professional development</strong> — at host sites and online. Adult participants (music teachers, administrators).</li>
+  <li><strong>Educational publishing</strong> — songbook of original songs and activities.</li>
+</ol>
+<p>Medley does not own or lease any facility.</p>
+</div>
+</div>
+
+<!-- ==================== BROKER EMAIL ==================== -->
+<div class="doc" id="doc-email">
+<h1>Email to Broker — Draft</h1>
+<p><strong>To:</strong> Meesh Ohradka &lt;Mohradka@dowd.com&gt;<br>
+<strong>From:</strong> Philip Silva<br>
+<strong>Subject:</strong> Medley Music Access &amp; Inclusion — Insurance Application Materials</p>
+<hr>
+<p>Hi Meesh,</p>
+<p>Attached are the completed answers for both questionnaires (Abuse &amp; Molestation and Comprehensive), along with supporting documents for Medley Music Access &amp; Inclusion.</p>
+
+<p><strong>A few things to know upfront:</strong></p>
+<ul>
+  <li><strong>Entity structure:</strong> Green Wall Group LLC has existed for ~15 years (affordable housing, financial services — completely unrelated to this application). "Medley Music Access &amp; Inclusion" is a new DBA under that LLC for Jess's inclusive music education work. The insurance we're seeking covers <strong>only Medley's activities</strong> — the LLC's other business lines are separate and not part of this application.</li>
+  <li>Medley is in early startup. Jess currently runs the Adaptive Music Program at the Springfield Community Music School (communitymusicschool.com), where she's directed adaptive music instruction in public school classrooms for ~5 years, serving 600+ students with a team of 9 teaching artists. She will transition to Medley full-time at the end of June. Jen Kass and Jon Burgos both work with her there now. We have one school contract for adaptive music instruction starting February 24 (part-time, alongside her current role). PD offerings will begin ramping up in spring, with full operations starting summer 2026.</li>
+  <li>We need <strong>all coverage</strong> (general liability, BOP, and A&amp;M) in place before that first school date (Feb 24), which is the immediate driver here.</li>
+  <li>We are pre-revenue on the Medley side — all financial figures are first-year projections for Medley only.</li>
+</ul>
+
+<div>
+<ul>
+  <li>The supporting policy documents (staff handbook, acknowledgment form, media release) <strong>have been drafted for implementation and will be formally adopted and executed before February 24.</strong> They were developed based on our understanding of what's required for organizations working with minors and vulnerable individuals in Massachusetts. If the insurer has specific requirements or recommended changes, we're happy to adjust — we want to end up with policies that work for the insurer and for our business model and student population.</li>
+  <li><strong>Background checks:</strong> Our policy requires CORI, SORI, and FBI fingerprint checks for all staff with student contact, plus CORI/SORI for all owners. Jess (owner/director) and our two instructors (Jen and Jon) all hold valid, current CORI and FBI fingerprint clearances through their existing employer (Springfield Community Music School) where they do identical work — adaptive music instruction in public school classrooms. Our third employee is a graphic artist with no student contact. <strong>Medley's own independent CORI/SORI checks have been initiated</strong> and our policy requires completion within 30 days of start date. Our handbook allows staff with verified current clearances from a Massachusetts public school employer to begin work while Medley's own checks are processed. Can you confirm this approach works for the insurer, and advise how best to represent it on the forms?</li>
+</ul>
+</div>
+
+<p><strong>What we do:</strong> Medley provides (1) adaptive music instruction for students with disabilities, primarily in public school classrooms but occasionally at other community facilities such as libraries, and (2) professional development workshops for music educators, delivered at host sites and online. We are also developing an educational songbook. Medley does not own or lease any facilities — all in-person services take place at host locations.</p>
+
+<p><strong>What's attached:</strong></p>
+<ol>
+  <li>Abuse &amp; Molestation Questionnaire — completed answers</li>
+  <li>Comprehensive Questionnaire — completed answers</li>
+  <li>Staff Policy Handbook (includes abuse prevention, incident reporting, background check policies)</li>
+  <li>Policy Acknowledgment Form</li>
+  <li>Photo &amp; Media Release Form</li>
+  <li>Résumés — Jessica Corwin, Jen Kass, Jon Burgos</li>
+  <li>School contract [if available — otherwise note: "Will forward when finalized"]</li>
+</ol>
+
+<p>Let us know if anything needs clarification or if you'd prefer we fill out the actual PDF forms directly.</p>
+<p>Thanks,<br>Philip</p>
+<p>Philip Silva<br>The Green Wall Group LLC d/b/a Medley Music Access &amp; Inclusion</p>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.doc').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.top-bar a').forEach(a => a.classList.remove('active'));
+  document.getElementById('doc-' + id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

@@ -18,12 +18,16 @@
 I understand that:
 
 - These materials may be used for promotional and educational purposes
+- This permission is granted indefinitely unless revoked in writing
 - I will not receive compensation for this use
 - I may revoke this consent at any time by written notice to Medley
 - Medley will make reasonable efforts to remove content upon revocation, but cannot guarantee removal from all platforms or materials already in circulation
+- Medley may crop, edit, or resize images for formatting purposes
 - Images and descriptions will center the individual's participation and musicianship, using respectful, identity-first language
 - No image or recording will be used in a way that is demeaning, exploitative, or misrepresentative
 - No image or recording will be sold to third parties
+
+I release and hold harmless The Green Wall Group LLC d/b/a Medley Music Access & Inclusion, its owners, employees, and agents from any claims arising from the authorized use of these materials as described above.
 
 ---
 

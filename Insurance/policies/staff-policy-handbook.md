@@ -52,7 +52,8 @@ Medley maintains a zero-tolerance policy toward any form of abuse, neglect, mole
 
 ## 1.5 Supervision Requirements
 
-- When providing direct instruction to minors, at least one other adult (Medley staff or host-site staff) must be present or the instruction must take place in an observable setting (open door, windowed room, or visible to other adults).
+- When providing direct instruction to minors, at least one other adult (Medley staff or host-site staff) must be present or the instruction must take place in an observable setting.
+- **"Observable setting"** means a space where the instructor and students are visible and accessible to other adults who can reasonably monitor the session or enter the space if needed — for example, an open door to an occupied hallway, a windowed room facing a staffed area, or a shared classroom with other adults present.
 - No employee or volunteer may be alone in a closed, unobservable space with a minor.
 - When Medley operates within a host school or facility, Medley staff will comply with the host site's supervision policies in addition to this policy. Where the host site's policies are stricter than Medley's, the stricter policy applies.
 - If a suitable observable space is not available at a host site, the staff member must request a different location or arrange for another adult to be present before beginning a session.
@@ -79,7 +80,7 @@ All staff will:
 
 - Treat every student, participant, and colleague with dignity and respect
 - Maintain clear professional boundaries in all interactions
-- Use identity-first, respectful language when discussing disability (e.g., "disabled students," "autistic students," "nonspeaking students")
+- Use respectful language when discussing disability, following identity-first conventions (e.g., "disabled students," "autistic students," "nonspeaking students") unless an individual or family expresses a different preference
 - Recognize that our role is to serve learners, not to fix them
 - Defer to families and caregivers on matters of personal care, medical needs, and behavioral support outside the scope of music instruction
 
@@ -109,20 +110,21 @@ All staff-initiated contact is directly related to an instructional objective, l
 
 ### Student-Initiated Contact
 
-Students with developmental, sensory, and physical disabilities frequently initiate physical contact with trusted adults. This is a well-documented characteristic of this population and an expected part of the therapeutic and educational relationship. Students may seek physical closeness, lean against an instructor, reach for or grasp an instructor's hands or body, or sit in close physical proximity during instruction.
+Students with developmental, sensory, and physical disabilities frequently initiate physical contact with trusted adults. This is a well-documented characteristic of this population and an expected part of the therapeutic and educational relationship. Students may seek physical closeness, lean against an instructor, reach for or grasp an instructor's hands or body, climb into an instructor's lap, or sit in close physical proximity during instruction.
 
-When a student initiates contact, staff respond with professional judgment:
+When a student initiates contact, staff respond with professional clinical judgment:
 
-- Staff do not reject or abruptly remove a student who seeks physical closeness, as this can be harmful to the student's sense of safety and trust
-- Staff use their clinical and educational training to determine the appropriate response — which may include allowing the contact, gently redirecting, or using the moment as an instructional opportunity
-- Patterns of student-initiated contact are communicated to parents/guardians and the school team as part of ongoing collaboration about the student's needs and behaviors
-- All sessions, including those where student-initiated contact occurs, take place in observable environments
+- Staff do not abruptly reject or forcibly remove a student who seeks physical closeness, as this can cause distress and harm the student's sense of safety and trust. Instead, staff use their clinical and educational training to determine the appropriate response — which may include allowing the contact briefly, gently redirecting the student to a more appropriate position, or using the moment as an instructional opportunity.
+- When student-initiated contact goes beyond what is typical for the instructional task (e.g., a student climbing into an instructor's lap or seeking prolonged physical closeness), staff redirect when clinically appropriate and document the behavior in session notes.
+- Staff may always disengage from any contact at their own discretion, without fear of reprisal. Staff safety and comfort are also protected.
+- Expected student-initiated behaviors, including physical contact patterns, are discussed with parents/guardians and the school team **before the first session** as part of intake planning, and revisited as part of ongoing collaboration about the student's needs.
+- All sessions take place in observable environments with other adults present (see Section 1.5). In practice, Medley instructors work within active classrooms alongside school support staff — paraprofessionals, aides, and classroom teachers — who are present throughout the session.
 
 ### Safeguards
 
 - Staff narrate their actions during physical contact ("I'm going to help guide your hand to the drum") and monitor for the student's verbal and non-verbal responses throughout
 - Staff immediately cease contact upon any sign of discomfort, distress, or refusal
-- Physical support strategies are discussed with parents/guardians and the student's school team in advance when appropriate, and aligned with the student's existing educational or therapeutic plans (IEP, 504, etc.)
+- Physical support strategies are discussed with parents/guardians and the student's school team before the first session and aligned with the student's existing educational or therapeutic plans (IEP, 504, etc.)
 - All instruction involving physical contact takes place in observable environments (open doors, windowed rooms, or other adults present)
 
 ### Scope Limitations
@@ -172,7 +174,16 @@ Violations of this Code of Conduct will be addressed based on severity and may i
 
 Any conduct involving suspected abuse of a minor will result in immediate suspension pending investigation and mandatory reporting to DCF.
 
-## 2.8 Host School Compliance
+## 2.8 Emergency Procedures
+
+Medley operates within host schools and facilities that maintain their own emergency protocols. All staff must:
+
+- Complete any host-site emergency orientation or training required of contractors
+- Follow host-site protocols for medical emergencies, student elopement, building evacuation, and lockdown
+- Not administer medication or provide medical interventions — defer to school personnel or the student's designated support team
+- Notify the Director of any emergency or near-miss as soon as the situation is stabilized, and document it per the Incident Reporting Procedure (Part 5)
+
+## 2.9 Host School Compliance
 
 When working at host schools or facilities, Medley staff must:
 
@@ -227,19 +238,19 @@ Prior to beginning any work that involves contact with minors or vulnerable indi
 | SORI (Sex Offender Registry Information) — Massachusetts | Yes |
 | National criminal background check (name-based) | Yes |
 | National Sex Offender Public Website (NSOPW) search | Yes |
-| Fingerprint-based national criminal history check (FBI/CHSB) | Yes, for all staff entering school facilities |
+| Fingerprint-based national criminal history check (FBI/CHSB) | Yes, for all staff with direct student or participant contact |
 | Verification of identity (government-issued photo ID) | Yes |
 | Professional license/certification verification (where applicable) | Yes |
 
 If an individual has resided outside Massachusetts in the past 5 years, an out-of-state criminal records check is also required.
 
-Staff who hold current, valid fingerprint-based clearances through another Massachusetts employer (e.g., a school district) may provide documentation of that clearance. The Director will verify the clearance is current and will run Medley's own CORI/SORI checks in addition. The Green Wall Group LLC is registered as a CORI requester with the Massachusetts Criminal History Systems Board (CHSB).
+Staff who hold a current, valid fingerprint-based clearance through a Massachusetts public school district or licensed educational employer may begin work upon written verification of that clearance from the issuing employer, provided Medley's own CORI and SORI checks have been initiated. All Medley-required checks must be completed within 30 days of the staff member's start date. Documentation of outside clearances does not replace Medley's independent screening — it permits work to begin while Medley's own checks are processed. The Green Wall Group LLC is registered as a CORI requester with the Massachusetts Criminal History Systems Board (CHSB).
 
 ## 4.2 Timing
 
 - All required checks must be completed and reviewed **before** the individual has any contact with minors or vulnerable individuals
 - No individual may begin working with students until background check results have been received and reviewed by the Director
-- There are no exceptions to this requirement
+- The sole exception is the transition provision in Section 4.1: staff with verified current clearances from a Massachusetts public school or licensed educational employer may begin work while Medley's independent checks are completed, provided those checks have been initiated and will be completed within 30 days
 
 ## 4.3 Renewal
 
@@ -271,10 +282,10 @@ Other criminal history will be reviewed on a case-by-case basis, considering the
 
 ## 4.7 Owner Status
 
-Philip Silva (Owner/Business Manager) and Jessica Corwin (Owner/Director) are excluded from workers' compensation and payroll as LLC owners. However:
+Philip Silva (Owner/Business Manager) and Jessica Corwin (Owner/Director) are excluded from workers' compensation and payroll as LLC owners. Both are subject to background screening and all policies in this handbook.
 
-- **Jessica Corwin** provides direct adaptive music instruction to minors and is fully covered under all liability and abuse & molestation insurance. She is subject to all policies in this handbook and maintains current CORI/fingerprint clearance through her position as a Massachusetts public school teacher, in addition to Medley's own checks.
-- **Philip Silva** serves as Business Manager with no direct student contact. He is subject to the Code of Conduct and reporting obligations in this handbook but does not require the same level of background screening as client-facing staff.
+- **Jessica Corwin** provides direct adaptive music instruction to minors and is fully covered under all liability and abuse & molestation insurance. She is subject to all screening and conduct policies and maintains current CORI/fingerprint clearance through her position as a Massachusetts public school teacher, in addition to Medley's own checks.
+- **Philip Silva** serves as Business Manager with no direct student contact. He is subject to CORI and SORI screening, the Code of Conduct, and all reporting obligations in this handbook.
 
 ---
 
@@ -282,7 +293,7 @@ Philip Silva (Owner/Business Manager) and Jessica Corwin (Owner/Director) are ex
 
 ## 5.1 Mandated Reporter Designation
 
-All Medley staff who work with minors or vulnerable individuals are designated as **mandated reporters** under this policy. Massachusetts law specifically designates teachers, counselors, and certain other professionals as mandated reporters (M.G.L. c. 119, Section 51A). Medley extends this designation to all staff as a matter of organizational policy.
+Massachusetts law designates teachers, counselors, and certain other professionals as **mandated reporters** who are legally required to report suspected child abuse or neglect (M.G.L. c. 119, Section 51A). Staff who hold these professional roles are mandated reporters under state law. As a matter of organizational policy, Medley requires **all** staff — regardless of statutory status — to follow the same reporting procedures described in this section. Failure by any staff member to report as required by this policy is grounds for immediate termination.
 
 ## 5.2 What Must Be Reported
 
